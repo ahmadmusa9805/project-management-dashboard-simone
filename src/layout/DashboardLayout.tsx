@@ -1,4 +1,4 @@
-import React, {  useState } from 'react';
+import React, {  useEffect, useState } from 'react';
 import {
   DesktopOutlined,
   FileOutlined,
@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Breadcrumb, Button, Layout, Menu, theme } from 'antd';
-import {  useLocation, matchPath, redirect, Link, useNavigate } from 'react-router-dom';
+import {  useLocation, matchPath,  Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/green-logo.png';
 import { FaRegUser } from "react-icons/fa6";
 import { IoNotificationsOutline } from 'react-icons/io5';
@@ -82,12 +82,25 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
+
+
+// DashboardLayout component starts here
+
+
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [notifications, setNotifications] = useState(notificationData);
   const unreadCount = notifications.filter(n => !n.isRead).length;
   const navigate = useNavigate();
+const [onProfilePage, setOnProfilePage] = useState(false);
+const location = useLocation();
+
+useEffect(() => {
+  setOnProfilePage(location.pathname === '/profile');
+}, [location.pathname]);
+
+
 
 const handleOpenNotification = () => {
   setIsNotificationModalOpen(true);
@@ -99,11 +112,12 @@ const handleOpenNotification = () => {
 };
 
 
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   
-  const location = useLocation();
+ 
 
   const userRole = localStorage.getItem('role');
 
@@ -178,25 +192,34 @@ const userInfo: UserInfo = rawUser ? JSON.parse(rawUser) : {};
     )}
   </Button>
           </div>
-          <Link to={`/profile`}>
-              <div className="flex items-center gap-2 mr-8 ml-4">
-                {userInfo?.profileImg ? (
-  <img
-    src={userInfo.profileImg}
-    className="w-8 h-8 object-cover rounded-full"
-    alt="Profile"
-  />
-) : (
-  <div className="border rounded-full p-2">
-    <FaRegUser />
-  </div>
-)}
+          
+<div
+  className="flex items-center gap-2 mr-8 ml-4 cursor-pointer"
+  onClick={() => {
+    if (onProfilePage) {
+      navigate(-1);
+    } else {
+      navigate('/profile');
+    }
+  }}
+>
+  {userInfo?.profileImg ? (
+    <img
+      src={userInfo.profileImg}
+      className="w-8 h-8 object-cover rounded-full"
+      alt="Profile"
+    />
+  ) : (
+    <div className="border rounded-full p-2">
+      <FaRegUser />
+    </div>
+  )}
+  <h3 className="text-gray-500 font-semibold">
+    {userInfo?.name?.firstName} {userInfo?.name?.lastName}
+  </h3>
+</div>
 
-<h3 className="text-gray-500 font-semibold">
-  {userInfo?.name?.firstName} {userInfo?.name?.lastName}
-</h3>
-              </div>
-            </Link>
+            
 
           {/* <div className='flex items-center justify-between mr-12 p-2'>
              <div className='border rounded-full p-2'><FaRegUser  /></div>

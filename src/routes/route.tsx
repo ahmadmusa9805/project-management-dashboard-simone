@@ -11,10 +11,12 @@ import NotFoundPage from "../pages/NotFoundPage";
 import DashboardLayout from "../layout/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import DashbordPage from "../pages/DashbordPage";
-import ProjectDetailPage from "../pages/shared/ProjectDetailPage";
+import ProjectDetailPage from "../pages/projects/ProjectDetailPage";
 
-import AdminTable from "../pages/shared/UserManagement";
-import OngoingProjects from "../pages/projects/ongoingProjects/OngoingProjects";
+import AdminTable from "../pages/user/UserManagement";
+import OngoingProjects from "../pages/projects/OngoingProjects";
+import UserProfileEdit from "../pages/user/userProfileEdit";
+
 
 
 
@@ -39,6 +41,17 @@ const AppRoutes: React.FC = () => (
                     <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin", "client"]}>
                          <DashboardLayout>
                             <DashbordPage></DashbordPage>
+                         </DashboardLayout>
+                       
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/profile" 
+                element={
+                    <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin", "client"]}>
+                         <DashboardLayout>
+                           <UserProfileEdit></UserProfileEdit>
                          </DashboardLayout>
                        
                     </ProtectedRoute>

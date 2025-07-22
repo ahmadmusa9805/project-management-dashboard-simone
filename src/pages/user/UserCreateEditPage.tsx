@@ -51,9 +51,9 @@ const UserCreateEditPage = ({ mode, defaultValues, onSubmitSuccess, onCancel }: 
   const location = useLocation();
   const path = location.pathname;
 
-  const [createClient, clientStatus] = useCreateClientMutation();
-  const [createPrimeAdmin, primeStatus] = useCreatePrimeAdminMutation();
-  const [createBasicAdmin, basicStatus] = useCreateBasicAdminMutation();
+  const [createClient, ] = useCreateClientMutation();
+  const [createPrimeAdmin, ] = useCreatePrimeAdminMutation();
+  const [createBasicAdmin, ] = useCreateBasicAdminMutation();
 
   
 const allowedRoles = useMemo<FormData['role'][]>(() => {

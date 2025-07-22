@@ -1,14 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CustomCreateButton from "../../../components/CustomCreateButton";
-import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
-import CustomSharedPage from "../../../components/CustomSharedPage";
+import CustomCreateButton from "../../components/CustomCreateButton";
+import CustomViewMoreButton from "../../components/CustomViewMoreButton";
+import CustomSharedPage from "../../components/CustomSharedPage";
+import CreateProjectForm from "./CreatedAndEditProjectForm";
+import type { z } from 'zod';
+import type { projectSchema } from "../../types/projectAllTypes/projectSchema";
+import { Drawer } from "antd";
+
+type ProjectForm = z.infer<typeof projectSchema>;
+
 
 const OngoingProjects = () => {
   const navigate = useNavigate();
 
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [sharedProjectId, setSharedProjectId] = useState<number | null>(null);
+const [isCreateOpen, setIsCreateOpen] = useState(false);
+const [editProject, setEditProject] = useState<ProjectForm | null>(null);
+const [isEditOpen, setIsEditOpen] = useState(false);
+
 
   const projects = [
     { id: 1, title: "Green Villa Renovation", status: "Ongoing" },
@@ -27,9 +38,34 @@ const OngoingProjects = () => {
       case "view":
         navigate(`/projects/${projectId}`);
         break;
-      case "edit":
-        console.log("Edit project", projectId);
-        break;
+     case "edit":
+  // Simulate fetch or set dummy data for now
+  const selectedProject = projects.find((p) => p.id === projectId);
+  if (selectedProject) {
+    // You should fetch actual project data here from API
+    setEditProject({
+      projectName: selectedProject.title,
+      clientName: "Demo Client",
+      projectType: "Renovation",
+      description: "Editing project...",
+      startDate: "2024-10-01",
+      estimatedCompletionDate: "2024-12-31",
+      contractDate: "2024-09-20",
+      contractReference: "REF-001",
+      contractValue: 100000,
+      estimatedBudget: 120000,
+      overheadCost: 10000,
+      billingCurrency: "USD",
+      projectAddress: "123 Project Street",
+      primaryContact: "John Doe",
+      contractPdf: undefined,
+      milestones: [],
+      team: [],
+    });
+    setIsEditOpen(true);
+  }
+  break;
+
       case "share":
         setSharedProjectId(projectId);
         setIsShareOpen(true);
@@ -39,6 +75,20 @@ const OngoingProjects = () => {
         break;
     }
   };
+
+
+
+  const handleCreateProject = (data: ProjectForm) => {
+  console.log("New Project Created:", data);
+  setIsCreateOpen(false);
+};
+
+
+const handleEditProject = (data: ProjectForm) => {
+  console.log("Project Updated:", data);
+  setIsEditOpen(false);
+};
+
 
   const handleShare = (userIds: number[]) => {
     console.log(`Project ${sharedProjectId} shared with users:`, userIds);
@@ -51,7 +101,7 @@ const OngoingProjects = () => {
       <div className="w-full px-4 flex flex-col gap-4">
         {/* Create Button */}
         <div className="w-full flex justify-end">
-          <CustomCreateButton title="Create Project" />
+         <CustomCreateButton title="Create Project" onClick={() => setIsCreateOpen(true)} />
         </div>
 
         {/* Project Cards */}
@@ -115,6 +165,42 @@ const OngoingProjects = () => {
           </div>
         </div>
       )}
+
+     <Drawer
+  title="Create Project"
+  placement="right"
+  width={600}
+  onClose={() => setIsCreateOpen(false)}
+  open={isCreateOpen}
+  destroyOnClose
+>
+  <CreateProjectForm
+    onSubmit={handleCreateProject}
+    submitText="Create Project"
+  />
+</Drawer>
+
+<Drawer
+  title="Edit Project"
+  placement="right"
+  width={600}
+  onClose={() => setIsEditOpen(false)}
+  open={isEditOpen}
+  destroyOnClose
+>
+  {editProject && (
+    <CreateProjectForm
+      onSubmit={handleEditProject}
+      defaultValues={editProject}
+      submitText="Update Project"
+    />
+  )}
+</Drawer>
+
+
+
+
+
     </>
   );
 };
