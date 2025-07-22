@@ -11,8 +11,11 @@ import NotFoundPage from "../pages/NotFoundPage";
 import DashboardLayout from "../layout/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import DashbordPage from "../pages/DashbordPage";
+import ProjectDetailPage from "../pages/shared/ProjectDetailPage";
+
+import AdminTable from "../pages/shared/UserManagement";
 import OngoingProjects from "../pages/projects/ongoingProjects/OngoingProjects";
-import ProjectDetailPage from "../pages/projects/ProjectDetailPage";
+
 
 
 
@@ -28,6 +31,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/login" element={<LoginPage />} />
             
+            
  {/* Project List: All roles */}                             
             <Route
                 path="/dashboard" 
@@ -35,6 +39,17 @@ const AppRoutes: React.FC = () => (
                     <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin", "client"]}>
                          <DashboardLayout>
                             <DashbordPage></DashbordPage>
+                         </DashboardLayout>
+                       
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/prime-admins" 
+                element={
+                    <ProtectedRoute allowedRoles={["super-admin"]}>
+                         <DashboardLayout>
+                            <AdminTable></AdminTable>
                          </DashboardLayout>
                        
                     </ProtectedRoute>
@@ -48,7 +63,7 @@ const AppRoutes: React.FC = () => (
                 element={
                     <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin", "client"]}>
                          <DashboardLayout>
-                            <OngoingProjects></OngoingProjects>
+                           <OngoingProjects></OngoingProjects>
                          </DashboardLayout>
                        
                     </ProtectedRoute>
