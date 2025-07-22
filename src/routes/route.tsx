@@ -55,6 +55,28 @@ const AppRoutes: React.FC = () => (
                     </ProtectedRoute>
                 }
             />
+            <Route
+                path="/basic-admins" 
+                element={
+                    <ProtectedRoute allowedRoles={["super-admin"]}>
+                         <DashboardLayout>
+                            <AdminTable></AdminTable>
+                         </DashboardLayout>
+                       
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/Clients" 
+                element={
+                    <ProtectedRoute allowedRoles={["super-admin"]}>
+                         <DashboardLayout>
+                            <AdminTable></AdminTable>
+                         </DashboardLayout>
+                       
+                    </ProtectedRoute>
+                }
+            />
 
 
             {/* Project List: All roles */}                             

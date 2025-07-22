@@ -3,8 +3,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Input, Select, Button, Upload } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
+import { useCreateBasicAdminMutation, useCreateClientMutation, useCreatePrimeAdminMutation } from '../../Redux/features/users/usersApi';
+import { errorAlert, successAlert } from '../../utils/alerts';
+
 
 const { Option } = Select;
 
@@ -26,11 +30,11 @@ type FormData = z.infer<typeof schema>;
 interface Props {
   mode: 'create' | 'edit';
   defaultValues?: Partial<FormData>;
-  onSubmit: (data: FormData) => void;
+  onSubmitSuccess?: () => void;
   onCancel: () => void;
 }
 
-const UserCreateEditPage = ({ mode, defaultValues, onSubmit, onCancel }: Props) => {
+const UserCreateEditPage = ({ mode, defaultValues, onSubmitSuccess, onCancel }: Props) => {
   const {
     control,
     handleSubmit,
@@ -46,23 +50,34 @@ const UserCreateEditPage = ({ mode, defaultValues, onSubmit, onCancel }: Props) 
   const [newProjectType, setNewProjectType] = useState('');
   const location = useLocation();
   const path = location.pathname;
-  
-let allowedRoles: FormData['role'][] = [];
-let showClientFields = false;
 
-if (path.includes('prime-admins')) {
-  allowedRoles = mode === 'edit' ? ['prime-admin', 'basic-admin'] : ['prime-admin'];
-} else if (path.includes('basic-admins')) {
-  allowedRoles = ['basic-admin'];
-} else if (path.includes('clients')) {
-  allowedRoles = ['client'];
-  showClientFields = true;
-}
-useEffect(() => {
-  if (mode === 'create' && allowedRoles.length === 1) {
-    setValue('role', allowedRoles[0]);
+  const [createClient, clientStatus] = useCreateClientMutation();
+  const [createPrimeAdmin, primeStatus] = useCreatePrimeAdminMutation();
+  const [createBasicAdmin, basicStatus] = useCreateBasicAdminMutation();
+
+  
+const allowedRoles = useMemo<FormData['role'][]>(() => {
+  if (path.includes('prime-admins')) {
+    return mode === 'edit' ? ['prime-admin', 'basic-admin'] : ['prime-admin'];
+  } else if (path.includes('basic-admins')) {
+    return ['basic-admin'];
+  } else if (path.includes('clients')) {
+    return ['client'];
+  } else {
+    return [];
   }
-}, [mode, allowedRoles, setValue]);
+}, [path, mode]);
+
+const showClientFields = useMemo(() => {
+  return path.includes('clients');
+}, [path]);
+
+
+  useEffect(() => {
+    if (mode === 'create' && allowedRoles.length === 1) {
+      setValue('role', allowedRoles[0]);
+    }
+  }, [mode, allowedRoles, setValue]);
 
   const role = watch('role');
 
@@ -74,9 +89,35 @@ useEffect(() => {
     }
   };
 
+  const handleFormSubmit = async (data: FormData) => {
+    try {
+      if (mode === 'edit') {
+        // Edit logic here (if implemented)
+        return;
+      }
+
+      let response;
+      if (data.role === 'client') {
+        response = await createClient(data).unwrap();
+      } else if (data.role === 'prime-admin') {
+        response = await createPrimeAdmin(data).unwrap();
+      } else if (data.role === 'basic-admin') {
+        response = await createBasicAdmin(data).unwrap();
+      }
+      onSubmitSuccess?.();
+      console.log('User created successfully:', response);
+      if(response.success) {
+        successAlert('success',response.message);
+      }   
+    } catch (err: any) {
+errorAlert('Error', err?.data?.message);
+    }
+  };
+
+
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(handleFormSubmit)}
       className="w-full bg-white rounded shadow-lg p-6 flex flex-col gap-6"
     >
       <h2 className="text-2xl font-semibold text-[#000E0F]">

@@ -8,6 +8,6 @@ export interface AuthResponse {
   user: {
     id: string;
     email: string;
-    role: 'super-admin' | 'prime_admin' | 'basic_admin' | 'client';
+    role: 'super-admin' | 'prime-admin' | 'basic-admin' | 'client';
   };
 }
