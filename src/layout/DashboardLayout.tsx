@@ -45,11 +45,21 @@ function getItem(
 
 // Submenu for Super / Prime Admin
 const projectSubMenuSuperPrime: MenuItem[] = [
+  getItem('Dashbord', '/project-Dashbord', <TeamOutlined />),
+  getItem('Project Details', '/project-details', <TeamOutlined />),
+  getItem('Quote Details', '/quote-details', <TeamOutlined />),
+  getItem('Interim Evaluation', '/interim-evaluation', <TeamOutlined />),
   getItem('Cost Management', '/cost-management', <TeamOutlined />),
   getItem('Payment Tracker', '/payment-tracker', <TeamOutlined />),
+  getItem('Site Pictures & Reports', '/site-pictures-reports', <TeamOutlined />),
   getItem('Handover Tool', '/handover-tool', <TeamOutlined />),
   getItem('Notes', '/notes', <TeamOutlined />),
+  getItem('Certificates', '/certificates', <TeamOutlined />),
+  getItem('Documents', '/documents', <TeamOutlined />),
+  getItem('Second Fixed list (Material)', '/second-fixed-list-material', <TeamOutlined />),
+  getItem('Time Schedule', '/time-schedule', <TeamOutlined />),
   getItem('Snagging List', '/snagging-list', <TeamOutlined />),
+  getItem('Client Details', '/client-details', <TeamOutlined />),
 ];
 
 // Submenu for Basic Admin

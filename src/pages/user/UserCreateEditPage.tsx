@@ -21,7 +21,7 @@ const schema = z.object({
   estimateNumber: z.string().optional(),
   projectType: z.string().optional(),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['prime-admin', 'basic-admin', 'client'], 'User type is required'),
+  role: z.enum(['super-admin','prime-admin', 'basic-admin', 'client'], 'User type is required'),
   photo: z.any().optional(),
 });
 

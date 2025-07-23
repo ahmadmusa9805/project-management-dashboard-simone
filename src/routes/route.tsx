@@ -15,7 +15,8 @@ import ProjectDetailPage from "../pages/projects/ProjectDetailPage";
 
 import AdminTable from "../pages/user/UserManagement";
 import OngoingProjects from "../pages/projects/OngoingProjects";
-import UserProfileEdit from "../pages/user/userProfileEdit";
+import UserProfileEdit from "../pages/user/UserProfileEdit";
+
 
 
 

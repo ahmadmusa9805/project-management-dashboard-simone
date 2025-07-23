@@ -1,9 +1,7 @@
-
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Input, Select, DatePicker, InputNumber, Button, Space, Row, Col, Upload } from 'antd';
-
 import { CloudUpload } from 'lucide-react';
 import moment from 'moment';
 import { projectSchema } from '../../types/projectAllTypes/projectSchema';
@@ -27,7 +25,6 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
   const {
     control,
     handleSubmit,
-    
     formState: { errors },
   } = useForm<ProjectForm>({
     resolver: zodResolver(projectSchema),
@@ -47,212 +44,209 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
     <form onSubmit={handleSubmit(onSubmit)} className="w-full bg-white p-6 flex flex-col gap-6">
       <h2 className="text-2xl font-semibold text-[#000E0F]">{submitText}</h2>
 
-      <Controller
-        control={control}
-        name="projectName"
-        render={({ field }) => (
-          <Input {...field} placeholder="Project Name" status={errors.projectName ? 'error' : ''} />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="clientName"
-        render={({ field }) => (
-          <Input {...field} placeholder="Client Name" status={errors.clientName ? 'error' : ''} />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="projectType"
-        render={({ field }) => (
-          <Select {...field} placeholder="Select Project Type">
-            <Option value="Renovation">Renovation</Option>
-            <Option value="New Build">New Build</Option>
-            <Option value="Extension">Extension</Option>
-          </Select>
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="description"
-        render={({ field }) => (
-          <Input.TextArea {...field} placeholder="Description" rows={4} />
-        )}
-      />
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Controller
-          
-            control={control}
-            name="startDate"
-            
-            render={({ field }) => (
-              <DatePicker
-              placeholder="Start Date"
-                {...field}
-                value={field.value ? moment(field.value) : null}
-                onChange={(_, dateString) => field.onChange(dateString)}
-                style={{ width: '100%' }}
-              />
-            )}
-          />
-        </Col>
-        <Col span={12}>
-          <Controller
-            control={control}
-            name="estimatedCompletionDate"
-            render={({ field }) => (
-              <DatePicker
-                placeholder="Estimated Completion Date"
-                {...field}
-                value={field.value ? moment(field.value) : null}
-                onChange={(_, dateString) => field.onChange(dateString)}
-                style={{ width: '100%' }}
-              />
-            )}
-          />
-        </Col>
-      </Row>
-
-      <Row gutter={25}>
-        <Col span={12}>
-          <Controller
-            control={control}
-            name="contractDate"
-            render={({ field }) => (
-              <DatePicker
-                placeholder="Contract Date"
-                {...field}
-                value={field.value ? moment(field.value) : null}
-                onChange={(_, dateString) => field.onChange(dateString)}
-                style={{ width: '100%' }}
-              />
-            )}
-          />
-        </Col>
-
-        <Col span={12}>
-          <Controller
-            control={control}
-            name="contractPdf"
-            render={({ field }) => (
-              <Dragger
-                name="file"
-                accept=".pdf"
-                beforeUpload={(file) => {
-                  field.onChange(file);
-                  return false;
-                }}
-                multiple={false}
-                fileList={field.value ? [field.value] : []}
-                onRemove={() => field.onChange(undefined)}
-              >
-                <p className="text-center flex flex-col items-center">
-                  <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
-                </p>
-                <p className="text-[10px]">Click or drag PDF to upload</p>
-              </Dragger>
-            )}
-          />
-        </Col>
-      </Row>
-
-      <Controller
-        control={control}
-        name="contractReference"
-        render={({ field }) => (
-          <Input {...field} placeholder="Contract Reference" />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="contractValue"
-        render={({ field }) => (
-          <InputNumber {...field} style={{ width: '100%' }} placeholder="Contract Value" />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="estimatedBudget"
-        render={({ field }) => (
-          <InputNumber {...field} style={{ width: '100%' }} placeholder="Estimated Budget" />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="overheadCost"
-        render={({ field }) => (
-          <InputNumber {...field} style={{ width: '100%' }} placeholder="Overhead Cost" />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="billingCurrency"
-        render={({ field }) => (
-          <Select {...field} placeholder="Billing Currency">
-            <Option value="USD">USD</Option>
-            <Option value="GBP">GBP</Option>
-            <Option value="EUR">EUR</Option>
-          </Select>
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="projectAddress"
-        render={({ field }) => (
-          <Input {...field} placeholder="Project Address" />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="primaryContact"
-        render={({ field }) => (
-          <Input {...field} placeholder="Primary Contact" />
-        )}
-      />
-
-      <div className="flex flex-col gap-4">
-        <label className="font-medium">Milestones</label>
-        {fields.map((item, index) => (
-          <Space key={item.id} style={{ marginBottom: 8 }} align="baseline" wrap>
+      <div className="flex flex-col gap-3">
+        {[
+          ['projectName', 'Project Name'],
+          ['clientName', 'Client Name'],
+          ['description', 'Description'],
+          ['contractReference', 'Contract Reference'],
+          ['projectAddress', 'Project Address'],
+          ['primaryContact', 'Primary Contact'],
+        ].map(([name, label]) => (
+          <div key={name} className="flex flex-col gap-1">
+            <label htmlFor={name} className="font-medium">{label}</label>
             <Controller
               control={control}
-              name={`milestones.${index}.name`}
+              name={name as keyof ProjectForm}
               render={({ field }) => (
-                <Input placeholder="Milestone Title" {...field} />
+                name === 'description' ? (
+                  <Input.TextArea {...field} id={name} rows={4} />
+                ) : (
+                  <Input {...field} id={name} />
+                )
               )}
             />
-            <Controller
-              control={control}
-              name={`milestones.${index}.date`}
-              render={({ field }) => (
-                <DatePicker
-                  value={field.value ? moment(field.value, 'YYYY-MM-DD') : null}
-                  onChange={(_, dateString) => field.onChange(dateString)}
-                  style={{ width: 150 }}
-                />
-              )}
-            />
-            <Input placeholder="Note (optional)" />
-            <Button danger onClick={() => remove(index)}>Remove</Button>
-          </Space>
+          </div>
         ))}
-        <Button
-          type="dashed"
-          onClick={() => append({ name: '', date: moment().format('YYYY-MM-DD') })}
-        >
-          + Add Milestone
-        </Button>
+
+        {/* Project Type */}
+        <div className="flex flex-col gap-1">
+          <label htmlFor="projectType" className="font-medium">Project Type</label>
+          <Controller
+            control={control}
+            name="projectType"
+            render={({ field }) => (
+              <Select {...field} id="projectType" placeholder="Select Project Type">
+                <Option value="Renovation">Renovation</Option>
+                <Option value="New Build">New Build</Option>
+                <Option value="Extension">Extension</Option>
+              </Select>
+            )}
+          />
+        </div>
+
+        {/* Date Pickers */}
+       {/* Start & Estimated Completion Date */}
+<Row gutter={16}>
+  <Col span={12}>
+    <div className="flex flex-col gap-1">
+      <label className="font-medium">Start Date</label>
+      <Controller
+        control={control}
+        name="startDate"
+        render={({ field }) => (
+          <DatePicker
+            placeholder="Start Date"
+            {...field}
+            value={field.value ? moment(field.value) : null}
+            onChange={(_, dateString) => field.onChange(dateString)}
+            style={{ width: '100%' }}
+          />
+        )}
+      />
+    </div>
+  </Col>
+
+  <Col span={12}>
+    <div className="flex flex-col gap-1">
+      <label className="font-medium">Estimated Completion Date</label>
+      <Controller
+        control={control}
+        name="estimatedCompletionDate"
+        render={({ field }) => (
+          <DatePicker
+            placeholder="Estimated Completion Date"
+            {...field}
+            value={field.value ? moment(field.value) : null}
+            onChange={(_, dateString) => field.onChange(dateString)}
+            style={{ width: '100%' }}
+          />
+        )}
+      />
+    </div>
+  </Col>
+</Row>
+
+{/* Contract Date & PDF Upload */}
+<Row gutter={16}>
+  <Col span={12}>
+    <div className="flex flex-col gap-1">
+      <label className="font-medium">Contract Date</label>
+      <Controller
+        control={control}
+        name="contractDate"
+        render={({ field }) => (
+          <DatePicker
+            placeholder="Contract Date"
+            {...field}
+            value={field.value ? moment(field.value) : null}
+            onChange={(_, dateString) => field.onChange(dateString)}
+            style={{ width: '100%' }}
+          />
+        )}
+      />
+    </div>
+  </Col>
+
+  <Col span={12}>
+    <div className="flex flex-col gap-1">
+      <label className="font-medium">Contract PDF</label>
+      <Controller
+        control={control}
+        name="contractPdf"
+        render={({ field }) => (
+          <Dragger
+            name="file"
+            accept=".pdf"
+            beforeUpload={(file) => {
+              field.onChange(file);
+              return false;
+            }}
+            multiple={false}
+            fileList={field.value ? [field.value] : []}
+            onRemove={() => field.onChange(undefined)}
+            style={{ padding: '8px' }}
+          >
+            <p className="text-center flex flex-col items-center">
+              <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+            </p>
+            <p className="text-[10px]">Click or drag PDF to upload</p>
+          </Dragger>
+        )}
+      />
+    </div>
+  </Col>
+</Row>
+
+
+        {/* Numeric Fields */}
+        {[
+          ['contractValue', 'Contract Value'],
+          ['estimatedBudget', 'Estimated Budget'],
+          ['overheadCost', 'Overhead Cost'],
+        ].map(([name, label]) => (
+          <div key={name} className="flex flex-col gap-1">
+            <label htmlFor={name} className="font-medium">{label}</label>
+            <Controller
+              control={control}
+              name={name as keyof ProjectForm}
+              render={({ field }) => (
+                <InputNumber {...field} style={{ width: '100%' }} id={name} />
+              )}
+            />
+          </div>
+        ))}
+
+        {/* Billing Currency */}
+        <div className="flex flex-col gap-1">
+          <label htmlFor="billingCurrency" className="font-medium">Billing Currency</label>
+          <Controller
+            control={control}
+            name="billingCurrency"
+            render={({ field }) => (
+              <Select {...field} id="billingCurrency" placeholder="Billing Currency">
+                <Option value="USD">USD</Option>
+                <Option value="GBP">GBP</Option>
+                <Option value="EUR">EUR</Option>
+              </Select>
+            )}
+          />
+        </div>
+
+        {/* Milestones */}
+        <div className="flex flex-col gap-4">
+          <label className="font-medium">Milestones</label>
+          {fields.map((item, index) => (
+            <Space key={item.id} style={{ marginBottom: 8 }} align="baseline" wrap>
+              <Controller
+                control={control}
+                name={`milestones.${index}.name` as const}
+                render={({ field }) => (
+                  <Input placeholder="Milestone Title" {...field} />
+                )}
+              />
+              <Controller
+                control={control}
+                name={`milestones.${index}.date` as const}
+                render={({ field }) => (
+                  <DatePicker
+                    value={field.value ? moment(field.value, 'YYYY-MM-DD') : null}
+                    onChange={(_, dateString) => field.onChange(dateString)}
+                    style={{ width: 150 }}
+                  />
+                )}
+              />
+              <Input placeholder="Note (optional)" />
+              <Button danger onClick={() => remove(index)}>Remove</Button>
+            </Space>
+          ))}
+          <Button
+            type="dashed"
+            onClick={() => append({ name: '', date: moment().format('YYYY-MM-DD') })}
+          >
+            + Add Milestone
+          </Button>
+        </div>
       </div>
 
       <div className="flex justify-end">
