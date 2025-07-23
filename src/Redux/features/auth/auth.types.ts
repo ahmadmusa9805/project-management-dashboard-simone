@@ -11,3 +11,17 @@ export interface AuthResponse {
     role: 'super-admin' | 'prime-admin' | 'basic-admin' | 'client';
   };
 }
+
+
+export interface User {
+  id: string;
+  email: string;
+  role: "super-admin" | "prime-admin" | "basic-admin" | "client";
+}
+
+
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+}

@@ -16,9 +16,9 @@ const OngoingProjects = () => {
 
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [sharedProjectId, setSharedProjectId] = useState<number | null>(null);
-const [isCreateOpen, setIsCreateOpen] = useState(false);
-const [editProject, setEditProject] = useState<ProjectForm | null>(null);
-const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editProject, setEditProject] = useState<ProjectForm | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
 
   const projects = [
@@ -38,33 +38,33 @@ const [isEditOpen, setIsEditOpen] = useState(false);
       case "view":
         navigate(`/projects/${projectId}`);
         break;
-     case "edit":
-  // Simulate fetch or set dummy data for now
-  const selectedProject = projects.find((p) => p.id === projectId);
-  if (selectedProject) {
-    // You should fetch actual project data here from API
-    setEditProject({
-      projectName: selectedProject.title,
-      clientName: "Demo Client",
-      projectType: "Renovation",
-      description: "Editing project...",
-      startDate: "2024-10-01",
-      estimatedCompletionDate: "2024-12-31",
-      contractDate: "2024-09-20",
-      contractReference: "REF-001",
-      contractValue: 100000,
-      estimatedBudget: 120000,
-      overheadCost: 10000,
-      billingCurrency: "USD",
-      projectAddress: "123 Project Street",
-      primaryContact: "John Doe",
-      contractPdf: undefined,
-      milestones: [],
-      team: [],
-    });
-    setIsEditOpen(true);
-  }
-  break;
+      case "edit":
+        // Simulate fetch or set dummy data for now
+        const selectedProject = projects.find((p) => p.id === projectId);
+        if (selectedProject) {
+          // You should fetch actual project data here from API
+          setEditProject({
+            projectName: selectedProject.title,
+            clientName: "Demo Client",
+            projectType: "Renovation",
+            description: "Editing project...",
+            startDate: "2024-10-01",
+            estimatedCompletionDate: "2024-12-31",
+            contractDate: "2024-09-20",
+            contractReference: "REF-001",
+            contractValue: 100000,
+            estimatedBudget: 120000,
+            overheadCost: 10000,
+            billingCurrency: "USD",
+            projectAddress: "123 Project Street",
+            primaryContact: "John Doe",
+            contractPdf: undefined,
+            milestones: [],
+            team: [],
+          });
+          setIsEditOpen(true);
+        }
+        break;
 
       case "share":
         setSharedProjectId(projectId);
@@ -79,15 +79,15 @@ const [isEditOpen, setIsEditOpen] = useState(false);
 
 
   const handleCreateProject = (data: ProjectForm) => {
-  console.log("New Project Created:", data);
-  setIsCreateOpen(false);
-};
+    console.log("New Project Created:", data);
+    setIsCreateOpen(false);
+  };
 
 
-const handleEditProject = (data: ProjectForm) => {
-  console.log("Project Updated:", data);
-  setIsEditOpen(false);
-};
+  const handleEditProject = (data: ProjectForm) => {
+    console.log("Project Updated:", data);
+    setIsEditOpen(false);
+  };
 
 
   const handleShare = (userIds: number[]) => {
@@ -101,7 +101,7 @@ const handleEditProject = (data: ProjectForm) => {
       <div className="w-full px-4 flex flex-col gap-4">
         {/* Create Button */}
         <div className="w-full flex justify-end">
-         <CustomCreateButton title="Create Project" onClick={() => setIsCreateOpen(true)} />
+          <CustomCreateButton title="Create Project" onClick={() => setIsCreateOpen(true)} />
         </div>
 
         {/* Project Cards */}
@@ -166,36 +166,36 @@ const handleEditProject = (data: ProjectForm) => {
         </div>
       )}
 
-     <Drawer
-  title="Create Project"
-  placement="right"
-  width={600}
-  onClose={() => setIsCreateOpen(false)}
-  open={isCreateOpen}
-  destroyOnClose
->
-  <CreateProjectForm
-    onSubmit={handleCreateProject}
-    submitText="Create Project"
-  />
-</Drawer>
+      <Drawer
+        title="Create Project"
+        placement="right"
+        width={600}
+        onClose={() => setIsCreateOpen(false)}
+        open={isCreateOpen}
+        destroyOnClose
+      >
+        <CreateProjectForm
+          onSubmit={handleCreateProject}
+          submitText="Create Project"
+        />
+      </Drawer>
 
-<Drawer
-  title="Edit Project"
-  placement="right"
-  width={600}
-  onClose={() => setIsEditOpen(false)}
-  open={isEditOpen}
-  destroyOnClose
->
-  {editProject && (
-    <CreateProjectForm
-      onSubmit={handleEditProject}
-      defaultValues={editProject}
-      submitText="Update Project"
-    />
-  )}
-</Drawer>
+      <Drawer
+        title="Edit Project"
+        placement="right"
+        width={600}
+        onClose={() => setIsEditOpen(false)}
+        open={isEditOpen}
+        destroyOnClose
+      >
+        {editProject && (
+          <CreateProjectForm
+            onSubmit={handleEditProject}
+            defaultValues={editProject}
+            submitText="Update Project"
+          />
+        )}
+      </Drawer>
 
 
 

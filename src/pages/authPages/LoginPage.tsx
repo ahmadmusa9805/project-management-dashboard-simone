@@ -1,7 +1,7 @@
 
 
 import { useState } from "react";
-import {  Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import greenLogo from "../../assets/green-logo.png";
@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../Redux/features/auth/authSlice";
 import { useLoginMutation } from "../../Redux/features/auth/authApi";
 import type { AppDispatch } from "../../Redux/app/store";
+import { successAlert } from "../../utils/alerts";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,17 +29,11 @@ const LoginPage = () => {
       console.log("Login successful:", result);
 
       localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user));
       localStorage.setItem("role", result.user.role);
 
 
-      Swal.fire({
-        icon: "success",
-        title: "Login successful",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-
-
+      successAlert("Login successful", "You have successfully logged in.");
 
       navigate("/dashboard");
     } catch (error: any) {
