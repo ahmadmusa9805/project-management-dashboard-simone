@@ -35,7 +35,7 @@ function getItem(
 }
 
 const mainItemsForSuperAdmin: MenuItem[] = [
-  getItem('Dashboard', '/welcome', <PieChartOutlined />),
+  getItem('Dashboard', '/', <PieChartOutlined />),
   getItem('Ongoing Projects', '/projects', <DesktopOutlined />),
   getItem('Completed Projects', '/projects?status=completed', <FileOutlined />),
   getItem('Super Admins', '/super-admin', <TeamOutlined />),
@@ -43,12 +43,21 @@ const mainItemsForSuperAdmin: MenuItem[] = [
   getItem('Basic Admins', '/basic-admins', <TeamOutlined />),
   getItem('Clients', '/clients', <TeamOutlined />),
 ];
+const mainItemsForPrimeAndBasicAdmin = (userRole: string): MenuItem[] => {
+  const items: MenuItem[] = [];
 
-const mainItemsForPrimeAndBasicAdmin: MenuItem[] = [
-  getItem('Dashboard', '/welcome', <PieChartOutlined />),
-  getItem('Ongoing Projects', '/projects', <DesktopOutlined />),
-  getItem('Completed Projects', '/projects?status=completed', <FileOutlined />),
-];
+  if (userRole === 'prime-admin') {
+    items.push(getItem('Dashboard', '/welcome', <PieChartOutlined />));
+  }
+
+  items.push(
+    getItem('Ongoing Projects', '/projects', <DesktopOutlined />),
+    getItem('Completed Projects', '/projects?status=completed', <FileOutlined />)
+  );
+
+  return items;
+};
+
 
 const DashboardLayout: React.FC = () => {
    const [collapsed, setCollapsed] = useState(false);
@@ -75,7 +84,7 @@ const DashboardLayout: React.FC = () => {
   if (userRole === 'super-admin') {
     mainItems = [...mainItemsForSuperAdmin];
   } else if (userRole === 'prime-admin' || userRole === 'basic-admin') {
-    mainItems = [...mainItemsForPrimeAndBasicAdmin];
+    mainItems = mainItemsForPrimeAndBasicAdmin(userRole);
   }
 
   if (isInProjectDetail && projectId) {
@@ -99,8 +108,6 @@ const DashboardLayout: React.FC = () => {
     }
     mainItems = projectMenuItems;
   }
-
-
   const rawUser = localStorage.getItem("user");
   const userInfo = rawUser ? JSON.parse(rawUser) : {};
 
