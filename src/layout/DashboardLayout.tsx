@@ -35,10 +35,10 @@ function getItem(
 }
 
 const mainItemsForSuperAdmin: MenuItem[] = [
-  getItem('Dashboard', '/', <PieChartOutlined />),
+  getItem('Dashboard', '/dashboard', <PieChartOutlined />),
   getItem('Ongoing Projects', '/projects', <DesktopOutlined />),
   getItem('Completed Projects', '/projects?status=completed', <FileOutlined />),
-  getItem('Super Admins', '/super-admin', <TeamOutlined />),
+  
   getItem('Prime Admins', '/prime-admins', <TeamOutlined />),
   getItem('Basic Admins', '/basic-admins', <TeamOutlined />),
   getItem('Clients', '/clients', <TeamOutlined />),

@@ -167,7 +167,7 @@ import SnaggingListPage from "../pages/SnaggingListPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import DashboardLayout from "../layout/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
-import DashbordPage from "../pages/DashbordPage";
+import DashbordPage from "../pages/dashbord/DashbordPage";
 import AdminTable from "../pages/user/UserManagement";
 import OngoingProjects from "../pages/projects/OngoingProjects";
 import UserProfileEdit from "../pages/user/UserProfileEdit";
