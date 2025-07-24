@@ -23,28 +23,19 @@
 // import TimeSchedulePage from "../pages/projects/specificProjectDetails/TimeSchedulePage";
 // import ClientDetailsPage from "../pages/projects/specificProjectDetails/ClientDetailsPage";
 
-
-
-
-
-
-
 // // Import your page components here
 
 // // Example role-based route guard (replace with your actual auth logic)
 
-
 // const AppRoutes: React.FC = () => (
-    
+
 //         <Routes>
 //             <Route path="/welcome" element={<WelcomePage />} />
 //             <Route path="/login" element={<LoginPage />} />
-            
-            
-//  {/* Project List: All roles */}                             
-       
 
-// {/*            
+//  {/* Project List: All roles */}
+
+// {/*
 // <Route
 //   path="/projects/:projectId"
 //   element={
@@ -69,8 +60,6 @@
 // </Route>
 //       */}
 
-
-
 //  <Route
 //       path="/projects/:projectId"
 //       element={
@@ -93,10 +82,6 @@
 //       <Route path="handover-tool" element={<HandoverToolPage />} />
 //       <Route path="notes" element={<NotesPage />} />
 //     </Route>
-
-
-
-
 
 // {/* <Route path="/projects/:projectId/interim-evaluation" element={
 //   <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
@@ -141,21 +126,12 @@
 // } />
 //  */}
 
-     
 //  <Route path="*" element={<NotFoundPage />} />
 //         </Routes>
-   
+
 // );
 
-
-
 // export default AppRoutes;
-
-
-
-
-
-
 
 import React from "react";
 import { Routes, Route } from "react-router-dom";
@@ -181,6 +157,7 @@ import DocumentsPage from "../pages/projects/specificProjectDetails/DocumentsPag
 import SecondFixedListPage from "../pages/projects/specificProjectDetails/SecondFixedListPage";
 import TimeSchedulePage from "../pages/projects/specificProjectDetails/TimeSchedulePage";
 import ClientDetailsPage from "../pages/projects/specificProjectDetails/ClientDetailsPage";
+import ReusableDocumentPage from "../components/ReusableDocumentPage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -192,7 +169,14 @@ const AppRoutes: React.FC = () => {
       {/* Protected Parent Route with Layout */}
       <Route
         element={
-          <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin", "client"]}>
+          <ProtectedRoute
+            allowedRoles={[
+              "super-admin",
+              "prime-admin",
+              "basic-admin",
+              "client",
+            ]}
+          >
             <DashboardLayout />
           </ProtectedRoute>
         }
@@ -210,16 +194,26 @@ const AppRoutes: React.FC = () => {
           <Route path="dashboard" element={<ProjectDashboard />} />
           <Route path="details" element={<ProjectDetailsPage />} />
           <Route path="quote-details" element={<QuoteDetailsPage />} />
-          <Route path="interim-evaluation" element={<InterimEvaluationPage />} />
-          <Route path="site-pictures-reports" element={<SitePicturesReportsPage />} />
+          <Route
+            path="interim-evaluation"
+            element={<InterimEvaluationPage />}
+          />
+          <Route
+            path="site-pictures-reports"
+            element={<SitePicturesReportsPage />}
+          />
           <Route path="certificates" element={<CertificatesPage />} />
           <Route path="documents" element={<DocumentsPage />} />
-          <Route path="second-fixed-list-material" element={<SecondFixedListPage />} />
+          <Route
+            path="second-fixed-list-material"
+            element={<SecondFixedListPage />}
+          />
           <Route path="time-schedule" element={<TimeSchedulePage />} />
           <Route path="client-details" element={<ClientDetailsPage />} />
           <Route path="handover-tool" element={<HandoverToolPage />} />
           <Route path="notes" element={<NotesPage />} />
           <Route path="snagging-list" element={<SnaggingListPage />} />
+          <Route path="quote-documents" element={<ReusableDocumentPage />} />
         </Route>
       </Route>
 

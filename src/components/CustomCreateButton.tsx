@@ -1,11 +1,14 @@
-import React from 'react';
+import React from "react";
 
 interface CustomCreateButtonProps {
   onClick?: () => void;
-   title?: string;
+  title?: string;
 }
 
-const CustomCreateButton: React.FC<CustomCreateButtonProps> = ({ onClick,title }) => {
+const CustomCreateButton: React.FC<CustomCreateButtonProps> = ({
+  onClick,
+  title,
+}) => {
   return (
     <button
       onClick={onClick}
