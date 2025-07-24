@@ -48,7 +48,7 @@ const ReusableDocumentPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4">
+    <div className=" flex flex-col gap-4 p-4">
       <h1 className="text-2xl font-bold mb-2">Documents for {quoteTitle}</h1>
 
       {documents.map((doc) => (
@@ -93,7 +93,7 @@ const ReusableDocumentPage: React.FC = () => {
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
-        width="90%"
+        width=""
         style={{ top: 20 }}
       >
         <ReusableDocumentViewer />

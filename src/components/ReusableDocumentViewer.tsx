@@ -4,7 +4,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { useSelector } from "react-redux";
 import type { RootState } from "../Redux/app/store";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 const ReusableDocumentViewer: React.FC = () => {
   const fileUrl = useSelector((state: RootState) => state.document.currentFile);
@@ -37,7 +37,6 @@ const ReusableDocumentViewer: React.FC = () => {
       });
 
     return () => {
-      // Cleanup
       if (blobUrl) URL.revokeObjectURL(blobUrl);
     };
   }, [fileUrl]);
@@ -47,7 +46,6 @@ const ReusableDocumentViewer: React.FC = () => {
     setPageNumber(1);
   };
 
-  const handlePrint = () => window.print();
   const handleDownload = () => {
     if (fileUrl) {
       const link = document.createElement("a");
@@ -57,63 +55,76 @@ const ReusableDocumentViewer: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (!fileUrl || !isPdf) return;
-
-    console.log("📄 Fetching PDF:", fileUrl); // 👈 log
-
-    setLoading(true);
-    fetch(fileUrl)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch PDF");
-        return res.blob();
-      })
-      .then((blob) => {
-        const blobURL = URL.createObjectURL(blob);
-        console.log("✅ Blob URL created:", blobURL); // 👈 log
-        setBlobUrl(blobURL);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("🚫 PDF loading error:", err);
-        setBlobUrl(null);
-        setLoading(false);
-      });
-
-    return () => {
-      if (blobUrl) URL.revokeObjectURL(blobUrl);
-    };
-  }, [fileUrl]);
-
   return (
-    <div className="w-full h-full p-4 bg-[#323639] shadow-lg">
-      {/* File Info */}
-      <div className="flex items-center gap-4">
-        <span className="text-white text-lg font-medium">
+    <div className=" p-6 bg-gradient-to-r from-slate-800 to-slate-900 shadow-lg rounded-xl">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-white text-xl font-semibold truncate">
           {fileUrl ? fileUrl.split("/").pop() : "No File Selected"}
-        </span>
-      </div>
-
-      {/* Controls */}
-      <div className="flex items-center gap-6 text-white mt-4">
-        <div>
-          Page {pageNumber} of {numPages ?? "..."}
+        </h2>
+        <div className="flex gap-2">
+          <button
+            onClick={handleDownload}
+            className="bg-blue-600 text-white px-4 py-1.5 rounded hover:bg-blue-700 transition"
+          >
+            ⬇️ Download
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="bg-green-600 text-white px-4 py-1.5 rounded hover:bg-green-700 transition"
+          >
+            🖨️ Print
+          </button>
         </div>
-        <button onClick={() => setScale((s) => Math.max(0.5, s - 0.1))}>
-          ➖
-        </button>
-        <span>{Math.round(scale * 100)}%</span>
-        <button onClick={() => setScale((s) => Math.min(2, s + 0.1))}>
-          ➕
-        </button>
-        <button onClick={handlePrint}>🖨️</button>
-        <button onClick={handleDownload}>⬇️</button>
       </div>
 
-      {/* Document Preview */}
-      <div className="w-full mt-6 flex justify-center bg-white rounded p-4 min-h-[400px]">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between text-white mb-4 bg-slate-700 px-4 py-2 rounded-md">
+        <div className="flex gap-4 items-center">
+          <button
+            disabled={pageNumber <= 1}
+            onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
+            className="hover:text-yellow-400 disabled:opacity-40"
+          >
+            ⬅️ Prev
+          </button>
+
+          <span className="text-sm font-medium">
+            Page {pageNumber} of {numPages ?? "..."}
+          </span>
+
+          <button
+            disabled={numPages !== null && pageNumber >= numPages}
+            onClick={() =>
+              setPageNumber((prev) => (numPages ? Math.min(prev + 1, numPages) : prev))
+            }
+            className="hover:text-yellow-400 disabled:opacity-40"
+          >
+            Next ➡️
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setScale((s) => Math.max(0.5, s - 0.1))}
+            className="text-xl hover:text-yellow-400"
+          >
+            ➖
+          </button>
+          <span className="text-sm">{Math.round(scale * 100)}%</span>
+          <button
+            onClick={() => setScale((s) => Math.min(2, s + 0.1))}
+            className="text-xl hover:text-yellow-400"
+          >
+            ➕
+          </button>
+        </div>
+      </div>
+
+      {/* Document Viewer */}
+      <div className="bg-white p-4 rounded-md shadow-inner flex justify-center items-center min-h-[500px]">
         {loading ? (
-          <p className="text-black">Loading PDF…</p>
+          <p className="text-black text-lg">Loading PDF…</p>
         ) : blobUrl && isPdf ? (
           <Document
             file={blobUrl}
@@ -125,11 +136,11 @@ const ReusableDocumentViewer: React.FC = () => {
         ) : fileUrl ? (
           <img
             src={fileUrl}
-            alt="Document preview"
-            className="max-h-[600px] rounded shadow"
+            alt="Preview"
+            className="max-h-[500px] rounded-lg shadow"
           />
         ) : (
-          <p className="text-white">No document to preview.</p>
+          <p className="text-white text-lg">No document to preview.</p>
         )}
       </div>
     </div>

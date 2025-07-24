@@ -27,6 +27,38 @@ const QuoteDetailsPage = () => {
     setIsDrawerOpen(true);
   };
 
+  const handleViewClick=(quote: QuoteItem) => {
+
+    navigate(`/projects/${projectId}/quote-documents`, {
+      state: {
+        quoteTitle: quote.title,
+        documents: [
+          {
+            id: 1,
+            title: "Property Document",
+            amount: 5000,
+            fileUrl:
+              "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+          },
+          {
+            id: 2,
+            title: "Quote Breakdown",
+            amount: 15000,
+            fileUrl:
+              "https://file-examples.com/wp-content/uploads/2017/10/file-example_PDF_1MB.pdf",
+          },
+          {
+            id: 3,
+            title: "Signature Sheet",
+            amount: 3000,
+            fileUrl:
+              "https://cors-anywhere.herokuapp.com/https://file-examples.com/storage/fe06201e15df7ea9dff2f74/2017/10/file-sample_150kB.pdf",
+          },
+        ],
+      },
+    });
+  }
+
   const handleEditClick = (quote: QuoteItem) => {
     setMode("edit");
     setEditQuote(quote);
@@ -88,37 +120,6 @@ const QuoteDetailsPage = () => {
 
       {quotes.map((quote) => (
         <div
-          key={quote.id}
-          onClick={
-            () =>
-              navigate(`/projects/${projectId}/quote-documents`, {
-                state: {
-                  quoteTitle: quote.title,
-                  documents: [
-                    {
-                      id: 1,
-                      title: "Property Document",
-                      amount: 5000,
-                      fileUrl:
-                        "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-                    },
-                    {
-                      id: 2,
-                      title: "Quote Breakdown",
-                      amount: 15000,
-                      fileUrl:
-                        "https://file-examples.com/wp-content/uploads/2017/10/file-example_PDF_1MB.pdf", // Dummy image
-                    },
-                    {
-                      id: 3,
-                      title: "Signature Sheet",
-                      amount: 3000,
-                      fileUrl:
-                        "https://cors-anywhere.herokuapp.com/https://file-examples.com/storage/fe06201e15df7ea9dff2f74/2017/10/file-sample_150kB.pdf",
-                    },
-                  ],
-                },
-              })
             //   state: {
             //     quoteTitle: quote.title,
             //     documents: [
@@ -126,7 +127,7 @@ const QuoteDetailsPage = () => {
             //     ],
             //   },
             // })
-          }
+          
           className="p-4 bg-gray-100 border border-gray-300 rounded w-60 flex flex-col gap-4 cursor-pointer hover:bg-gray-200 transition"
         >
           <div className="flex justify-between items-start w-full">
@@ -135,11 +136,15 @@ const QuoteDetailsPage = () => {
             </h3>
             <CustomViewMoreButton
               items={[
+                { key: "view quote", label: "View Quote" },
                 { key: "edit", label: "Edit Quote" },
                 { key: "share", label: "Share Quote" },
               ]}
               onClick={(key) => {
                 switch (key) {
+                  case "view quote":
+                    handleViewClick(quote);
+                    break;
                   case "edit":
                     handleEditClick(quote);
                     break;

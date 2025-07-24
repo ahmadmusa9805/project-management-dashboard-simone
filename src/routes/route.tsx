@@ -164,7 +164,7 @@ const AppRoutes: React.FC = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/welcome" element={<WelcomePage />} />
+      <Route path="/" element={<WelcomePage />} />
 
       {/* Protected Parent Route with Layout */}
       <Route
@@ -213,7 +213,10 @@ const AppRoutes: React.FC = () => {
           <Route path="handover-tool" element={<HandoverToolPage />} />
           <Route path="notes" element={<NotesPage />} />
           <Route path="snagging-list" element={<SnaggingListPage />} />
+
           <Route path="quote-documents" element={<ReusableDocumentPage />} />
+          <Route path="interim-documents" element={<ReusableDocumentPage  />} />
+
         </Route>
       </Route>
 
