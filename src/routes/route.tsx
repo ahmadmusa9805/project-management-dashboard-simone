@@ -133,8 +133,123 @@
 
 // export default AppRoutes;
 
+// import React from "react";
+// import { Routes, Route, Navigate } from "react-router-dom";
+// import LoginPage from "../pages/authPages/LoginPage";
+// import WelcomePage from "../pages/WelcomePage";
+// import HandoverToolPage from "../pages/HandoverToolPage";
+// import NotesPage from "../pages/NotesPage";
+// import SnaggingListPage from "../pages/SnaggingListPage";
+// import NotFoundPage from "../pages/NotFoundPage";
+// import DashboardLayout from "../layout/DashboardLayout";
+// import ProtectedRoute from "./ProtectedRoute";
+// import DashbordPage from "../pages/dashbord/DashbordPage";
+// import AdminTable from "../pages/user/UserManagement";
+// import OngoingProjects from "../pages/projects/OngoingProjects";
+// import UserProfileEdit from "../pages/user/UserProfileEdit";
+// import ProjectDashboard from "../pages/projects/specificProjectDetails/ProjectDashboard";
+// import ProjectDetailsPage from "../pages/projects/specificProjectDetails/ProjectDetailsPage";
+// import QuoteDetailsPage from "../pages/projects/specificProjectDetails/QuoteDetailsPage";
+// import InterimEvaluationPage from "../pages/projects/specificProjectDetails/InterimEvaluationPage";
+// import SitePicturesReportsPage from "../pages/projects/specificProjectDetails/SitePicturesReportsPage";
+// import CertificatesPage from "../pages/projects/specificProjectDetails/CertificatesPage";
+// import DocumentsPage from "../pages/projects/specificProjectDetails/DocumentsPage";
+// import SecondFixedListPage from "../pages/projects/specificProjectDetails/SecondFixedListPage";
+// import TimeSchedulePage from "../pages/projects/specificProjectDetails/TimeSchedulePage";
+// import ClientDetailsPage from "../pages/projects/specificProjectDetails/ClientDetailsPage";
+// import ReusableDocumentPage from "../components/ReusableDocumentPage";
+// import ProjectDefaultRedirect from "./ProjectDefaultRedirect";
+
+// const AppRoutes: React.FC = () => {
+//   return (
+//     <Routes>
+//       {/* Public Routes */}
+//       <Route path="/login" element={<LoginPage />} />
+//       <Route path="/" element={<WelcomePage />} />
+
+//       {/* Protected Parent Route with Layout */}
+//       <Route
+//         element={
+//           <ProtectedRoute
+//             allowedRoles={[
+//               "super-admin",
+//               "prime-admin",
+//               "basic-admin",
+//               "client",
+//             ]}
+//           >
+//             <DashboardLayout />
+//           </ProtectedRoute>
+//         }
+//       >
+
+
+//         {/* Main Menu Routes */}
+
+
+//         <ProtectedRoute
+//             allowedRoles={[
+//               "super-admin",
+//               "prime-admin",
+              
+//             ]}
+//           >
+//             <Route path="/dashboard" element={<DashbordPage />} />
+//           </ProtectedRoute>
+       
+//         <Route path="/profile" element={<UserProfileEdit />} />
+//         <Route path="/projects" element={<OngoingProjects />} />
+//         <Route path="/prime-admins" element={<AdminTable />} />
+//         <Route path="/basic-admins" element={<AdminTable />} />
+//         <Route path="/clients" element={<AdminTable />} />
+
+//         {/* Project-specific Nested Routes */}
+//         <Route path="/projects/:projectId">
+//        <Route index element={<ProjectDefaultRedirect />} />
+
+
+//           <Route path="dashboard" element={<ProjectDashboard />} />
+//           <Route path="details" element={<ProjectDetailsPage />} />
+//           <Route path="quote-details" element={<QuoteDetailsPage />} />
+//           <Route
+//             path="interim-evaluation"
+//             element={<InterimEvaluationPage />}
+//           />
+//           <Route
+//             path="site-pictures-reports"
+//             element={<SitePicturesReportsPage />}
+//           />
+//           <Route path="certificates" element={<CertificatesPage />} />
+//           <Route path="documents" element={<DocumentsPage />} />
+//           <Route
+//             path="second-fixed-list-material"
+//             element={<SecondFixedListPage />}
+//           />
+//           <Route path="time-schedule" element={<TimeSchedulePage />} />
+//           <Route path="client-details" element={<ClientDetailsPage />} />
+//           <Route path="handover-tool" element={<HandoverToolPage />} />
+//           <Route path="notes" element={<NotesPage />} />
+//           <Route path="snagging-list" element={<SnaggingListPage />} />
+
+//           <Route path="quote-documents" element={<ReusableDocumentPage />} />
+//           <Route path="interim-documents" element={<ReusableDocumentPage  />} />
+
+//         </Route>
+//       </Route>
+
+//       {/* Not Found */}
+//       <Route path="*" element={<NotFoundPage />} />
+//     </Routes>
+//   );
+// };
+
+// export default AppRoutes;
+
+
+
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+
 import LoginPage from "../pages/authPages/LoginPage";
 import WelcomePage from "../pages/WelcomePage";
 import HandoverToolPage from "../pages/HandoverToolPage";
@@ -158,6 +273,7 @@ import SecondFixedListPage from "../pages/projects/specificProjectDetails/Second
 import TimeSchedulePage from "../pages/projects/specificProjectDetails/TimeSchedulePage";
 import ClientDetailsPage from "../pages/projects/specificProjectDetails/ClientDetailsPage";
 import ReusableDocumentPage from "../components/ReusableDocumentPage";
+import ProjectDefaultRedirect from "./ProjectDefaultRedirect";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -166,7 +282,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<WelcomePage />} />
 
-      {/* Protected Parent Route with Layout */}
+      {/* Protected Shared Layout for Authenticated Roles */}
       <Route
         element={
           <ProtectedRoute
@@ -181,46 +297,62 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        {/* Main Menu Routes */}
-        <Route path="/dashboard" element={<DashbordPage />} />
+        {/* Dashboard (only super-admin and prime-admin) */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <DashbordPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Common routes (all roles) */}
         <Route path="/profile" element={<UserProfileEdit />} />
         <Route path="/projects" element={<OngoingProjects />} />
         <Route path="/prime-admins" element={<AdminTable />} />
         <Route path="/basic-admins" element={<AdminTable />} />
         <Route path="/clients" element={<AdminTable />} />
 
-        {/* Project-specific Nested Routes */}
+        {/* Project-specific routes */}
         <Route path="/projects/:projectId">
+          {/* Default redirect route when only /projects/:id is visited */}
+          <Route
+            index
+            element={
+              <ProtectedRoute
+                allowedRoles={[
+                  "super-admin",
+                  "prime-admin",
+                  "basic-admin",
+                  "client",
+                ]}
+              >
+                <ProjectDefaultRedirect />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Nested project routes */}
           <Route path="dashboard" element={<ProjectDashboard />} />
           <Route path="details" element={<ProjectDetailsPage />} />
           <Route path="quote-details" element={<QuoteDetailsPage />} />
-          <Route
-            path="interim-evaluation"
-            element={<InterimEvaluationPage />}
-          />
-          <Route
-            path="site-pictures-reports"
-            element={<SitePicturesReportsPage />}
-          />
+          <Route path="interim-evaluation" element={<InterimEvaluationPage />} />
+          <Route path="site-pictures-reports" element={<SitePicturesReportsPage />} />
           <Route path="certificates" element={<CertificatesPage />} />
           <Route path="documents" element={<DocumentsPage />} />
-          <Route
-            path="second-fixed-list-material"
-            element={<SecondFixedListPage />}
-          />
+          <Route path="second-fixed-list-material" element={<SecondFixedListPage />} />
           <Route path="time-schedule" element={<TimeSchedulePage />} />
           <Route path="client-details" element={<ClientDetailsPage />} />
           <Route path="handover-tool" element={<HandoverToolPage />} />
           <Route path="notes" element={<NotesPage />} />
           <Route path="snagging-list" element={<SnaggingListPage />} />
-
           <Route path="quote-documents" element={<ReusableDocumentPage />} />
-          <Route path="interim-documents" element={<ReusableDocumentPage  />} />
-
+          <Route path="interim-documents" element={<ReusableDocumentPage />} />
         </Route>
       </Route>
 
-      {/* Not Found */}
+      {/* Fallback */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

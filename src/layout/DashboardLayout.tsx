@@ -89,9 +89,10 @@ const DashboardLayout: React.FC = () => {
 
   if (isInProjectDetail && projectId) {
     const projectMenuItems: MenuItem[] = [];
-    projectMenuItems.push(getItem('Dashboard', `/projects/${projectId}/dashboard`, <TeamOutlined />));
+   
     projectMenuItems.push(getItem('Project Details', `/projects/${projectId}/details`, <TeamOutlined />));
     if (['super-admin', 'prime-admin'].includes(userRole)) {
+       projectMenuItems.push(getItem('Dashboard', `/projects/${projectId}/dashboard`, <TeamOutlined />));
       projectMenuItems.push(getItem('Quote Details', `/projects/${projectId}/quote-details`, <TeamOutlined />));
       projectMenuItems.push(getItem('Interim Evaluation', `/projects/${projectId}/interim-evaluation`, <TeamOutlined />));
       projectMenuItems.push(getItem('Site Pictures & Reports', `/projects/${projectId}/site-pictures-reports`, <TeamOutlined />));
