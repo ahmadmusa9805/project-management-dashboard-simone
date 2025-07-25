@@ -1,21 +1,26 @@
-import { Navigate, useLocation } from "react-router-dom";
+// 📂routes/ProtectedRoute.tsx
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "../Redux/app/store";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles: string[];
+  allowedRoles: string[]; // ["super-admin", "prime-admin", ...]
 }
 
-const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const location = useLocation();
-  const userRole = localStorage.getItem("role");
-  const isAuthenticated = !!localStorage.getItem("token");
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles,
+}) => {
+  const user = useSelector((state: RootState) => state.auth.user);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
-  if (!allowedRoles.includes(userRole || "")) {
-    return <Navigate to="/unauthorized" replace />;
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;

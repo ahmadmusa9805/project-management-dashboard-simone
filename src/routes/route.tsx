@@ -1,267 +1,18 @@
-// import React from "react";
-// import { BrowserRouter as Router, Routes, Route,  } from "react-router-dom";
-// import LoginPage from "../pages/authPages/LoginPage";
-// import WelcomePage from "../pages/WelcomePage";
-// import HandoverToolPage from "../pages/HandoverToolPage";
-// import NotesPage from "../pages/NotesPage";
-// import SnaggingListPage from "../pages/SnaggingListPage";
-// import NotFoundPage from "../pages/NotFoundPage";
-// import DashboardLayout from "../layout/DashboardLayout";
-// import ProtectedRoute from "./ProtectedRoute";
-// import DashbordPage from "../pages/DashbordPage";
-// import AdminTable from "../pages/user/UserManagement";
-// import OngoingProjects from "../pages/projects/OngoingProjects";
-// import UserProfileEdit from "../pages/user/UserProfileEdit";
-// import ProjectDashboard from "../pages/projects/specificProjectDetails/ProjectDashboard";
-// import ProjectDetailsPage from "../pages/projects/specificProjectDetails/ProjectDetailsPage";
-// import QuoteDetailsPage from "../pages/projects/specificProjectDetails/QuoteDetailsPage";
-// import InterimEvaluationPage from "../pages/projects/specificProjectDetails/InterimEvaluationPage";
-// import SitePicturesReportsPage from "../pages/projects/specificProjectDetails/SitePicturesReportsPage";
-// import CertificatesPage from "../pages/projects/specificProjectDetails/CertificatesPage";
-// import DocumentsPage from "../pages/projects/specificProjectDetails/DocumentsPage";
-// import SecondFixedListPage from "../pages/projects/specificProjectDetails/SecondFixedListPage";
-// import TimeSchedulePage from "../pages/projects/specificProjectDetails/TimeSchedulePage";
-// import ClientDetailsPage from "../pages/projects/specificProjectDetails/ClientDetailsPage";
-
-// // Import your page components here
-
-// // Example role-based route guard (replace with your actual auth logic)
-
-// const AppRoutes: React.FC = () => (
-
-//         <Routes>
-//             <Route path="/welcome" element={<WelcomePage />} />
-//             <Route path="/login" element={<LoginPage />} />
-
-//  {/* Project List: All roles */}
-
-// {/*
-// <Route
-//   path="/projects/:projectId"
-//   element={
-//     <ProtectedRoute allowedRoles={["super-admin"]}>
-//       <DashboardLayout ></DashboardLayout>
-//     </ProtectedRoute>
-//   }
-// >
-//   <Route path="dashboard" element={<ProjectDashboard />} />
-//   <Route path="details" element={<ProjectDetailsPage />} />
-//   <Route path="quote-details" element={<QuoteDetailsPage />} />
-//   <Route path="interim-evaluation" element={<InterimEvaluationPage />} />
-//   <Route path="site-pictures-reports" element={<SitePicturesReportsPage />} />
-//   <Route path="certificates" element={<CertificatesPage />} />
-//   <Route path="documents" element={<DocumentsPage />} />
-//   <Route path="second-fixed-list-material" element={<SecondFixedListPage />} />
-//   <Route path="time-schedule" element={<TimeSchedulePage />} />
-//   <Route path="client-details" element={<ClientDetailsPage />} />
-//   <Route path="handover-tool" element={<HandoverToolPage />} />
-//   <Route path="notes" element={<NotesPage />} />
-//   <Route path="snagging-list" element={<SnaggingListPage />} />
-// </Route>
-//       */}
-
-//  <Route
-//       path="/projects/:projectId"
-//       element={
-//         <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin", "client"]}>
-//           <DashboardLayout />
-//         </ProtectedRoute>
-//       }
-//     >
-//       <Route path="dashboard" element={<ProjectDashboard />} />
-//       <Route path="details" element={<ProjectDetailsPage />} />
-//       <Route path="quote-details" element={<QuoteDetailsPage />} />
-//       <Route path="interim-evaluation" element={<InterimEvaluationPage />} />
-//       <Route path="site-pictures-reports" element={<SitePicturesReportsPage />} />
-//       <Route path="certificates" element={<CertificatesPage />} />
-//       <Route path="documents" element={<DocumentsPage />} />
-//       <Route path="second-fixed-list-material" element={<SecondFixedListPage />} />
-//       <Route path="time-schedule" element={<TimeSchedulePage />} />
-//       <Route path="client-details" element={<ClientDetailsPage />} />
-//       <Route path="snagging-list" element={<SnaggingListPage />} />
-//       <Route path="handover-tool" element={<HandoverToolPage />} />
-//       <Route path="notes" element={<NotesPage />} />
-//     </Route>
-
-// {/* <Route path="/projects/:projectId/interim-evaluation" element={
-//   <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-//     <DashboardLayout><InterimEvaluationPage /></DashboardLayout>
-//   </ProtectedRoute>
-// } />
-
-// <Route path="/projects/:projectId/site-pictures-reports" element={
-//   <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-//     <DashboardLayout><SitePicturesReportsPage /></DashboardLayout>
-//   </ProtectedRoute>
-// } />
-
-// <Route path="/projects/:projectId/certificates" element={
-//   <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-//     <DashboardLayout><CertificatesPage /></DashboardLayout>
-//   </ProtectedRoute>
-// } />
-
-// <Route path="/projects/:projectId/documents" element={
-//   <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-//     <DashboardLayout><DocumentsPage /></DashboardLayout>
-//   </ProtectedRoute>
-// } />
-
-// <Route path="/projects/:projectId/second-fixed-list-material" element={
-//   <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-//     <DashboardLayout><SecondFixedListPage /></DashboardLayout>
-//   </ProtectedRoute>
-// } />
-
-// <Route path="/projects/:projectId/time-schedule" element={
-//   <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin"]}>
-//     <DashboardLayout><TimeSchedulePage /></DashboardLayout>
-//   </ProtectedRoute>
-// } />
-
-// <Route path="/projects/:projectId/client-details" element={
-//   <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-//     <DashboardLayout><ClientDetailsPage /></DashboardLayout>
-//   </ProtectedRoute>
-// } />
-//  */}
-
-//  <Route path="*" element={<NotFoundPage />} />
-//         </Routes>
-
-// );
-
-// export default AppRoutes;
-
-// import React from "react";
-// import { Routes, Route, Navigate } from "react-router-dom";
-// import LoginPage from "../pages/authPages/LoginPage";
-// import WelcomePage from "../pages/WelcomePage";
-// import HandoverToolPage from "../pages/HandoverToolPage";
-// import NotesPage from "../pages/NotesPage";
-// import SnaggingListPage from "../pages/SnaggingListPage";
-// import NotFoundPage from "../pages/NotFoundPage";
-// import DashboardLayout from "../layout/DashboardLayout";
-// import ProtectedRoute from "./ProtectedRoute";
-// import DashbordPage from "../pages/dashbord/DashbordPage";
-// import AdminTable from "../pages/user/UserManagement";
-// import OngoingProjects from "../pages/projects/OngoingProjects";
-// import UserProfileEdit from "../pages/user/UserProfileEdit";
-// import ProjectDashboard from "../pages/projects/specificProjectDetails/ProjectDashboard";
-// import ProjectDetailsPage from "../pages/projects/specificProjectDetails/ProjectDetailsPage";
-// import QuoteDetailsPage from "../pages/projects/specificProjectDetails/QuoteDetailsPage";
-// import InterimEvaluationPage from "../pages/projects/specificProjectDetails/InterimEvaluationPage";
-// import SitePicturesReportsPage from "../pages/projects/specificProjectDetails/SitePicturesReportsPage";
-// import CertificatesPage from "../pages/projects/specificProjectDetails/CertificatesPage";
-// import DocumentsPage from "../pages/projects/specificProjectDetails/DocumentsPage";
-// import SecondFixedListPage from "../pages/projects/specificProjectDetails/SecondFixedListPage";
-// import TimeSchedulePage from "../pages/projects/specificProjectDetails/TimeSchedulePage";
-// import ClientDetailsPage from "../pages/projects/specificProjectDetails/ClientDetailsPage";
-// import ReusableDocumentPage from "../components/ReusableDocumentPage";
-// import ProjectDefaultRedirect from "./ProjectDefaultRedirect";
-
-// const AppRoutes: React.FC = () => {
-//   return (
-//     <Routes>
-//       {/* Public Routes */}
-//       <Route path="/login" element={<LoginPage />} />
-//       <Route path="/" element={<WelcomePage />} />
-
-//       {/* Protected Parent Route with Layout */}
-//       <Route
-//         element={
-//           <ProtectedRoute
-//             allowedRoles={[
-//               "super-admin",
-//               "prime-admin",
-//               "basic-admin",
-//               "client",
-//             ]}
-//           >
-//             <DashboardLayout />
-//           </ProtectedRoute>
-//         }
-//       >
-
-
-//         {/* Main Menu Routes */}
-
-
-//         <ProtectedRoute
-//             allowedRoles={[
-//               "super-admin",
-//               "prime-admin",
-              
-//             ]}
-//           >
-//             <Route path="/dashboard" element={<DashbordPage />} />
-//           </ProtectedRoute>
-       
-//         <Route path="/profile" element={<UserProfileEdit />} />
-//         <Route path="/projects" element={<OngoingProjects />} />
-//         <Route path="/prime-admins" element={<AdminTable />} />
-//         <Route path="/basic-admins" element={<AdminTable />} />
-//         <Route path="/clients" element={<AdminTable />} />
-
-//         {/* Project-specific Nested Routes */}
-//         <Route path="/projects/:projectId">
-//        <Route index element={<ProjectDefaultRedirect />} />
-
-
-//           <Route path="dashboard" element={<ProjectDashboard />} />
-//           <Route path="details" element={<ProjectDetailsPage />} />
-//           <Route path="quote-details" element={<QuoteDetailsPage />} />
-//           <Route
-//             path="interim-evaluation"
-//             element={<InterimEvaluationPage />}
-//           />
-//           <Route
-//             path="site-pictures-reports"
-//             element={<SitePicturesReportsPage />}
-//           />
-//           <Route path="certificates" element={<CertificatesPage />} />
-//           <Route path="documents" element={<DocumentsPage />} />
-//           <Route
-//             path="second-fixed-list-material"
-//             element={<SecondFixedListPage />}
-//           />
-//           <Route path="time-schedule" element={<TimeSchedulePage />} />
-//           <Route path="client-details" element={<ClientDetailsPage />} />
-//           <Route path="handover-tool" element={<HandoverToolPage />} />
-//           <Route path="notes" element={<NotesPage />} />
-//           <Route path="snagging-list" element={<SnaggingListPage />} />
-
-//           <Route path="quote-documents" element={<ReusableDocumentPage />} />
-//           <Route path="interim-documents" element={<ReusableDocumentPage  />} />
-
-//         </Route>
-//       </Route>
-
-//       {/* Not Found */}
-//       <Route path="*" element={<NotFoundPage />} />
-//     </Routes>
-//   );
-// };
-
-// export default AppRoutes;
-
-
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "../pages/authPages/LoginPage";
 import WelcomePage from "../pages/WelcomePage";
-import HandoverToolPage from "../pages/HandoverToolPage";
-import NotesPage from "../pages/NotesPage";
-import SnaggingListPage from "../pages/SnaggingListPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import DashboardLayout from "../layout/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import ProjectDefaultRedirect from "./ProjectDefaultRedirect";
+
 import DashbordPage from "../pages/dashbord/DashbordPage";
 import AdminTable from "../pages/user/UserManagement";
 import OngoingProjects from "../pages/projects/OngoingProjects";
 import UserProfileEdit from "../pages/user/UserProfileEdit";
+
 import ProjectDashboard from "../pages/projects/specificProjectDetails/ProjectDashboard";
 import ProjectDetailsPage from "../pages/projects/specificProjectDetails/ProjectDetailsPage";
 import QuoteDetailsPage from "../pages/projects/specificProjectDetails/QuoteDetailsPage";
@@ -272,90 +23,310 @@ import DocumentsPage from "../pages/projects/specificProjectDetails/DocumentsPag
 import SecondFixedListPage from "../pages/projects/specificProjectDetails/SecondFixedListPage";
 import TimeSchedulePage from "../pages/projects/specificProjectDetails/TimeSchedulePage";
 import ClientDetailsPage from "../pages/projects/specificProjectDetails/ClientDetailsPage";
+import HandoverToolPage from "../pages/projects/specificProjectDetails/HandoverToolPage";
+import NotesPage from "../pages/projects/specificProjectDetails/NotesPage";
+import SnaggingListPage from "../pages/projects/specificProjectDetails/SnaggingListPage";
 import ReusableDocumentPage from "../components/ReusableDocumentPage";
-import ProjectDefaultRedirect from "./ProjectDefaultRedirect";
+import CostManagementPage from "../pages/projects/specificProjectDetails/CostManagementPage";
+import PaymentTrackerPage from "../pages/projects/specificProjectDetails/PaymentTrackerPage";
 
-const AppRoutes: React.FC = () => {
-  return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/" element={<WelcomePage />} />
+import LaborPage from "../pages/projects/specificProjectDetails/LaborPage";
+import LabourManagementPage from "../pages/user/LabourManagementPage";
 
-      {/* Protected Shared Layout for Authenticated Roles */}
+const AppRoutes: React.FC = () => (
+  <Routes>
+    {/* Public */}
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/" element={<WelcomePage />} />
+
+    {/* Protected Routes with Layout */}
+    <Route
+      element={
+        <ProtectedRoute
+          allowedRoles={["super-admin", "prime-admin", "basic-admin", "client"]}
+        >
+          <DashboardLayout />
+        </ProtectedRoute>
+      }
+    >
+      {/* Dashboard only */}
       <Route
+        path="/dashboard"
         element={
-          <ProtectedRoute
-            allowedRoles={[
-              "super-admin",
-              "prime-admin",
-              "basic-admin",
-              "client",
-            ]}
-          >
-            <DashboardLayout />
+          <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+            <DashbordPage />
           </ProtectedRoute>
         }
-      >
-        {/* Dashboard (only super-admin and prime-admin) */}
+      />
+
+      {/* Profile and General Pages */}
+      <Route path="/profile" element={<UserProfileEdit />} />
+      <Route path="/projects" element={<OngoingProjects />} />
+
+      {/* Admin Pages (super-admin only) */}
+      <Route
+        path="/prime-admins"
+        element={
+          <ProtectedRoute allowedRoles={["super-admin"]}>
+            <AdminTable />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/basic-admins"
+        element={
+          <ProtectedRoute allowedRoles={["super-admin"]}>
+            <AdminTable />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/clients"
+        element={
+          <ProtectedRoute allowedRoles={["super-admin"]}>
+            <AdminTable />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/labours"
+        element={
+          <ProtectedRoute allowedRoles={["super-admin"]}>
+            <LabourManagementPage></LabourManagementPage>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Project-specific nested routes */}
+      <Route path="/projects/:projectId">
+        {/* Redirect logic */}
         <Route
-          path="/dashboard"
+          index
           element={
-            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-              <DashbordPage />
+            <ProtectedRoute
+              allowedRoles={[
+                "super-admin",
+                "prime-admin",
+                "basic-admin",
+                "client",
+              ]}
+            >
+              <ProjectDefaultRedirect />
             </ProtectedRoute>
           }
         />
 
-        {/* Common routes (all roles) */}
-        <Route path="/profile" element={<UserProfileEdit />} />
-        <Route path="/projects" element={<OngoingProjects />} />
-        <Route path="/prime-admins" element={<AdminTable />} />
-        <Route path="/basic-admins" element={<AdminTable />} />
-        <Route path="/clients" element={<AdminTable />} />
+        {/* Now protect each project route by role */}
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <ProjectDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="details"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "super-admin",
+                "prime-admin",
+                "basic-admin",
+                "client",
+              ]}
+            >
+              <ProjectDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="quote-details"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "client"]}
+            >
+              <QuoteDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="interim-evaluation"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <InterimEvaluationPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="live-project-costs"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <CostManagementPage></CostManagementPage>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="payments-track"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <PaymentTrackerPage></PaymentTrackerPage>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="site-pictures-reports"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <SitePicturesReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="certificates"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "super-admin",
+                "prime-admin",
+                "basic-admin",
+                "client",
+              ]}
+            >
+              <CertificatesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="documents"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <DocumentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="second-fixed-list-material"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <SecondFixedListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="time-schedule"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <TimeSchedulePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="client-details"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "client"]}
+            >
+              <ClientDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="handover-tool"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "super-admin",
+                "prime-admin",
+                "basic-admin",
+                "client",
+              ]}
+            >
+              <HandoverToolPage />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Project-specific routes */}
-        <Route path="/projects/:projectId">
-          {/* Default redirect route when only /projects/:id is visited */}
-          <Route
-            index
-            element={
-              <ProtectedRoute
-                allowedRoles={[
-                  "super-admin",
-                  "prime-admin",
-                  "basic-admin",
-                  "client",
-                ]}
-              >
-                <ProjectDefaultRedirect />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Nested project routes */}
-          <Route path="dashboard" element={<ProjectDashboard />} />
-          <Route path="details" element={<ProjectDetailsPage />} />
-          <Route path="quote-details" element={<QuoteDetailsPage />} />
-          <Route path="interim-evaluation" element={<InterimEvaluationPage />} />
-          <Route path="site-pictures-reports" element={<SitePicturesReportsPage />} />
-          <Route path="certificates" element={<CertificatesPage />} />
-          <Route path="documents" element={<DocumentsPage />} />
-          <Route path="second-fixed-list-material" element={<SecondFixedListPage />} />
-          <Route path="time-schedule" element={<TimeSchedulePage />} />
-          <Route path="client-details" element={<ClientDetailsPage />} />
-          <Route path="handover-tool" element={<HandoverToolPage />} />
-          <Route path="notes" element={<NotesPage />} />
-          <Route path="snagging-list" element={<SnaggingListPage />} />
-          <Route path="quote-documents" element={<ReusableDocumentPage />} />
-          <Route path="interim-documents" element={<ReusableDocumentPage />} />
-        </Route>
+        <Route
+          path="notes"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "super-admin",
+                "prime-admin",
+                "basic-admin",
+                "client",
+              ]}
+            >
+              <NotesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="labour"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <LaborPage></LaborPage>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="snagging-list"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "super-admin",
+                "prime-admin",
+                "basic-admin",
+                "client",
+              ]}
+            >
+              <SnaggingListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="quote-documents"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <ReusableDocumentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="interim-documents"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <ReusableDocumentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="expense-documents"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <ReusableDocumentPage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
+    </Route>
 
-      {/* Fallback */}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-  );
-};
+    {/* Catch all */}
+    <Route path="*" element={<NotFoundPage />} />
+  </Routes>
+);
 
 export default AppRoutes;

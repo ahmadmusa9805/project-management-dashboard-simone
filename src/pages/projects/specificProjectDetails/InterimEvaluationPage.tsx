@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
 import { message, Modal, Select } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomCreateButton from "../../../components/CustomCreateButton";
@@ -17,15 +18,13 @@ interface DocumentType {
 }
 
 const InterimEvaluationPage = () => {
-
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const { projectId } = useParams();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [documents, setDocuments] = useState<DocumentType[]>([]);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [editDoc, setEditDoc] = useState<DocumentType | null>(null);
-
 
   const handleCreate = () => {
     setMode("create");
@@ -60,24 +59,26 @@ const InterimEvaluationPage = () => {
   const handleViewMoreAction = (key: string, doc: DocumentType) => {
     if (key === "view document") {
       navigate(`/projects/${projectId}/interim-documents`, {
-  state: {
-    quoteTitle: doc.folderName,
-    documents: [
-      {
-        id: 1,
-        title: "Interim Report",
-        amount: parseFloat(doc.amount),
-        fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      },
-      {
-        id: 2,
-        title: "Evaluation Sheet",
-        amount: 1500,
-        fileUrl: "https://file-examples.com/wp-content/uploads/2017/10/file-example_PDF_1MB.pdf",
-      },
-    ],
-  },
-});
+        state: {
+          quoteTitle: doc.folderName,
+          documents: [
+            {
+              id: 1,
+              title: "Interim Report",
+              amount: parseFloat(doc.amount),
+              fileUrl:
+                "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            },
+            {
+              id: 2,
+              title: "Evaluation Sheet",
+              amount: 1500,
+              fileUrl:
+                "https://file-examples.com/wp-content/uploads/2017/10/file-example_PDF_1MB.pdf",
+            },
+          ],
+        },
+      });
     } else if (key === "edit") {
       handleEdit(doc);
     } else if (key === "delete") {
@@ -106,9 +107,7 @@ const InterimEvaluationPage = () => {
 
   const handleStatusChange = (id: number, value: "pending" | "paid") => {
     setDocuments((prev) =>
-      prev.map((doc) =>
-        doc.id === id ? { ...doc, status: value } : doc
-      )
+      prev.map((doc) => (doc.id === id ? { ...doc, status: value } : doc))
     );
   };
 
@@ -125,10 +124,7 @@ const InterimEvaluationPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {documents.map((doc) => (
-          <div
-           
-            className="relative p-4 bg-white border rounded shadow  transition group cursor-pointer"
-          >
+          <div className="relative p-4 bg-white border rounded shadow  transition group cursor-pointer">
             <div
               className="absolute top-2 right-2 opacity-100 z-10"
               onClick={(e) => e.stopPropagation()} // Prevent card click
