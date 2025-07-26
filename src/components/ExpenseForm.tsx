@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { useForm, Controller, type SubmitHandler } from "react-hook-form";
-import { DatePicker, Checkbox, Button, Upload } from "antd";
-
+import { useForm, Controller } from "react-hook-form";
+import { DatePicker, Checkbox, Button, Input, Select, Upload } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import type { ExpenseItem } from "../types/projectAllTypes/expense";
 
-type ExpenseType = "Labor" | "Subcontractor" | "Material";
+
+export interface ExpenseFormValues extends Omit<ExpenseItem, "id"> {}
 
 interface ExpenseFormProps {
   defaultValues?: ExpenseFormValues;
@@ -14,18 +16,8 @@ interface ExpenseFormProps {
   onCancel: () => void;
 }
 
-export interface ExpenseFormValues {
-  type: ExpenseType;
-  name: string;
-  quantity: number;
-  cost: number;
-  vatRate: number;
-  includesVat: boolean;
-  date: string;
-  time: string;
-  description: string;
-  files?: any;
-}
+const { TextArea } = Input;
+const { Option } = Select;
 
 const ExpenseForm: React.FC<ExpenseFormProps> = ({
   defaultValues,
@@ -34,9 +26,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   onCancel,
 }) => {
   const {
-    handleSubmit,
-    register,
     control,
+    handleSubmit,
     formState: { errors },
   } = useForm<ExpenseFormValues>({
     defaultValues: defaultValues ?? {
@@ -49,148 +40,147 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       date: dayjs().format("YYYY-MM-DD"),
       time: "00:00",
       description: "",
+      files: [],
     },
   });
 
-  const handleFormSubmit: SubmitHandler<ExpenseFormValues> = (data) => {
+  const handleFormSubmit = (data: ExpenseFormValues) => {
     onSubmit(data);
   };
 
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="bg-white rounded shadow-md p-6 w-full flex flex-col gap-6"
+      className="w-full bg-white rounded shadow-lg p-6 flex flex-col gap-6"
     >
-      <h2 className="text-2xl font-semibold text-gray-800">
-        {mode === "create" ? "Add Expense" : "Edit Expense"}
+      <h2 className="text-2xl font-semibold text-[#000E0F]">
+        {mode === "edit" ? "Edit Expense" : "Create Expense"}
       </h2>
 
       {/* Expense Type */}
-      <div>
-        <label className="block mb-1 font-medium">Expense Type</label>
-        <select
-          {...register("type", { required: "Type is required" })}
-          className="w-full border px-3 py-2 rounded"
-        >
-          <option value="Labor">Labor</option>
-          <option value="Subcontractor">Subcontractor</option>
-          <option value="Material">Material</option>
-        </select>
-        {errors.type && (
-          <p className="text-red-500 text-sm">{errors.type.message}</p>
-        )}
+      <div className="flex flex-col gap-2">
+        <label>Expense Type</label>
+        <Controller
+          control={control}
+          name="type"
+          render={({ field }) => (
+            <Select {...field} placeholder="Select expense type">
+              <Option value="Labor">Labor</Option>
+              <Option value="Subcontractor">Subcontractor</Option>
+              <Option value="Material">Material</Option>
+            </Select>
+          )}
+        />
       </div>
 
       {/* Name */}
-      <div>
-        <label className="block mb-1 font-medium">Name</label>
-        <input
-          {...register("name", { required: "Name is required" })}
-          className="w-full border px-3 py-2 rounded"
-          placeholder="Labor name / Supplier name"
+      <div className="flex flex-col gap-2">
+        <label>Name</label>
+        <Controller
+          control={control}
+          name="name"
+          render={({ field }) => (
+            <Input {...field} placeholder="Labor or supplier name" />
+          )}
         />
-        {errors.name && (
-          <p className="text-red-500 text-sm">{errors.name.message}</p>
-        )}
       </div>
 
       {/* Quantity */}
-      <div>
-        <label className="block mb-1 font-medium">Quantity / Unit / Days</label>
-        <input
-          type="number"
-          {...register("quantity", { required: true, min: 1 })}
-          className="w-full border px-3 py-2 rounded"
+      <div className="flex flex-col gap-2">
+        <label>Quantity / Unit / Days</label>
+        <Controller
+          control={control}
+          name="quantity"
+          render={({ field }) => (
+            <Input type="number" {...field} placeholder="Quantity" />
+          )}
         />
       </div>
 
       {/* Cost */}
-      <div>
-        <label className="block mb-1 font-medium">Cost</label>
-        <input
-          type="number"
-          {...register("cost", { required: "Cost is required", min: 0.01 })}
-          className="w-full border px-3 py-2 rounded"
+      <div className="flex flex-col gap-2">
+        <label>Cost</label>
+        <Controller
+          control={control}
+          name="cost"
+          render={({ field }) => (
+            <Input type="number" {...field} placeholder="Total cost" />
+          )}
         />
-        {errors.cost && (
-          <p className="text-red-500 text-sm">{errors.cost.message}</p>
-        )}
       </div>
 
-      {/* VAT Rate and Checkbox */}
+      {/* VAT + includes VAT */}
       <div className="flex gap-4 items-center">
         <div className="flex-1">
-          <label className="block mb-1 font-medium">VAT Rate (%)</label>
-          <input
-            type="number"
-            step="0.01"
-            {...register("vatRate", { required: true })}
-            className="w-full border px-3 py-2 rounded"
-          />
-        </div>
-        <div className="mt-6">
+          <label>VAT Rate (%)</label>
           <Controller
-            name="includesVat"
             control={control}
-            render={({ field }) => (
-              <Checkbox {...field}>Rate includes VAT</Checkbox>
-            )}
+            name="vatRate"
+            render={({ field }) => <Input type="number" step="0.01" {...field} />}
           />
         </div>
+        <Controller
+          control={control}
+          name="includesVat"
+          render={({ field }) => (
+            <Checkbox {...field} checked={field.value}>
+              Rate includes VAT
+            </Checkbox>
+          )}
+        />
       </div>
 
       {/* Date */}
-      <div>
-        <label className="block mb-1 font-medium">Date</label>
+      <div className="flex flex-col gap-2">
+        <label>Date</label>
         <Controller
           name="date"
           control={control}
           render={({ field }) => (
             <DatePicker
-              {...field}
               className="w-full"
               format="YYYY-MM-DD"
-              onChange={(_date, dateString) => field.onChange(dateString)}
+              value={dayjs(field.value)}
+              onChange={(date, dateString) => field.onChange(dateString)}
             />
           )}
         />
       </div>
 
       {/* Time */}
-      <div>
-        <label className="block mb-1 font-medium">Time (hh:mm)</label>
-        <input
-          type="time"
-          {...register("time", { required: true })}
-          className="w-full border px-3 py-2 rounded"
+      <div className="flex flex-col gap-2">
+        <label>Time</label>
+        <Controller
+          control={control}
+          name="time"
+          render={({ field }) => <Input type="time" {...field} className="w-full" />}
         />
       </div>
 
       {/* Description */}
-      <div>
-        <label className="block mb-1 font-medium">Description</label>
-        <textarea
-          {...register("description")}
-          rows={4}
-          className="w-full border px-3 py-2 rounded"
-          placeholder="Optional notes"
+      <div className="flex flex-col gap-2">
+        <label>Description</label>
+        <Controller
+          control={control}
+          name="description"
+          render={({ field }) => (
+            <TextArea {...field} rows={3} placeholder="Optional notes" />
+          )}
         />
       </div>
 
       {/* Upload */}
-      <div>
-        <label className="block mb-1 font-medium">Upload Files</label>
+      <div className="flex flex-col gap-2">
+        <label>Upload Files</label>
         <Controller
           control={control}
           name="files"
           render={({ field }) => (
             <Upload
-              {...field}
-              maxCount={1}
               beforeUpload={() => false}
               onChange={({ fileList }) => field.onChange(fileList)}
             >
-              <Button>Click to Upload</Button>
+              <Button icon={<UploadOutlined />}>Upload</Button>
             </Upload>
           )}
         />
@@ -200,7 +190,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       <div className="flex justify-end gap-4">
         <Button onClick={onCancel}>Cancel</Button>
         <Button type="primary" htmlType="submit">
-          {mode === "create" ? "Save" : "Update"}
+          {mode === "edit" ? "Update" : "Create"}
         </Button>
       </div>
     </form>

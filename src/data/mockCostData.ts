@@ -1,7 +1,7 @@
 export const expenseFullMockData = {
   Labor: [
-    {
-      type: "Labor",
+    {id: 1,
+      type: "Labor" as const,
       name: "Electrician - Site A",
       quantity: 5,
       cost: 2500,
@@ -13,7 +13,8 @@ export const expenseFullMockData = {
       files: [],
     },
     {
-      type: "Labor",
+      id: 2,
+     type: "Labor" as const,
       name: "Mason - Basement Work",
       quantity: 8,
       cost: 6400,
@@ -25,7 +26,8 @@ export const expenseFullMockData = {
       files: [],
     },
     {
-      type: "Labor",
+      id: 3,
+      type: "Labor" as const,
       name: "Painter",
       quantity: 3,
       cost: 1800,
@@ -39,7 +41,8 @@ export const expenseFullMockData = {
   ],
   Subcontractor: [
     {
-      type: "Subcontractor",
+      id: 1,
+      type: "Subcontractor"as const,
       name: "Roofing Experts Ltd.",
       quantity: 1,
       cost: 18500,
@@ -51,7 +54,8 @@ export const expenseFullMockData = {
       files: [],
     },
     {
-      type: "Subcontractor",
+      id: 2,
+      type: "Subcontractor"as const,
       name: "Plumbing Services Co.",
       quantity: 1,
       cost: 12500,
@@ -63,7 +67,8 @@ export const expenseFullMockData = {
       files: [],
     },
     {
-      type: "Subcontractor",
+      id: 3,
+      type: "Subcontractor"as const,
       name: "HVAC Solutions",
       quantity: 1,
       cost: 22000,
@@ -77,7 +82,8 @@ export const expenseFullMockData = {
   ],
   Material: [
     {
-      type: "Material",
+      id: 1,
+      type: "Material"as const,
       name: "Cement Bags",
       quantity: 100,
       cost: 40000,
@@ -89,7 +95,8 @@ export const expenseFullMockData = {
       files: [],
     },
     {
-      type: "Material",
+      id: 2,
+      type: "Material"as const,
       name: "Steel Rods",
       quantity: 50,
       cost: 30000,
@@ -101,7 +108,8 @@ export const expenseFullMockData = {
       files: [],
     },
     {
-      type: "Material",
+      id: 3,
+      type: "Material"as const,
       name: "Sand (truckloads)",
       quantity: 20,
       cost: 12000,

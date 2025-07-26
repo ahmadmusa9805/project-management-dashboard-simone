@@ -33,6 +33,8 @@ import PaymentTrackerPage from "../pages/projects/specificProjectDetails/Payment
 import LaborPage from "../pages/projects/specificProjectDetails/LaborPage";
 import LabourManagementPage from "../pages/user/LabourManagementPage";
 
+import ExpenseDocumentsPage from "../pages/projects/specificProjectDetails/ExpenseDocumentsPage";
+
 const AppRoutes: React.FC = () => (
   <Routes>
     {/* Public */}
@@ -49,6 +51,9 @@ const AppRoutes: React.FC = () => (
         </ProtectedRoute>
       }
     >
+{/* Profile and General Pages */}
+      <Route path="/profile" element={<UserProfileEdit />} />
+
       {/* Dashboard only */}
       <Route
         path="/dashboard"
@@ -59,9 +64,11 @@ const AppRoutes: React.FC = () => (
         }
       />
 
-      {/* Profile and General Pages */}
-      <Route path="/profile" element={<UserProfileEdit />} />
-      <Route path="/projects" element={<OngoingProjects />} />
+      
+      <Route
+  path="/projects"
+  element={<OngoingProjects />}
+/>
 
       {/* Admin Pages (super-admin only) */}
       <Route
@@ -100,6 +107,7 @@ const AppRoutes: React.FC = () => (
       {/* Project-specific nested routes */}
       <Route path="/projects/:projectId">
         {/* Redirect logic */}
+         
         <Route
           index
           element={
@@ -313,14 +321,23 @@ const AppRoutes: React.FC = () => (
             </ProtectedRoute>
           }
         />
-        <Route
-          path="expense-documents"
-          element={
-            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-              <ReusableDocumentPage />
-            </ProtectedRoute>
-          }
-        />
+        
+<Route
+  path="expense-documents"
+  element={
+    <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+      <ExpenseDocumentsPage />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+
+
+
+
+
       </Route>
     </Route>
 

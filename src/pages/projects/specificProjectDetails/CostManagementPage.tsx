@@ -1,12 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
 import CustomSearchInput from "../../../components/CustomSearchInput";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
-import { expenseMockData } from "../../../data/mockCostData";
+import { expenseFullMockData} from "../../../data/mockCostData";
 
 const CostManagementPage = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
-  const documents = expenseMockData;
+  console.log("projectId: ", projectId);
+   const documents = expenseFullMockData; 
 
   const calculateTotal = (type: "Labor" | "Subcontractor" | "Material") => {
     return documents[type].reduce((total, item) => total + item.cost, 0);
@@ -17,16 +18,15 @@ const CostManagementPage = () => {
   const totalMaterial = calculateTotal("Material");
   const totalProject = totalLabor + totalSubcontractor + totalMaterial;
 
-  const handleViewCost = (type: "Labor" | "Subcontractor" | "Material") => {
-    const selectedData = documents[type]; // This is already an array of specific data
-
-    navigate(`/projects/${projectId}/expense-documents`, {
-      state: {
-        quoteTitle: `${type} Expense List`,
-        documents: selectedData, // ✅ Pass full list of items for the selected type
-      },
-    });
-  };
+ 
+const handleViewCost = (type: "Labor" | "Subcontractor" | "Material") => {
+  navigate(`/projects/${projectId}/expense-documents`, {
+    state: {
+      quoteTitle: `${type} Expense List`,
+      documents: expenseFullMockData[type],
+    },
+  });
+};
 
   return (
     <div className="w-full h-full">

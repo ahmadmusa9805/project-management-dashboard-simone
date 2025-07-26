@@ -21,29 +21,35 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const result = await login({ email, password }).unwrap();
-      dispatch(setCredentials(result));
-      console.log("Login successful:", result);
+ const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const result = await login({ email, password }).unwrap();
+    dispatch(setCredentials(result));
+    console.log("Login successful:", result);
 
-      localStorage.setItem("token", result.token);
-      localStorage.setItem("user", JSON.stringify(result.user));
-      localStorage.setItem("role", result.user.role);
+    localStorage.setItem("token", result.token);
+    localStorage.setItem("user", JSON.stringify(result.user));
+    localStorage.setItem("role", result.user.role);
 
+    successAlert("Login successful", "You have successfully logged in.");
 
-      successAlert("Login successful", "You have successfully logged in.");
-
+    // ✅ Redirect based on role
+    if (result.user.role === "super-admin") {
       navigate("/dashboard");
-    } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Credentials",
-        text: error?.data?.error || "Email or password is incorrect.",
-      });
+    } else {
+      navigate("/projects?status=ongoing");
     }
-  };
+
+  } catch (error: any) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Credentials",
+      text: error?.data?.error || "Email or password is incorrect.",
+    });
+  }
+};
+
 
   return (
     <div className="flex flex-col items-center gap-14 self-stretch min-h-screen bg-white px-4 py-8">
