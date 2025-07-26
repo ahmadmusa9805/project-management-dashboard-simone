@@ -331,13 +331,6 @@ const AppRoutes: React.FC = () => (
   }
 />
 
-
-
-
-
-
-
-
       </Route>
     </Route>
 
@@ -347,3 +340,9 @@ const AppRoutes: React.FC = () => (
 );
 
 export default AppRoutes;
+
+
+
+
+
+

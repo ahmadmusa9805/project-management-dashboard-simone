@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 
 import type { MenuProps } from "antd";
-import { Breadcrumb, Button, Layout, Menu } from "antd";
+import { Breadcrumb, Button, Layout, Menu, Modal } from "antd";
 import { useLocation, useNavigate, useParams, Outlet } from "react-router-dom";
 import logo from "../assets/green-logo.png";
 import { FaRegUser } from "react-icons/fa6";
@@ -15,6 +15,7 @@ import {
   getProjectMenuItems,
   getSidebarMenuItems,
 } from "../utils/sidebarItems";
+import UserProfileEdit from "../pages/user/UserProfileEdit";
 
 const { Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
@@ -33,7 +34,7 @@ const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const { projectId } = useParams();
   const user = useSelector((state: RootState) => state.auth.user);
-
+ const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const path = location.pathname;
   const userRole = user?.role;
   const validRoles = ["super-admin", "prime-admin", "basic-admin", "client"];
@@ -55,29 +56,15 @@ const DashboardLayout: React.FC = () => {
   const rawUser = localStorage.getItem("user");
   const userInfo = rawUser ? JSON.parse(rawUser) : {};
 
- const handleAvatarClick = () => {
-    const currentPath = location.pathname + location.search + location.hash;
 
-    if (currentPath !== "/profile") {
-      // Save current path before going to profile
-      prevLocationRef.current = currentPath;
-      navigate("/profile");
-    } else {
-      // If already on profile, go back to saved location or fallback
-      if (prevLocationRef.current) {
-        navigate(prevLocationRef.current);
-        prevLocationRef.current = null; // reset after navigating back
-      } else {
-        // fallback if no previous location stored
-        navigate("/");
-      }
-    }
+  // On avatar click, open modal
+  const handleAvatarClick = () => {
+    setIsProfileModalOpen(true);
   };
 
-
-
-
-
+ const handleProfileModalClose = () => {
+    setIsProfileModalOpen(false);
+  };
   
   return (
     <>
@@ -105,6 +92,10 @@ const DashboardLayout: React.FC = () => {
               )}
             </Button>
           </div>
+
+
+
+
           <div
       className="flex items-center gap-2 mr-8 ml-4 cursor-pointer"
       onClick={handleAvatarClick}
@@ -126,6 +117,19 @@ const DashboardLayout: React.FC = () => {
     </div>
         </div>
       </div>
+
+
+
+        <Modal
+        title="Edit Profile"
+        visible={isProfileModalOpen}
+        onCancel={handleProfileModalClose}
+        footer={null} // you can add footer buttons inside UserProfileEdit if needed
+        width={900}
+        
+      >
+        <UserProfileEdit />
+      </Modal>
 
       <Layout style={{ minHeight: "100vh", paddingTop: 64 }}>
         <Sider

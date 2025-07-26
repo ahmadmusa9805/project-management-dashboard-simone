@@ -4,7 +4,13 @@
 const ProjectDetailPage = () => {
   return (
     
-     <> <h1>Project Details Page</h1></>
+     <> <h1>Project Details Page</h1>
+     
+     
+     
+     
+     
+     </>
    
   );
 };
