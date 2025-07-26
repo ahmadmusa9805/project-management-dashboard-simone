@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { DatePicker, Checkbox, Button, Input, Select, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { ExpenseItem } from "../types/projectAllTypes/expense";
-
 
 export interface ExpenseFormValues extends Omit<ExpenseItem, "id"> {}
 
@@ -25,11 +25,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ExpenseFormValues>({
+  const { control, handleSubmit } = useForm<ExpenseFormValues>({
     defaultValues: defaultValues ?? {
       type: "Labor",
       name: "",
@@ -116,7 +112,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           <Controller
             control={control}
             name="vatRate"
-            render={({ field }) => <Input type="number" step="0.01" {...field} />}
+            render={({ field }) => (
+              <Input type="number" step="0.01" {...field} />
+            )}
           />
         </div>
         <Controller
@@ -141,7 +139,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               className="w-full"
               format="YYYY-MM-DD"
               value={dayjs(field.value)}
-              onChange={(date, dateString) => field.onChange(dateString)}
+              onChange={(_date, dateString) => field.onChange(dateString)}
             />
           )}
         />
@@ -153,7 +151,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         <Controller
           control={control}
           name="time"
-          render={({ field }) => <Input type="time" {...field} className="w-full" />}
+          render={({ field }) => (
+            <Input type="time" {...field} className="w-full" />
+          )}
         />
       </div>
 

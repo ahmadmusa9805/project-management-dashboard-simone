@@ -5,6 +5,7 @@ import { baseApi } from "./api/baseApi";
 import userReducer from "../features/users/usersSlice";
 import earningsReducer from "../features/projects/dashbordSlice";
 import documentReducer from "../features/projects/project/shared/documentSlice";
+import paymentReducer from "../features/payments/paymentSlice";
 export const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
@@ -13,6 +14,7 @@ export const store = configureStore({
     user: userReducer,
     earnings: earningsReducer,
     document: documentReducer,
+    payment: paymentReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()

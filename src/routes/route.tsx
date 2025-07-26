@@ -51,7 +51,7 @@ const AppRoutes: React.FC = () => (
         </ProtectedRoute>
       }
     >
-{/* Profile and General Pages */}
+      {/* Profile and General Pages */}
       <Route path="/profile" element={<UserProfileEdit />} />
 
       {/* Dashboard only */}
@@ -64,11 +64,7 @@ const AppRoutes: React.FC = () => (
         }
       />
 
-      
-      <Route
-  path="/projects"
-  element={<OngoingProjects />}
-/>
+      <Route path="/projects" element={<OngoingProjects />} />
 
       {/* Admin Pages (super-admin only) */}
       <Route
@@ -107,7 +103,7 @@ const AppRoutes: React.FC = () => (
       {/* Project-specific nested routes */}
       <Route path="/projects/:projectId">
         {/* Redirect logic */}
-         
+
         <Route
           index
           element={
@@ -321,16 +317,23 @@ const AppRoutes: React.FC = () => (
             </ProtectedRoute>
           }
         />
-        
-<Route
-  path="expense-documents"
-  element={
-    <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
-      <ExpenseDocumentsPage />
-    </ProtectedRoute>
-  }
-/>
 
+        <Route
+          path="expense-documents"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <ExpenseDocumentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="paymentrucker-documents"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <ReusableDocumentPage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
     </Route>
 
@@ -340,9 +343,3 @@ const AppRoutes: React.FC = () => (
 );
 
 export default AppRoutes;
-
-
-
-
-
-

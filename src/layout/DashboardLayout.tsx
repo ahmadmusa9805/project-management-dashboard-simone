@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 
 import type { MenuProps } from "antd";
 import { Breadcrumb, Button, Layout, Menu, Modal } from "antd";
@@ -22,10 +22,7 @@ type MenuItem = Required<MenuProps>["items"][number];
 type Role = "super-admin" | "prime-admin" | "basic-admin" | "client";
 
 const DashboardLayout: React.FC = () => {
-   
-
   // We'll use a ref to store the previous page URL
-  const prevLocationRef = useRef<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [notifications, setNotifications] = useState(notificationData);
@@ -34,7 +31,7 @@ const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const { projectId } = useParams();
   const user = useSelector((state: RootState) => state.auth.user);
- const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const path = location.pathname;
   const userRole = user?.role;
   const validRoles = ["super-admin", "prime-admin", "basic-admin", "client"];
@@ -56,16 +53,15 @@ const DashboardLayout: React.FC = () => {
   const rawUser = localStorage.getItem("user");
   const userInfo = rawUser ? JSON.parse(rawUser) : {};
 
-
   // On avatar click, open modal
   const handleAvatarClick = () => {
     setIsProfileModalOpen(true);
   };
 
- const handleProfileModalClose = () => {
+  const handleProfileModalClose = () => {
     setIsProfileModalOpen(false);
   };
-  
+
   return (
     <>
       <div className="bg-white h-16 w-full fixed top-0 left-0 z-50 shadow-sm flex items-center justify-between px-6 ">
@@ -93,40 +89,34 @@ const DashboardLayout: React.FC = () => {
             </Button>
           </div>
 
-
-
-
           <div
-      className="flex items-center gap-2 mr-8 ml-4 cursor-pointer"
-      onClick={handleAvatarClick}
-    >
-      {userInfo?.profileImg ? (
-        <img
-          src={userInfo.profileImg}
-          className="w-8 h-8 object-cover rounded-full"
-          alt="profile"
-        />
-      ) : (
-        <div className="border rounded-full p-2">
-          <FaRegUser />
-        </div>
-      )}
-      <h3 className="text-gray-500 font-semibold">
-        {userInfo?.name?.firstName} {userInfo?.name?.lastName}
-      </h3>
-    </div>
+            className="flex items-center gap-2 mr-8 ml-4 cursor-pointer"
+            onClick={handleAvatarClick}
+          >
+            {userInfo?.profileImg ? (
+              <img
+                src={userInfo.profileImg}
+                className="w-8 h-8 object-cover rounded-full"
+                alt="profile"
+              />
+            ) : (
+              <div className="border rounded-full p-2">
+                <FaRegUser />
+              </div>
+            )}
+            <h3 className="text-gray-500 font-semibold">
+              {userInfo?.name?.firstName} {userInfo?.name?.lastName}
+            </h3>
+          </div>
         </div>
       </div>
 
-
-
-        <Modal
+      <Modal
         title="Edit Profile"
         visible={isProfileModalOpen}
         onCancel={handleProfileModalClose}
         footer={null} // you can add footer buttons inside UserProfileEdit if needed
         width={900}
-        
       >
         <UserProfileEdit />
       </Modal>
@@ -171,6 +161,3 @@ const DashboardLayout: React.FC = () => {
 };
 
 export default DashboardLayout;
-
-
-
