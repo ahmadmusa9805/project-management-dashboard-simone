@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate} from "react-router-dom";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 
@@ -16,7 +16,7 @@ interface SubfolderFilesPageProps {
 const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = ({ baseRoute = "documents" }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { pathname } = location;
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const folder = location.state as {
