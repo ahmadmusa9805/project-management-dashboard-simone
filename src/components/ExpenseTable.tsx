@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Input, Drawer } from 'antd';
+import {  Drawer } from 'antd';
 import type { ExpenseItem } from '../types/projectAllTypes/expense';
-import CustomSearchInput from './CustomSearchInput';
+
 import CustomViewMoreButton from './CustomViewMoreButton';
 import CustomCreateButton from './CustomCreateButton';
 import ExpenseForm from './ExpenseForm';
@@ -14,7 +14,7 @@ interface ExpenseTableProps {
 
 const ExpenseTable = ({ data }: ExpenseTableProps) => {
   const [expenseData, setExpenseData] = useState<ExpenseItem[]>([]);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, ] = useState('');
   const [page, setPage] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ExpenseItem | null>(null);

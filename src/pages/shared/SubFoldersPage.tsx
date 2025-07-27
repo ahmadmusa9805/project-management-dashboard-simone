@@ -1,24 +1,26 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import CustomCreateButton from "../../components/CustomCreateButton";
 import { Modal } from "antd";
 import CreateFolder from "../../components/CreateFolder";
-import CustomCreateButton from "../../components/CustomCreateButton";
 
-type Subfolder = {
+interface Subfolder {
   id: string;
   name: string;
-};
+}
 
-const SubFoldersPage = () => {
+interface SubFoldersPageProps {
+  baseRoute?: "documents" | "second-fixed-list-material" | "handover-tool";
+}
+
+const SubFoldersPage: React.FC<SubFoldersPageProps> = ({ baseRoute = "documents" }) => {
+  const { projectId, mainFolderId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { projectId, mainFolderId } = useParams();
-  console.log("projectId:", projectId);
 
   const folder = location.state as { name: string; id: string } | null;
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [subfolders, setSubfolders] = useState<Subfolder[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCreateSubfolder = (name: string, id: string) => {
     setSubfolders((prev) => [...prev, { name, id }]);
@@ -26,9 +28,12 @@ const SubFoldersPage = () => {
   };
 
   const handleSubfolderClick = (sub: Subfolder) => {
-    navigate(`/projects/${projectId}/documents/${mainFolderId}/${sub.id}`, {
-      state: { name: sub.name, id: sub.id },
-    });
+    navigate(
+      `/projects/${projectId}/${baseRoute}/${mainFolderId}/${sub.id}`,
+      {
+        state: { name: sub.name, id: sub.id, from: baseRoute },
+      }
+    );
   };
 
   if (!folder?.name && !mainFolderId) {
@@ -47,18 +52,16 @@ const SubFoldersPage = () => {
 
   return (
     <div className="w-full h-full p-6">
-      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">
           📁 {folder?.name || mainFolderId} — Subfolders
         </h1>
         <CustomCreateButton
-          title="Create Subfolder"
+          title={`Create (${baseRoute})`}
           onClick={() => setIsModalOpen(true)}
         />
       </div>
 
-      {/* Subfolders List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {subfolders.map((sub) => (
           <div
@@ -71,7 +74,6 @@ const SubFoldersPage = () => {
         ))}
       </div>
 
-      {/* Modal */}
       <Modal
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}

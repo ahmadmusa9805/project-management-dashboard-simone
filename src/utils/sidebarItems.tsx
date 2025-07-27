@@ -96,11 +96,11 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
       label: "Dashboard",
       allowedRoles: ["super-admin", "prime-admin"],
     },
-    {
-      key: `/projects/${projectId}/details`,
-      label: "Project Details",
-      allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
-    },
+    // {
+    //   key: `/projects/${projectId}/details`,
+    //   label: "Project Details",
+    //   allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
+    // },
     {
       key: `/projects/${projectId}/quote-details`,
       label: "Quote Details",
@@ -162,11 +162,11 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
       label: "Notes",
       allowedRoles: ["super-admin", "prime-admin", "basic-admin", "client"],
     },
-    {
-      key: `/projects/${projectId}/labour`,
-      label: "Labour",
-      allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
-    },
+    // {
+    //   key: `/projects/${projectId}/labour`,
+    //   label: "Labour",
+    //   allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
+    // },
     {
       key: `/projects/${projectId}/client-details`,
       label: "Client Details",

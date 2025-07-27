@@ -10,7 +10,7 @@ interface CardProps {
 
 const StatCard: React.FC<CardProps> = ({ title, value, percentage, trend }) => {
   const isUp = trend === 'up';
-  const isDown = trend === 'down';
+  // const isDown = trend === 'down';
 
   return (
     <div className="flex-1 bg-white border border-[#E6E7E7] rounded-sm px-6 pt-5 pb-2 overflow-hidden flex flex-col justify-start items-start">

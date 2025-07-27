@@ -13,7 +13,6 @@ interface ToastEditorProps {
 
 const ToastEditor: React.FC<ToastEditorProps> = ({
   initialValue = "",
-  height = "400px",
   previewStyle = "vertical",
   theme = "light",
   onChange,
@@ -21,14 +20,14 @@ const ToastEditor: React.FC<ToastEditorProps> = ({
   const editorRef = useRef<Editor | null>(null);
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [content, setContent] = useState(initialValue);
+  const [, setContent] = useState(initialValue);
 
   useEffect(() => {
     if (!editorContainerRef.current) return;
 
     editorRef.current = new Editor({
       el: editorContainerRef.current,
-      height,
+      
       previewStyle,
       initialValue,
       theme,
@@ -71,10 +70,6 @@ const ToastEditor: React.FC<ToastEditorProps> = ({
     fileInputRef.current?.click();
   };
 
-  const handleSaveDefault = () => {
-    localStorage.setItem("toastEditorDefault", content);
-    alert("Content saved as default!");
-  };
 
   return (
     <div>
@@ -104,20 +99,6 @@ const ToastEditor: React.FC<ToastEditorProps> = ({
           Upload Image
         </button>
 
-        <button
-          type="button"
-          onClick={handleSaveDefault}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: 4,
-            cursor: "pointer",
-          }}
-        >
-          Save as Default
-        </button>
       </div>
     </div>
   );

@@ -12,8 +12,7 @@ import {
 import DashboardSummaryCards from './UserCard';
 import EarningsChart from './EarningsChart';
 
-const userCount = 54973;
-const earningsTotal = 126560;
+
 
 const clientData = [
   { month: 'Jan', thisYear: 5000, lastYear: 4000 },
@@ -30,14 +29,14 @@ const clientData = [
   { month: 'Dec', thisYear: 9400, lastYear: 8100 },
 ];
 
-const earningsData = [
-  { month: 'May', earning: 3000 },
-  { month: 'June', earning: 3500 },
-  { month: 'July', earning: 4000 },
-  { month: 'Aug', earning: 2800 },
-  { month: 'Sep', earning: 3200 },
-  { month: 'Oct', earning: 3760 },
-];
+// const earningsData = [
+//   { month: 'May', earning: 3000 },
+//   { month: 'June', earning: 3500 },
+//   { month: 'July', earning: 4000 },
+//   { month: 'Aug', earning: 2800 },
+//   { month: 'Sep', earning: 3200 },
+//   { month: 'Oct', earning: 3760 },
+// ];
 
 const DashboardAnalytics: React.FC = () => {
   return (

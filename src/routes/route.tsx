@@ -339,6 +339,14 @@ const AppRoutes: React.FC = () => (
           }
         />
         <Route
+          path="schedule-documents"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <ReusableDocumentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="site-pictures-reports/:folderId"
           element={
             <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
@@ -353,7 +361,7 @@ const AppRoutes: React.FC = () => (
             <ProtectedRoute
               allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
             >
-              <SubFoldersPage></SubFoldersPage>
+              <SubFoldersPage baseRoute="documents"></SubFoldersPage>
             </ProtectedRoute>
           }
         />
@@ -375,7 +383,7 @@ const AppRoutes: React.FC = () => (
             <ProtectedRoute
               allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
             >
-              <SubFoldersPage></SubFoldersPage>
+              <SubFoldersPage baseRoute="second-fixed-list-material"></SubFoldersPage>
             </ProtectedRoute>
           }
         />
@@ -385,11 +393,36 @@ const AppRoutes: React.FC = () => (
             <ProtectedRoute
               allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
             >
-              <SubfolderFilesPage />
+              <SubfolderFilesPage  />
             </ProtectedRoute>
           }
         />
       </Route>
+
+
+
+      // Routes setup for HandoverTool with nested folder/subfolder
+
+<Route
+  path="/projects/:projectId/handover-tool/:mainFolderId"
+  element={
+    <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin"]}>
+      <SubFoldersPage baseRoute="handover-tool" />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/projects/:projectId/handover-tool/:mainFolderId/:subFolderId"
+  element={
+    <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin"]}>
+      <SubfolderFilesPage baseRoute="handover-tool" />
+    </ProtectedRoute>
+  }
+/>
+
+
+
     </Route>
 
     {/* Catch all */}

@@ -25,7 +25,6 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
   const {
     control,
     handleSubmit,
-    formState: { errors },
   } = useForm<ProjectForm>({
     resolver: zodResolver(projectSchema),
     defaultValues: {

@@ -13,36 +13,41 @@ type Folder = {
 interface documentsComponenetsProps {
   title?: string;
 }
+
 const DocumentsPage = ({ title }: documentsComponenetsProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [folders, setFolders] = useState<Folder[]>([]);
   const navigate = useNavigate();
   const { projectId } = useParams();
-  let pageTitle = "";
-  if (title) {
-    // this is for  SecondFixedListPage components
-    pageTitle = title;
-  } else {
-    // this is for  DocumentsPage components
-    pageTitle = "Documents";
-  }
+
+  // ✅ Normalize title logic
+  const pageTitle = title || "Documents";
+
+  // ✅ Map title to baseRoute (URL segment)
+  const getBaseRoute = () => {
+    switch (pageTitle) {
+      case "Second Fixed List":
+        return "second-fixed-list-material";
+      case "Handover Tool":
+        return "handover-tool";
+      default:
+        return "documents";
+    }
+  };
+
   const handleCreateFolder = (folderName: string, folderId: string) => {
     setFolders((prev) => [...prev, { id: folderId, name: folderName }]);
     setIsModalOpen(false);
   };
 
   const handleFolderClick = (folder: Folder) => {
-    const basePath =
-      pageTitle === "Second Fixed List"
-        ? "second-fixed-list-material"
-        : "documents";
+    const baseRoute = getBaseRoute();
 
-    navigate(`/projects/${projectId}/${basePath}/${folder.id}`, {
+    navigate(`/projects/${projectId}/${baseRoute}/${folder.id}`, {
       state: {
         name: folder.name,
         id: folder.id,
-        from:
-          pageTitle === "Second Fixed List" ? "second-fixed-list" : "documents",
+        from: baseRoute,
       },
     });
   };

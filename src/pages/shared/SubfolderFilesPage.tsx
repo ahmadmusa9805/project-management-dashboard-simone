@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 
@@ -9,7 +9,11 @@ interface UploadedFile {
   size: number;
 }
 
-const SubfolderFilesPage = () => {
+interface SubfolderFilesPageProps {
+  baseRoute?: "documents" | "second-fixed-list-material" | "handover-tool";
+}
+
+const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = ({ baseRoute = "documents" }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { pathname } = location;
@@ -74,11 +78,13 @@ const SubfolderFilesPage = () => {
     );
   }
 
-  // ✅ Determine title based on route
-  const isFromFixedList = pathname.includes("second-fixed-list-material");
-  const uploadTitle = isFromFixedList
-    ? "Upload Fixed List Files"
-    : "Upload Files";
+  // Customize upload button title based on baseRoute
+  const uploadTitle =
+    baseRoute === "handover-tool"
+      ? "Upload Handover Documents"
+      : baseRoute === "second-fixed-list-material"
+      ? "Upload Fixed List Files"
+      : "Upload Files";
 
   return (
     <div className="w-full h-full p-6">
