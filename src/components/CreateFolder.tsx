@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 
 interface CreateFolderProps {
-  onCreate: (folderName: string) => void;
+  onCreate: (folderName: string, folderId: string) => void;
   onCancel: () => void;
 }
 
 const CreateFolder: React.FC<CreateFolderProps> = ({ onCreate, onCancel }) => {
   const [folderName, setFolderName] = useState("Untitled folder");
+
+  const generateFolderId = () => `folder-${Date.now()}`;
+
+  const handleCreate = () => {
+    const id = generateFolderId();
+    onCreate(folderName, id);
+  };
 
   return (
     <div className="w-full h-full p-6 bg-white shadow-xl rounded-md flex flex-col gap-6">
@@ -34,7 +41,7 @@ const CreateFolder: React.FC<CreateFolderProps> = ({ onCreate, onCancel }) => {
           Cancel
         </button>
         <button
-          onClick={() => onCreate(folderName)}
+          onClick={handleCreate}
           className="h-12 px-6 bg-[#001D01] text-white rounded text-base font-medium font-['IBM Plex Sans'] tracking-[0.48px] hover:bg-[#003A03] transition"
         >
           Create folder

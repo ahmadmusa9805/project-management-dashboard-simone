@@ -34,6 +34,9 @@ import LaborPage from "../pages/projects/specificProjectDetails/LaborPage";
 import LabourManagementPage from "../pages/user/LabourManagementPage";
 
 import ExpenseDocumentsPage from "../pages/projects/specificProjectDetails/ExpenseDocumentsPage";
+import SitePicturesAndReportsViewPage from "../components/SitePicturesAndReportsViewPage";
+import SubFoldersPage from "../pages/shared/SubFoldersPage";
+import SubfolderFilesPage from "../pages/shared/SubfolderFilesPage";
 
 const AppRoutes: React.FC = () => (
   <Routes>
@@ -201,7 +204,7 @@ const AppRoutes: React.FC = () => (
                 "client",
               ]}
             >
-              <CertificatesPage />
+              <CertificatesPage></CertificatesPage>
             </ProtectedRoute>
           }
         />
@@ -215,6 +218,7 @@ const AppRoutes: React.FC = () => (
             </ProtectedRoute>
           }
         />
+
         <Route
           path="second-fixed-list-material"
           element={
@@ -331,6 +335,57 @@ const AppRoutes: React.FC = () => (
           element={
             <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
               <ReusableDocumentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="site-pictures-reports/:folderId"
+          element={
+            <ProtectedRoute allowedRoles={["super-admin", "prime-admin"]}>
+              <SitePicturesAndReportsViewPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projects/:projectId/documents/:mainFolderId"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <SubFoldersPage></SubFoldersPage>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projects/:projectId/documents/:mainFolderId/:subFolderId"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <SubfolderFilesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projects/:projectId/second-fixed-list-material/:mainFolderId"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <SubFoldersPage></SubFoldersPage>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:projectId/second-fixed-list-material/:mainFolderId/:subFolderId"
+          element={
+            <ProtectedRoute
+              allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+            >
+              <SubfolderFilesPage />
             </ProtectedRoute>
           }
         />

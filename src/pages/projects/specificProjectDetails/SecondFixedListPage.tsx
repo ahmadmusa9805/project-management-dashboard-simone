@@ -1,4 +1,10 @@
+import DocumentsPage from "./DocumentsPage";
+
 const SecondFixedListPage = () => {
-  return <div>Second Fixed List (Material) Page (Super/Prime Admin only)</div>;
+  return (
+    <div>
+      <DocumentsPage title="Second Fixed List" />
+    </div>
+  );
 };
 export default SecondFixedListPage;

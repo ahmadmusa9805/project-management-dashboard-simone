@@ -1,4 +1,41 @@
+import { useNavigate, useParams } from "react-router-dom";
+
+const foldersData = [
+  {
+    id: "demolitions",
+    name: "Demolitions",
+  },
+  {
+    id: "structural-works",
+    name: "Structural works",
+  },
+  {
+    id: "internal-works",
+    name: "Internal works",
+  },
+  {
+    id: "m-e",
+    name: "M/E",
+  },
+  {
+    id: "finishing",
+    name: "Finishing",
+  },
+  {
+    id: "report",
+    name: "Report",
+  },
+];
+
 const SitePicturesReportsPage = () => {
+  const navigate = useNavigate();
+  const { projectId } = useParams();
+
+  const handleFolderClick = (folderId: string) => {
+    console.log("Navigating to folder", folderId, "in project", projectId);
+    navigate(`/projects/${projectId}/site-pictures-reports/${folderId}`);
+  };
+
   return (
     <div className="self-stretch px-8 py-6 bg-white inline-flex flex-col justify-start items-end gap-8">
       {/* Header */}
@@ -14,21 +51,15 @@ const SitePicturesReportsPage = () => {
 
       {/* Report Categories */}
       <div className="self-stretch flex-1 inline-flex justify-start items-start gap-3 flex-wrap content-start">
-        {[
-          "Demolitions",
-          "Structural works",
-          "Internal works",
-          "M/E",
-          "Finishing",
-          "Report",
-        ].map((title, idx) => (
+        {foldersData.map((folder) => (
           <div
-            key={idx}
+            key={folder.id}
+            onClick={() => handleFolderClick(folder.id)}
             className="w-80 h-28 px-3 py-8 bg-zinc-100 rounded-[3px] flex justify-start items-center gap-4 cursor-pointer"
           >
             <div className="flex-1 flex flex-col justify-center items-start">
               <div className="w-full max-w-32 text-gray-950 text-lg font-medium leading-normal tracking-tight">
-                {title}
+                {folder.name}
               </div>
             </div>
             <div className="w-6 rotate-180 flex justify-start items-center">

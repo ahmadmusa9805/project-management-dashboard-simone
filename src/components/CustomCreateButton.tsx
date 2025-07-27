@@ -21,7 +21,7 @@ const CustomCreateButton: React.FC<CustomCreateButtonProps> = ({
       </div>
 
       {/* Button Text */}
-      <span className="tracking-wide">{title}</span>
+      <span className="tracking-wide text-white">{title}</span>
     </button>
   );
 };
