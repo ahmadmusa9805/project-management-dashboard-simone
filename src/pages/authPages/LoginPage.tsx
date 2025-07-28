@@ -1,8 +1,8 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import greenLogo from "../../assets/green-logo.png";
 
@@ -21,35 +21,33 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
 
- const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    const result = await login({ email, password }).unwrap();
-    dispatch(setCredentials(result));
-    console.log("Login successful:", result);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const result = await login({ email, password }).unwrap();
+      dispatch(setCredentials(result));
+      console.log("Login successful:", result);
 
-    localStorage.setItem("token", result.token);
-    localStorage.setItem("user", JSON.stringify(result.user));
-    localStorage.setItem("role", result.user.role);
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user));
+      localStorage.setItem("role", result.user.role);
 
-    successAlert("Login successful", "You have successfully logged in.");
+      successAlert("Login successful", "You have successfully logged in.");
 
-    // ✅ Redirect based on role
-    if (result.user.role === "super-admin") {
-      navigate("/dashboard");
-    } else {
-      navigate("/projects?status=ongoing");
+      // ✅ Redirect based on role
+      if (result.user.role === "super-admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/projects?status=ongoing");
+      }
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Credentials",
+        text: error?.data?.error || "Email or password is incorrect.",
+      });
     }
-
-  } catch (error: any) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Credentials",
-      text: error?.data?.error || "Email or password is incorrect.",
-    });
-  }
-};
-
+  };
 
   return (
     <div className="flex flex-col items-center gap-14 self-stretch min-h-screen bg-white px-4 py-8">
@@ -63,7 +61,9 @@ const LoginPage = () => {
       {/* Middle Section */}
       <div className="flex flex-col items-center gap-6 w-full max-w-md">
         <div className="flex flex-col items-start gap-2 w-full">
-          <h2 className="text-xl font-semibold text-gray-900">Login to your account</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Login to your account
+          </h2>
           <p className="text-base text-gray-500 text-center">
             Please enter your email & password to continue.
           </p>
@@ -109,8 +109,17 @@ const LoginPage = () => {
 
       {/* Lower Section */}
       <div className="flex flex-col items-center gap-2 w-full">
-        <span className="text-base text-gray-700">Go to our Website</span>
-        <span className="text-lg font-semibold text-green-700">Instant Quote</span>
+        {/* https://www.themvv.co.uk/ */}
+
+        <Link to={"https://www.themvv.co.uk/"}>
+          <span className="text-base text-gray-500 underline hover:text-gray-900">
+            Go to our Website
+          </span>
+        </Link>
+
+        <span className="text-lg font-semibold text-green-700">
+          Instant Quote
+        </span>
       </div>
     </div>
   );

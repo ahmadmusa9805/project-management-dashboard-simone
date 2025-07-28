@@ -1,11 +1,30 @@
 // ✅ src/utils/sidebarItems.tsx
 import React from "react";
-import {
-  PieChartOutlined,
-  DesktopOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
+
 import type { MenuProps } from "antd";
+import {
+  BanknoteIcon,
+  CalendarClockIcon,
+  ChartBarBigIcon,
+  ClipboardListIcon,
+  Crown,
+  FileBadgeIcon,
+  FilePenLineIcon,
+  FolderOpenIcon,
+  HandshakeIcon,
+  HardHatIcon,
+  ImageIcon,
+  Layers,
+  LayoutDashboardIcon,
+  ListChecksIcon,
+  ListTodoIcon,
+  RefreshCw,
+  ShieldCheckIcon,
+  SquareUserRoundIcon,
+  TrendingUp,
+  UserPlus,
+  Users,
+} from "lucide-react";
 
 type Role = "super-admin" | "prime-admin" | "basic-admin" | "client";
 
@@ -25,23 +44,25 @@ const rawSidebarItems: SidebarItem[] = [
   {
     key: "/dashboard",
     label: "Dashboard",
-    icon: <PieChartOutlined />,
-    allowedRoles: ["super-admin", "prime-admin"],
+    icon: <LayoutDashboardIcon />,
+    allowedRoles: ["super-admin"],
   },
   {
     key: "/projects",
     label: "Projects",
-    icon: <DesktopOutlined />,
+    icon: <Layers />,
     allowedRoles: ["super-admin", "prime-admin", "basic-admin", "client"],
     children: [
       {
         key: "/projects?status=onging",
         label: "Ongoing Projects",
+        icon: <RefreshCw />,
         allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
       },
       {
         key: "/projects?status=completed",
         label: "Completed Projects",
+        icon: <ShieldCheckIcon />,
         allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
       },
     ],
@@ -49,25 +70,25 @@ const rawSidebarItems: SidebarItem[] = [
   {
     key: "/prime-admins",
     label: "Prime Admins",
-    icon: <TeamOutlined />,
+    icon: <Crown />,
     allowedRoles: ["super-admin"],
   },
   {
     key: "/basic-admins",
     label: "Basic Admins",
-    icon: <TeamOutlined />,
+    icon: <Users />,
     allowedRoles: ["super-admin"],
   },
   {
     key: "/labours",
     label: "Labour Management",
-    icon: <TeamOutlined />,
+    icon: <HardHatIcon />,
     allowedRoles: ["super-admin"],
   },
   {
     key: "/clients",
     label: "Clients",
-    icon: <TeamOutlined />,
+    icon: <UserPlus></UserPlus>,
     allowedRoles: ["super-admin"],
   },
 ];
@@ -94,6 +115,7 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
     {
       key: `/projects/${projectId}/dashboard`,
       label: "Dashboard",
+      icon: <LayoutDashboardIcon />,
       allowedRoles: ["super-admin", "prime-admin"],
     },
     // {
@@ -104,62 +126,74 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
     {
       key: `/projects/${projectId}/quote-details`,
       label: "Quote Details",
+      icon: <ClipboardListIcon />,
       allowedRoles: ["super-admin", "prime-admin", "client"],
     },
     {
       key: `/projects/${projectId}/interim-evaluation`,
       label: "Interim Evaluations",
+      icon: <ChartBarBigIcon />,
       allowedRoles: ["super-admin", "prime-admin"],
     },
     {
       key: `/projects/${projectId}/live-project-costs`,
       label: "Live Project Costs",
+      icon: <TrendingUp />,
       allowedRoles: ["super-admin", "prime-admin"],
     },
     {
       key: `/projects/${projectId}/payments-track`,
       label: "Payments Track",
+      icon: <BanknoteIcon />,
       allowedRoles: ["super-admin", "prime-admin"],
     },
     {
       key: `/projects/${projectId}/site-pictures-reports`,
       label: "Site Pictures & Reports",
+      icon: <ImageIcon />,
       allowedRoles: ["super-admin", "prime-admin", "basic-admin", "client"],
     },
 
     {
       key: `/projects/${projectId}/certificates`,
       label: "Certificates",
+      icon: <FileBadgeIcon />,
       allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
     },
     {
       key: `/projects/${projectId}/documents`,
       label: "Documents",
+      icon: <FolderOpenIcon />,
       allowedRoles: ["super-admin", "prime-admin", "basic-admin", "client"],
     },
     {
       key: `/projects/${projectId}/second-fixed-list-material`,
       label: "Second Fixed List",
+      icon: <ListChecksIcon />,
       allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
     },
     {
       key: `/projects/${projectId}/handover-tool`,
       label: "Handover Tool",
+      icon: <HandshakeIcon />,
       allowedRoles: ["super-admin", "prime-admin"],
     },
     {
       key: `/projects/${projectId}/time-schedule`,
       label: "Time Schedule",
+      icon: <CalendarClockIcon />,
       allowedRoles: ["super-admin", "prime-admin", "basic-admin", "client"],
     },
     {
       key: `/projects/${projectId}/snagging-list`,
       label: "Snagging List",
+      icon: <ListTodoIcon />,
       allowedRoles: ["super-admin", "prime-admin", "basic-admin", "client"],
     },
     {
       key: `/projects/${projectId}/notes`,
       label: "Notes",
+      icon: <FilePenLineIcon />,
       allowedRoles: ["super-admin", "prime-admin", "basic-admin", "client"],
     },
     // {
@@ -170,6 +204,7 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
     {
       key: `/projects/${projectId}/client-details`,
       label: "Client Details",
+      icon: <SquareUserRoundIcon />,
       allowedRoles: ["super-admin", "prime-admin"],
     },
   ];
@@ -179,6 +214,6 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
     .map((item) => ({
       key: item.key,
       label: item.label,
-      icon: <TeamOutlined />,
+      icon: item?.icon,
     }));
 }

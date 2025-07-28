@@ -12,7 +12,7 @@ const CustomCreateButton: React.FC<CustomCreateButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1 px-6 py-2 bg-[#001D01] text-white text-sm font-medium rounded"
+      className="inline-flex items-center gap-1 px-6 py-2 bg-primary hover:opacity-80 text-white text-sm font-medium rounded"
     >
       {/* Plus Icon */}
       <div className="relative w-4 h-4">

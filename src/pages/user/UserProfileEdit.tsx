@@ -115,19 +115,18 @@ const UserProfileEdit = () => {
                 />
                 <span className="text-white font-medium">Enable Edit</span>
               </label>
-              
             </div>
-             {isEditing && (
-        <button
-          className=" px-4 py-1.5 bg-[#001D01] text-white font-semibold rounded"
-          onClick={() => {
-            console.log("Updated data:", formData);
-            setIsEditing(false); // Exit editing mode after submit
-          }}
-        >
-          Update
-        </button>
-      )}
+            {isEditing && (
+              <button
+                className=" px-4 py-1.5 bg-[#001D01] text-white font-semibold rounded"
+                onClick={() => {
+                  console.log("Updated data:", formData);
+                  setIsEditing(false); // Exit editing mode after submit
+                }}
+              >
+                Update
+              </button>
+            )}
           </div>
 
           {/* Fields */}
@@ -172,7 +171,7 @@ const UserProfileEdit = () => {
         {/* Update Password Button */}
         <div className="w-full flex flex-col justify-start items-start gap-6">
           <div className="w-full flex gap-65 items-center ">
-            <div className="min-h-[32px] px-6 bg-[#172B4D0F] rounded flex justify-center items-center gap-1 cursor-pointer">
+            <div className="min-h-[32px] px-6 bg-[#DA453F] rounded flex justify-center items-center gap-1 cursor-pointer">
               <button
                 onClick={(e) => {
                   e.preventDefault();
@@ -181,21 +180,11 @@ const UserProfileEdit = () => {
               >
                 Update password
               </button>
-            </div><div className="min-h-[32px] px-6 bg-[#172B4D0F] rounded flex justify-center items-center gap-1 cursor-pointer">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsPasswordModalOpen(true);
-                }}
-              >
-                Forget password
-              </button>
             </div>
           </div>
         </div>
       </div>
 
-     
       <PasswordUpdateModal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
@@ -208,11 +197,6 @@ const UserProfileEdit = () => {
           setIsPasswordModalOpen(false);
         }}
       />
-
-
-
-      
-
     </div>
   );
 };

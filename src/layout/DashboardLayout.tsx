@@ -1,8 +1,14 @@
 import React, { useState } from "react";
-
+import "./dashboard.css";
 import type { MenuProps } from "antd";
 import { Breadcrumb, Button, Layout, Menu, Modal } from "antd";
-import { useLocation, useNavigate, useParams, Outlet } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  Outlet,
+  Link,
+} from "react-router-dom";
 import logo from "../assets/green-logo.png";
 import { FaRegUser } from "react-icons/fa6";
 import { IoNotificationsOutline } from "react-icons/io5";
@@ -61,14 +67,17 @@ const DashboardLayout: React.FC = () => {
   const handleProfileModalClose = () => {
     setIsProfileModalOpen(false);
   };
-
+  const redirectPath = userRole === "super-admin" ? "/dashboard" : "/projects";
   return (
     <>
       <div className="bg-white h-16 w-full fixed top-0 left-0 z-50 shadow-sm flex items-center justify-between px-6 ">
-        <div className="flex items-center justify-between m-8">
-          <img src={logo} alt="Logo" className={`w-8 h-4 mx-auto my-6 `} />
-          <p className="text-lg font-bold m-4">MVV Portal</p>
-        </div>
+        <Link to={redirectPath} className="block">
+          <div className="flex items-center justify-center m-8 cursor-pointer">
+            <img src={logo} alt="Logo" className="w-8 h-8 mr-2" />
+            <span className="text-lg font-bold leading-none">MVV Portal</span>
+          </div>
+        </Link>
+
         <div className="flex items-center justify-between mt-2 ">
           <div className="relative">
             <Button
@@ -82,7 +91,7 @@ const DashboardLayout: React.FC = () => {
             >
               <IoNotificationsOutline size={22} />
               {unreadCount > 0 && (
-                <span className="absolute top-0 left-6 bg-[#031F04] text-xs px-1 text-white border rounded-full">
+                <span className="absolute top-0 left-6 bg-[#DA453F] text-xs px-1 text-white border rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -135,7 +144,10 @@ const DashboardLayout: React.FC = () => {
             onClick={({ key }) => navigate(key)}
             mode="inline"
             items={mainItems}
+            className="custom-sidebar-menu"
           />
+
+          {/* Add this inline style block inside your component (just after return) */}
         </Sider>
 
         <Layout>
@@ -146,7 +158,7 @@ const DashboardLayout: React.FC = () => {
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>
-            Ant Design ©{new Date().getFullYear()} Created by Ant UED
+            themvv.co.uk ©{new Date().getFullYear()} Created by Ant UED
           </Footer>
         </Layout>
       </Layout>

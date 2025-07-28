@@ -127,7 +127,7 @@ const UserCreateEditPage = ({
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="w-full bg-white rounded shadow-lg p-6 flex flex-col gap-6"
+      className="w-full bg-white  p-6 flex flex-col gap-6"
     >
       <h2 className="text-2xl font-semibold text-[#000E0F]">
         {mode === "edit" ? "Edit User" : "Create a New User"}

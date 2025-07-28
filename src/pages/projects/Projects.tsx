@@ -2,16 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
-import CustomSharedPage from "../../components/CustomSharedPage";
 import CreateProjectForm from "./CreatedAndEditProjectForm";
-import type { z } from 'zod';
+import type { z } from "zod";
 import type { projectSchema } from "../../types/projectAllTypes/projectSchema";
-import { Drawer } from "antd";
+import { Drawer, Modal } from "antd";
+import CustomShareSelector from "../../components/CustomShareSelector";
 
 type ProjectForm = z.infer<typeof projectSchema>;
 
-
-const OngoingProjects = () => {
+const Projects = () => {
   const navigate = useNavigate();
 
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -19,7 +18,6 @@ const OngoingProjects = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editProject, setEditProject] = useState<ProjectForm | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-
 
   const projects = [
     { id: 1, title: "Green Villa Renovation", status: "Ongoing" },
@@ -34,13 +32,13 @@ const OngoingProjects = () => {
   ];
 
   const handleMoreClick = (key: string, projectId: number) => {
+    // Simulate fetch or set dummy data for now
+    const selectedProject = projects.find((p) => p.id === projectId);
     switch (key) {
       case "view":
         navigate(`/projects/${projectId}`);
         break;
       case "edit":
-        // Simulate fetch or set dummy data for now
-        const selectedProject = projects.find((p) => p.id === projectId);
         if (selectedProject) {
           // You should fetch actual project data here from API
           setEditProject({
@@ -76,19 +74,15 @@ const OngoingProjects = () => {
     }
   };
 
-
-
   const handleCreateProject = (data: ProjectForm) => {
     console.log("New Project Created:", data);
     setIsCreateOpen(false);
   };
 
-
   const handleEditProject = (data: ProjectForm) => {
     console.log("Project Updated:", data);
     setIsEditOpen(false);
   };
-
 
   const handleShare = (userIds: number[]) => {
     console.log(`Project ${sharedProjectId} shared with users:`, userIds);
@@ -101,7 +95,10 @@ const OngoingProjects = () => {
       <div className="w-full px-4 flex flex-col gap-4">
         {/* Create Button */}
         <div className="w-full flex justify-end">
-          <CustomCreateButton title="Create Project" onClick={() => setIsCreateOpen(true)} />
+          <CustomCreateButton
+            title="Create Project"
+            onClick={() => setIsCreateOpen(true)}
+          />
         </div>
 
         {/* Project Cards */}
@@ -153,18 +150,20 @@ const OngoingProjects = () => {
       </div>
 
       {/* Shared Page Conditional Rendering */}
-      {isShareOpen && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white max-w-md w-full p-6 rounded shadow-lg">
-            <CustomSharedPage
-              title="Share Ongoing Project"
-              roles={["Prime Admin", "Basic Admin", "Clients"]}
-              users={mockUsers}
-              onShare={handleShare}
-            />
-          </div>
-        </div>
-      )}
+      <Modal
+        open={isShareOpen}
+        footer={null}
+        onCancel={() => {
+          setIsShareOpen(false);
+          setSharedProjectId(null);
+        }}
+      >
+        <CustomShareSelector
+          roles={["Admin", "Editor", "Client"]}
+          users={mockUsers}
+          onShare={handleShare}
+        />
+      </Modal>
 
       <Drawer
         title="Create Project"
@@ -196,13 +195,8 @@ const OngoingProjects = () => {
           />
         )}
       </Drawer>
-
-
-
-
-
     </>
   );
 };
 
-export default OngoingProjects;
+export default Projects;

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Input, Checkbox, Button } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { useState } from "react";
+import { Input, Checkbox, Button } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 
 interface User {
   id: number;
@@ -8,20 +8,20 @@ interface User {
   avatar: string;
 }
 
-interface CustomSharedPageProps {
+interface CustomShareSelectorProps {
   title?: string;
   roles: string[];
   users: User[];
   onShare: (selectedUserIds: number[]) => void;
 }
 
-const CustomSharedPage = ({
-  title = 'Share with',
+const CustomShareSelector = ({
+  title = "Share with",
   roles,
   users,
   onShare,
-}: CustomSharedPageProps) => {
-  const [searchText, setSearchText] = useState('');
+}: CustomShareSelectorProps) => {
+  const [searchText, setSearchText] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
 
   const filteredUsers = users.filter((user) =>
@@ -54,7 +54,7 @@ const CustomSharedPage = ({
         ))}
       </div>
 
-      {/* Search Box */}
+      {/* Search */}
       <div className="flex items-center gap-3 px-2 py-3 border-2 border-gray-200 rounded">
         <div className="flex items-center gap-1">
           {filteredUsers.slice(0, 3).map((user) => (
@@ -76,8 +76,8 @@ const CustomSharedPage = ({
         />
       </div>
 
-      {/* Users List */}
-      <div className="flex flex-col gap-4">
+      {/* User List */}
+      <div className="flex flex-col gap-4 max-h-60 overflow-y-auto">
         {filteredUsers.map((user) => (
           <div
             key={user.id}
@@ -89,7 +89,9 @@ const CustomSharedPage = ({
                 src={user.avatar}
                 alt={user.name}
               />
-              <span className="text-[#172B4D] text-base font-medium">{user.name}</span>
+              <span className="text-[#172B4D] text-base font-medium">
+                {user.name}
+              </span>
             </div>
             <Checkbox
               checked={selectedUserIds.includes(user.id)}
@@ -111,4 +113,4 @@ const CustomSharedPage = ({
   );
 };
 
-export default CustomSharedPage;
+export default CustomShareSelector;

@@ -10,7 +10,7 @@ import ProjectDefaultRedirect from "./ProjectDefaultRedirect";
 
 import DashbordPage from "../pages/dashbord/DashbordPage";
 import AdminTable from "../pages/user/UserManagement";
-import OngoingProjects from "../pages/projects/OngoingProjects";
+
 import UserProfileEdit from "../pages/user/UserProfileEdit";
 
 import ProjectDashboard from "../pages/projects/specificProjectDetails/ProjectDashboard";
@@ -37,6 +37,7 @@ import ExpenseDocumentsPage from "../pages/projects/specificProjectDetails/Expen
 import SitePicturesAndReportsViewPage from "../components/SitePicturesAndReportsViewPage";
 import SubFoldersPage from "../pages/shared/SubFoldersPage";
 import SubfolderFilesPage from "../pages/shared/SubfolderFilesPage";
+import Projects from "../pages/projects/Projects";
 
 const AppRoutes: React.FC = () => (
   <Routes>
@@ -56,7 +57,6 @@ const AppRoutes: React.FC = () => (
     >
       {/* Profile and General Pages */}
       <Route path="/profile" element={<UserProfileEdit />} />
-
       {/* Dashboard only */}
       <Route
         path="/dashboard"
@@ -66,9 +66,7 @@ const AppRoutes: React.FC = () => (
           </ProtectedRoute>
         }
       />
-
-      <Route path="/projects" element={<OngoingProjects />} />
-
+      <Route path="/projects" element={<Projects />} />
       {/* Admin Pages (super-admin only) */}
       <Route
         path="/prime-admins"
@@ -102,7 +100,6 @@ const AppRoutes: React.FC = () => (
           </ProtectedRoute>
         }
       />
-
       {/* Project-specific nested routes */}
       <Route path="/projects/:projectId">
         {/* Redirect logic */}
@@ -393,36 +390,32 @@ const AppRoutes: React.FC = () => (
             <ProtectedRoute
               allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
             >
-              <SubfolderFilesPage  />
+              <SubfolderFilesPage />
             </ProtectedRoute>
           }
         />
       </Route>
-
-
-
       // Routes setup for HandoverTool with nested folder/subfolder
-
-<Route
-  path="/projects/:projectId/handover-tool/:mainFolderId"
-  element={
-    <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin"]}>
-      <SubFoldersPage baseRoute="handover-tool" />
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/projects/:projectId/handover-tool/:mainFolderId/:subFolderId"
-  element={
-    <ProtectedRoute allowedRoles={["super-admin", "prime-admin", "basic-admin"]}>
-      <SubfolderFilesPage baseRoute="handover-tool" />
-    </ProtectedRoute>
-  }
-/>
-
-
-
+      <Route
+        path="/projects/:projectId/handover-tool/:mainFolderId"
+        element={
+          <ProtectedRoute
+            allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+          >
+            <SubFoldersPage baseRoute="handover-tool" />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/projects/:projectId/handover-tool/:mainFolderId/:subFolderId"
+        element={
+          <ProtectedRoute
+            allowedRoles={["super-admin", "prime-admin", "basic-admin"]}
+          >
+            <SubfolderFilesPage baseRoute="handover-tool" />
+          </ProtectedRoute>
+        }
+      />
     </Route>
 
     {/* Catch all */}

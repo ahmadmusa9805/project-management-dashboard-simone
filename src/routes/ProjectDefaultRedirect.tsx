@@ -18,7 +18,9 @@ const ProjectDefaultRedirect: React.FC = () => {
     if (["super-admin", "prime-admin"].includes(role)) {
       navigate(`/projects/${projectId}/dashboard`, { replace: true });
     } else if (role === "client" || role === "basic-admin") {
-      navigate(`/projects/${projectId}/details`, { replace: true });
+      navigate(`/projects/${projectId}/site-pictures-reports`, {
+        replace: true,
+      });
     } else {
       navigate("/not-found", { replace: true });
     }
