@@ -53,7 +53,7 @@ const DashboardAnalytics: React.FC = () => {
           </div>
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-900 rounded" />
+              <div className="w-3 h-3 bg-[#0d542b] rounded" />
               <span className="text-sm text-gray-700">This year</span>
             </div>
             <div className="flex items-center space-x-2">

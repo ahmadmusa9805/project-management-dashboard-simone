@@ -60,7 +60,7 @@ const EarningsChart: React.FC = () => {
               <option key={proj.id} value={proj.id}>{proj.name}</option>
             ))}
           </select>
-          <div className="w-3 h-2 bg-gray-800" />
+          <div className="w-3 h-2 bg-[#0d542b]" />
         </div>
       </div>
 

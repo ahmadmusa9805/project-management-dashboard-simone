@@ -70,17 +70,18 @@ const DashboardLayout: React.FC = () => {
   const redirectPath = userRole === "super-admin" ? "/dashboard" : "/projects";
   return (
     <>
-      <div className="bg-white h-16 w-full fixed top-0 left-0 z-50 shadow-sm flex items-center justify-between px-6 ">
+      <div className="bg-white h-20 w-full fixed top-0 left-0 z-50 shadow-sm flex items-center justify-between px-6 ">
         <Link to={redirectPath} className="block">
           <div className="flex items-center justify-center m-8 cursor-pointer">
-            <img src={logo} alt="Logo" className="w-8 h-8 mr-2" />
-            <span className="text-lg font-bold leading-none">MVV Portal</span>
+            <img src={logo} alt="Logo" className="w-10 h-10 mr-2" />
+            <span className="text-3xl text-[#0d542b] font-bold leading-none">MVV Portal</span>
           </div>
         </Link>
 
         <div className="flex items-center justify-between mt-2 ">
           <div className="relative">
             <Button
+            className="text-[#0d542b]"
               type="text"
               onClick={() => {
                 setIsNotificationModalOpen(true);
@@ -91,7 +92,7 @@ const DashboardLayout: React.FC = () => {
             >
               <IoNotificationsOutline size={22} />
               {unreadCount > 0 && (
-                <span className="absolute top-0 left-6 bg-[#DA453F] text-xs px-1 text-white border rounded-full">
+                <span className="absolute top-0 left-6 bg-[#DA453F]  text-xs px-1 text-white border rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -99,7 +100,7 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           <div
-            className="flex items-center gap-2 mr-8 ml-4 cursor-pointer"
+            className="flex items-center gap-2 mr-8 ml-4 cursor-pointer text-[#0d542b]"
             onClick={handleAvatarClick}
           >
             {userInfo?.profileImg ? (
@@ -132,13 +133,14 @@ const DashboardLayout: React.FC = () => {
 
       <Layout style={{ minHeight: "100vh", paddingTop: 64 }}>
         <Sider
-          width={250}
+          width={300}
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
-          style={{ background: "#ffffff" }}
+         style={{ background: "#ffffff", position: "relative" }} 
         >
-          <Menu
+          <div className="custom-sidebar-menu-wrapper">
+  <Menu
             selectedKeys={[location.pathname]}
             defaultSelectedKeys={[path]}
             onClick={({ key }) => navigate(key)}
@@ -146,6 +148,8 @@ const DashboardLayout: React.FC = () => {
             items={mainItems}
             className="custom-sidebar-menu"
           />
+          </div>
+        
 
           {/* Add this inline style block inside your component (just after return) */}
         </Sider>
@@ -153,7 +157,7 @@ const DashboardLayout: React.FC = () => {
         <Layout>
           <Content style={{ margin: "0 16px" }}>
             <Breadcrumb style={{ margin: "16px 0" }} />
-            <div>
+            <div className="bg-bg-white!">
               <Outlet />
             </div>
           </Content>
@@ -167,6 +171,7 @@ const DashboardLayout: React.FC = () => {
         open={isNotificationModalOpen}
         onClose={() => setIsNotificationModalOpen(false)}
         notifications={notifications}
+        
       />
     </>
   );

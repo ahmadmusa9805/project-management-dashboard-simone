@@ -54,17 +54,17 @@ const rawSidebarItems: SidebarItem[] = [
     allowedRoles: ["super-admin", "prime-admin", "basic-admin", "client"],
     children: [
       {
-        key: "/projects?status=onging",
-        label: "Ongoing Projects",
-        icon: <RefreshCw />,
-        allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
-      },
-      {
-        key: "/projects?status=completed",
-        label: "Completed Projects",
-        icon: <ShieldCheckIcon />,
-        allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
-      },
+  key: "/projects?status=ongoing", // Correct spelling: ongoing (not onging)
+  label: "Ongoing Projects",
+  icon: <RefreshCw />,
+  allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
+},
+{
+  key: "/projects?status=completed",
+  label: "Completed Projects",
+  icon: <ShieldCheckIcon />,
+  allowedRoles: ["super-admin", "prime-admin", "basic-admin"],
+}
     ],
   },
   {

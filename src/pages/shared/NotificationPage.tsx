@@ -24,24 +24,24 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ open, onClose, no
     <Modal
       title={
         <div className="flex items-center gap-2 text-lg font-semibold">
-          <IoNotificationsOutline size={20} /> Notification
+          <IoNotificationsOutline size={30} /> Notification
         </div>
       }
       open={open}
       onCancel={onClose}
       footer={null}
-      width={450}
+      width={900}
     >
       <div className="max-h-[400px] overflow-y-auto pr-2 space-y-3">
         {notifications.map((item) => (
           <div
             key={item._id}
-            className="bg-gray-100 p-3 rounded hover:bg-gray-200 transition-all duration-200"
+            className="bg-gray-100 p-3 rounded hover:bg-[#e6f4ea] transition-all duration-200"
           >
-            <div className="text-sm font-medium text-gray-800">
-              {item.message}
+            <div className="text-sm gap-3 flex font-medium text-gray-800">
+            <IoNotificationsOutline size={20} />   {item.message}
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="ml-8 text-xs text-gray-500 mt-1">
               {new Date(item.createdAt).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',

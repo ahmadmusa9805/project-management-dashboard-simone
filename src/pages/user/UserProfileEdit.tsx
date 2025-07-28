@@ -1,6 +1,8 @@
 import { Camera } from "lucide-react";
 import { useState } from "react";
 import PasswordUpdateModal from "../../components/PasswordUpdateModal";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../Redux/app/store";
 
 const UserProfileEdit = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -8,6 +10,8 @@ const UserProfileEdit = () => {
     "https://placehold.co/80x80"
   );
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+const userRole = useSelector((state: RootState) => state.auth.user?.role);
+console.log("Logged-in role:", userRole);
 
   const [formData, setFormData] = useState({
     firstName: "Sarah",
@@ -29,24 +33,26 @@ const UserProfileEdit = () => {
     }
   };
 
-  const renderInput = (
-    label: string,
-    name: keyof typeof formData,
-    defaultValue: string
-  ) => (
-    <div className="w-[364px] flex flex-col justify-start items-start gap-4">
-      <label className="text-[#2B3738] text-sm font-normal">{label}</label>
-      <input
-        type="text"
-        name={name}
-        value={formData[name] ?? ""}
-        onChange={handleInputChange}
-        disabled={!isEditing}
-        placeholder={formData[name] || defaultValue}
-        className="w-full px-3 py-1 border border-gray-300 rounded focus:outline-none"
-      />
-    </div>
-  );
+ const renderInput = (
+  label: string,
+  name: keyof typeof formData,
+  defaultValue: string,
+  disabled: boolean = false
+) => (
+  <div className="w-[364px] flex flex-col justify-start items-start gap-4">
+    <label className="text-[#2B3738] text-sm font-normal">{label}</label>
+    <input
+      type="text"
+      name={name}
+      value={formData[name] ?? ""}
+      onChange={handleInputChange}
+      disabled={!isEditing || disabled}
+      placeholder={formData[name] || defaultValue}
+      className="w-full px-3 py-1 border border-gray-300 rounded focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+    />
+  </div>
+);
+
 
   return (
     <div className="w-full h-full px-8 py-6 bg-white flex flex-col justify-start items-end gap-8">
@@ -62,7 +68,7 @@ const UserProfileEdit = () => {
       </div>
 
       {/* Profile Section */}
-      <div className="w-full p-6 bg-[#F7F7F7] rounded border-2 border-[#E6E7E7] flex flex-col justify-start items-start gap-6">
+      <div className="w-full p-6 bg-[#F7F7F7] rounded border-2 border-[#e6f4ea] flex flex-col justify-start items-start gap-6">
         <div className="w-full flex flex-col justify-start items-start gap-12">
           <div className="w-full flex flex-col justify-start items-start gap-12">
             <div className="w-full flex flex-col justify-start items-start gap-6">
@@ -102,10 +108,10 @@ const UserProfileEdit = () => {
       <div className="w-full flex flex-col justify-start items-start gap-12">
         <div className="w-full flex flex-col justify-start items-start gap-6">
           <div className="w-full flex justify-start items-center gap-4">
-            <div className="flex-1 flex flex-col justify-center text-black text-lg font-medium leading-[24.3px] tracking-tight font-ibm">
+            <div className="flex-1 flex flex-col justify-center  text-lg font-medium leading-[24.3px] tracking-tight font-ibm">
               Personal Information
             </div>
-            <div className="min-h-[32px] px-4 bg-[#001D01] rounded flex justify-center items-center gap-1">
+            <div className="min-h-[32px] px-4 bg-[#0d542b] rounded flex justify-center items-center gap-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -113,18 +119,18 @@ const UserProfileEdit = () => {
                   onChange={(e) => setIsEditing(e.target.checked)}
                   className="py-1.5"
                 />
-                <span className="text-white font-medium">Enable Edit</span>
+                <span className="text-white bg-[#0d542b] font-medium">Enable Edit</span>
               </label>
             </div>
             {isEditing && (
               <button
-                className=" px-4 py-1.5 bg-[#001D01] text-white font-semibold rounded"
+                className=" px-4 py-[5px] bg-[#0d542b] text-white font-semibold rounded"
                 onClick={() => {
                   console.log("Updated data:", formData);
                   setIsEditing(false); // Exit editing mode after submit
                 }}
               >
-                Update
+                <span className="text-white">Update</span>
               </button>
             )}
           </div>
@@ -159,9 +165,10 @@ const UserProfileEdit = () => {
             </div>
             <div className="w-[364px] flex flex-col justify-start items-start gap-4">
               <div className="w-full flex flex-col justify-start items-start gap-2">
-                <div className="w-full flex justify-center flex-col text-black text-sm font-medium leading-[16.24px] font-ibm">
+                <div className="w-full flex justify-center flex-col text-black disabled text-sm font-medium leading-[16.24px] font-ibm">
                   {" "}
-                  {renderInput("E-mail", "email", "example@example.com")}
+                  {renderInput("E-mail", "email", "example@example.com", userRole !== "super-admin")}
+
                 </div>
               </div>
             </div>
@@ -171,7 +178,7 @@ const UserProfileEdit = () => {
         {/* Update Password Button */}
         <div className="w-full flex flex-col justify-start items-start gap-6">
           <div className="w-full flex gap-65 items-center ">
-            <div className="min-h-[32px] px-6 bg-[#DA453F] rounded flex justify-center items-center gap-1 cursor-pointer">
+            <div className="min-h-[32px] px-6 bg-[#0d542b] rounded font-medium text-white flex justify-center items-center gap-1 cursor-pointer">
               <button
                 onClick={(e) => {
                   e.preventDefault();

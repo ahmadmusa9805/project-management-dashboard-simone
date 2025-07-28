@@ -2,6 +2,94 @@
 
 @theme: {
     
-    --color-primary: "#001D01",        // Dark green
+    --color-primary: "#0d542b",        // Dark green
     --color-lightPrimary: "#e6f4ea",   // Light green
   }
+
+  /* hover:bg-[#0b4725]   #0d542b  -p */
+
+
+  /* Dropdown menu item default */
+/* Override Ant Design Input, TextArea borders and focus */
+/* INPUT, TEXTAREA, SELECT, DATEPICKER, INPUTNUMBER */
+
+/* Remove default box-shadow on focus and hover */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input:hover,
+.ant-input:focus,
+.ant-input-affix-wrapper:hover,
+.ant-input-affix-wrapper-focused,
+.ant-input-number,
+.ant-input-number-focused,
+.ant-input-number:hover,
+.ant-input-textarea,
+.ant-input-textarea:hover,
+.ant-input-textarea:focus,
+.ant-select-selector,
+.ant-select-focused .ant-select-selector,
+.ant-select:hover .ant-select-selector,
+.ant-picker,
+.ant-picker-focused,
+.ant-picker:hover {
+  border-color: #0d542b !important;
+  box-shadow: 0 0 0 2px rgba(13, 84, 43, 0.2) !important;
+  outline: none !important; /* Remove any default outlines */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-clip: padding-box; /* Prevent black outlines due to background */
+}
+
+/* Remove any inset or extra shadows */
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-picker,
+.ant-input-number {
+  box-shadow: none !important;
+}
+
+/* For focused states, apply subtle glow with no black border */
+.ant-input:focus,
+.ant-input-affix-wrapper-focused,
+.ant-input-number-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  border-color: #0d542b !important;
+  box-shadow: 0 0 0 2px rgba(13, 84, 43, 0.3) !important;
+  outline: ;
+}
+
+/* Upload Dragger extra fixes */
+.ant-upload.ant-upload-drag,
+.ant-upload.ant-upload-drag:hover {
+  border-color: #0d542b !important;
+  background-color: #f7faf7 !important;
+}
+
+/* Button primary fixes */
+.ant-btn-primary {
+  background-color: #0d542b !important;
+  border-color: #0d542b !important;
+  color: white !important;
+}
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background-color: #0d542b !important;
+  border-color: #0d542b !important;
+  color: white !important;
+}
+
+/* Dropdown menu items */
+.ant-select-item-option {
+  transition: background-color 0.3s ease;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled),
+.ant-select-item-option:hover:not(.ant-select-item-option-disabled) {
+  background-color: #e6f4ea !important;
+  
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #e6f4ea !important;
+  
+}

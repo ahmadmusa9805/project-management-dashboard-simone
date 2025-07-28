@@ -10,17 +10,17 @@ const { Option } = Select;
 const { Dragger } = Upload;
 
 type ProjectForm = z.infer<typeof projectSchema>;
-
 interface CreateProjectFormProps {
   onSubmit: (data: ProjectForm) => void;
   defaultValues?: Partial<ProjectForm>;
   submitText?: string;
+  isEdit?: boolean; // NEW prop to tell if form is for edit or create
 }
-
 const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
   onSubmit,
   defaultValues,
   submitText = 'Create Project',
+   isEdit = false,
 }) => {
   const {
     control,
@@ -247,12 +247,38 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
           </Button>
         </div>
       </div>
+      {isEdit && (
+  <>
+    <div className="flex flex-col gap-1">
+      <label htmlFor="status" className="font-medium">Project Status</label>
+      <Controller
+        control={control}
+        name="status"
+        render={({ field }) => (
+          <Select {...field} id="status" placeholder="Select Project Status">
+            <Option value="ongoing">Ongoing</Option>
+            <Option value="completed">Completed</Option>
+            <Option value="pending">Pending</Option>
+            <Option value="cancelled">Cancelled</Option>
+          </Select>
+        )}
+      />
+    </div>
+
+  </>
+)}
+
 
       <div className="flex justify-end">
-        <Button type="primary" htmlType="submit" className="bg-[#001D01]">
-          {submitText}
-        </Button>
-      </div>
+ <Button
+  htmlType="submit"
+  className="!bg-[#0d542b] !text-white"
+>
+  {submitText}
+</Button>
+
+</div>
+
     </form>
   );
 };

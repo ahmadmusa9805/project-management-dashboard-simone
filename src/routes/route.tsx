@@ -205,6 +205,7 @@ const AppRoutes: React.FC = () => (
             </ProtectedRoute>
           }
         />
+
         <Route
           path="documents"
           element={

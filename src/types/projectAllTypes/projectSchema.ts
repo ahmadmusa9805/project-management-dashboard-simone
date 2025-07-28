@@ -20,5 +20,45 @@ export const projectSchema = z.object({
     name: z.string(),
     date: z.string(),
   })).optional(),
-  contractPdf: z.any().optional()
+  contractPdf: z.any().optional(),
+   status: z.enum(['ongoing', 'completed', 'pending', 'cancelled']).optional(),
 });
+
+
+ export type projectType = {
+  id:number;
+  projectName: string;
+  clientName: string;
+  projectType: string;
+  primaryContact: string;
+  projectAddress: string;
+  description: string;
+  
+  contract: {
+    reference: string;
+    date: string; // ISO date string
+    pdf: {
+      uid: string;
+      name: string;
+    };
+    value: number;
+    currency: string;
+    estimatedBudget: number;
+    overheadCost: number;
+  };
+
+  timeline: {
+    startDate: string; // ISO date string
+    estimatedCompletionDate: string; // ISO date string
+    status: string;
+  };
+
+  milestones: {
+    name: string;
+    date: string; // ISO date string
+  }[];
+
+  team: any[]; // You can replace `any` with more specific types if you have team member structure
+};
+
+

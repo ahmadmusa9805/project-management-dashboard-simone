@@ -70,13 +70,13 @@ const PasswordUpdateModal: React.FC<PasswordUpdateModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+            className="px-4 py-2 bg-gray-300 hover:opacity-80 rounded"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded"
+            className="px-4 py-2 bg-[#0d542b] text-white hover:opacity-80 font-semibold rounded"
           >
             Save
           </button>

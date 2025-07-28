@@ -9,6 +9,6 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Users','Dashbord'], // Add more tags as needed like 'Projects', 'Auth', etc.
+  tagTypes: ['Users','Dashbord','Projects'], // Add more tags as needed like 'Projects', 'Auth', etc.
   endpoints: () => ({}), // Extend this in child APIs
 });
