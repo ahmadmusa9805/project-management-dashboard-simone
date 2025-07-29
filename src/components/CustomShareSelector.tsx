@@ -1,32 +1,43 @@
 import { useState } from "react";
 import { Input, Checkbox, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+import { useGetAllUsersQuery } from "../Redux/features/users/usersApi";
 
 interface User {
   id: number;
   name: string;
-  avatar: string;
+  email?: string;
+  role: string;
+  photo?: string;
 }
 
 interface CustomShareSelectorProps {
   title?: string;
-  roles: string[];
-  users: User[];
+  roles: string[]; // Example: ['prime-admin', 'basic-admin', 'client']
   onShare: (selectedUserIds: number[]) => void;
 }
 
 const CustomShareSelector = ({
   title = "Share with",
   roles,
-  users,
   onShare,
 }: CustomShareSelectorProps) => {
+  const { data: response } = useGetAllUsersQuery();
+  const users: User[] = (response?.data || []).filter(
+    (item: any) => item.email && item.photo && item.role && item.name
+  );
+
   const [searchText, setSearchText] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+  const [selectedRole, setSelectedRole] = useState<string>("all");
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchText.toLowerCase())
-  );
+ const filteredUsers = users.filter((user) => {
+  const matchesName = user.name.toLowerCase().includes(searchText.toLowerCase());
+  const matchesRole =
+    selectedRole === "all" || user.role.toLowerCase() === selectedRole.toLowerCase();
+  return matchesName && matchesRole;
+});
+
 
   const handleToggleUser = (id: number) => {
     setSelectedUserIds((prev) =>
@@ -42,26 +53,37 @@ const CustomShareSelector = ({
         <div className="w-6 h-6 bg-[#001D01] rounded" />
       </div>
 
-      {/* Roles */}
+      {/* Role Filter Buttons */}
       <div className="flex gap-2 flex-wrap">
+        <div
+          onClick={() => setSelectedRole("all")}
+          className={`px-3 py-2 rounded-full text-sm font-medium cursor-pointer border ${
+            selectedRole === "all" ? "bg-[#e6f4ea] border-[#0d542b]" : "border-[#969C9D]"
+          }`}
+        >
+          All
+        </div>
         {roles.map((role) => (
           <div
             key={role}
-            className="px-3 py-2 rounded-full border border-[#969C9D] text-sm font-medium text-[#2B3738]"
+            onClick={() => setSelectedRole(role)}
+            className={`px-3 py-2 rounded-full text-sm font-medium cursor-pointer border ${
+              selectedRole === role ? "bg-[#e6f4ea] border-[#0d542b]" : "border-[#969C9D]"
+            }`}
           >
-            {role}
+            {role.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
           </div>
         ))}
       </div>
 
-      {/* Search */}
+      {/* Search Bar */}
       <div className="flex items-center gap-3 px-2 py-3 border-2 border-gray-200 rounded">
         <div className="flex items-center gap-1">
           {filteredUsers.slice(0, 3).map((user) => (
             <img
               key={user.id}
               className="w-6 h-6 rounded-full border border-gray-300"
-              src={user.avatar}
+              src={user.photo}
               alt={user.name}
             />
           ))}
@@ -78,27 +100,34 @@ const CustomShareSelector = ({
 
       {/* User List */}
       <div className="flex flex-col gap-4 max-h-60 overflow-y-auto">
-        {filteredUsers.map((user) => (
-          <div
-            key={user.id}
-            className="w-full flex items-center justify-between gap-4 border-b border-[#E6E7E7] py-4"
-          >
-            <div className="flex items-center gap-4">
-              <img
-                className="w-10 h-10 p-2 bg-[#E6E7E7] rounded-full"
-                src={user.avatar}
-                alt={user.name}
+        {filteredUsers.length > 0 ? (
+          filteredUsers.map((user) => (
+            <div
+              key={user.id}
+              className="w-full flex items-center justify-between gap-4 border-b border-[#E6E7E7] py-4"
+            >
+              <div className="flex items-center gap-4">
+                <img
+                  className="w-10 h-10 p-2 bg-[#E6E7E7] rounded-full"
+                  src={user.photo}
+                  alt={user.name}
+                />
+                <div>
+                  <span className="text-[#172B4D] text-base font-medium">
+                    {user.name}
+                  </span>
+                  <div className="text-xs text-[#6B7374]">{user.role}</div>
+                </div>
+              </div>
+              <Checkbox
+                checked={selectedUserIds.includes(user.id)}
+                onChange={() => handleToggleUser(user.id)}
               />
-              <span className="text-[#172B4D] text-base font-medium">
-                {user.name}
-              </span>
             </div>
-            <Checkbox
-              checked={selectedUserIds.includes(user.id)}
-              onChange={() => handleToggleUser(user.id)}
-            />
-          </div>
-        ))}
+          ))
+        ) : (
+          <div className="text-center text-sm text-gray-500">No users found</div>
+        )}
       </div>
 
       {/* Share Button */}

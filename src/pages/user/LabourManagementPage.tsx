@@ -24,7 +24,7 @@ interface LaborItem {
   role?: string;
 }
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 type SearchProps = GetProps<typeof Input.Search>;
 
 const LaborTable: React.FC = () => {
@@ -79,7 +79,7 @@ const LaborTable: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto p-4">
+      <div className="bg-white min-h-screen mx-auto w-full p-4">
         <div className="flex justify-between mb-4">
           <h1 className="text-2xl font-semibold">Manage Labor Entries</h1>
           <CustomSearchInput onSearch={onSearch} />
@@ -104,7 +104,7 @@ const LaborTable: React.FC = () => {
         ) : (
           <>
             <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-[#e6f4ea] border-b border-gray-300">
                 <tr>
                   <th className="px-4 py-2 text-left">Type</th>
                   <th className="px-4 py-2 text-left">Name</th>
@@ -119,7 +119,7 @@ const LaborTable: React.FC = () => {
                 {currentData.map((item) => (
                   <tr
                     key={item.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
+                    className="border-b border-gray-100 hover:bg-[#e6f4ea]"
                   >
                     <td className="px-4 py-3">{item.type}</td>
                     <td className="px-4 py-3">{item.name}</td>
@@ -150,7 +150,7 @@ const LaborTable: React.FC = () => {
               </tbody>
             </table>
 
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-evenly items-center mt-4">
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page <= 1}

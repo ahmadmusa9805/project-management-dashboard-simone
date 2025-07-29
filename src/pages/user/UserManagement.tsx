@@ -26,7 +26,7 @@ interface DataItem {
 
 type SearchProps = GetProps<typeof Input.Search>;
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const AdminTable = () => {
   const [page, setPage] = useState(1);
@@ -115,9 +115,9 @@ const AdminTable = () => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto p-4 ">
+      <div className="w-full mx-auto p-4 bg-white min-h-screen">
         <div className="flex  justify-between">
-          <h1 className="text-2xl font-semibold mb-4">Manage {title} Table</h1>{" "}
+          <h1 className="text-2xl font-semibold mb-4">Manage {title} </h1>{" "}
           <CustomSearchInput onSearch={onSearch} />
         </div>
         <div className="py-2 justify-end flex">
@@ -132,7 +132,7 @@ const AdminTable = () => {
         </div>
 
         <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-[#e6f4ea] border-b border-gray-300">
             <tr>
               <th className="text-left px-4 py-2 text-gray-700">Name</th>
               <th className="text-left px-4 py-2 text-gray-700">Email</th>
@@ -155,7 +155,7 @@ const AdminTable = () => {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="">
             {currentData.map(
               ({
                 id,
@@ -169,7 +169,7 @@ const AdminTable = () => {
               }) => (
                 <tr
                   key={id}
-                  className="border-b border-gray-100 hover:bg-gray-50"
+                  className="border-b border-gray-100 hover:bg-[#e6f4ea]"
                 >
                   <td className="px-4 py-3 text-gray-900">{name}</td>
                   <td className="px-4 py-3 text-gray-900">{email}</td>
@@ -258,7 +258,7 @@ const AdminTable = () => {
         </table>
 
         {/* Pagination controls */}
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-evenly items-center mt-4">
           <button
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1}

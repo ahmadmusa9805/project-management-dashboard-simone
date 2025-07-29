@@ -12,19 +12,20 @@ import { Drawer, Modal } from "antd";
 import CustomShareSelector from "../../components/CustomShareSelector";
 import { useGetProjectsQuery } from "../../Redux/features/projects/projectsApi";
 import { RefreshCw, ShieldCheckIcon } from "lucide-react";
+import { useGetAllUsersQuery } from "../../Redux/features/users/usersApi";
 
 type ProjectForm = z.infer<typeof projectSchema>;
 
 const Projects = () => {
   const navigate = useNavigate();
-
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [sharedProjectId, setSharedProjectId] = useState<number | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editProject, setEditProject] = useState<ProjectForm | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-
   const location = useLocation();
+ 
+
 
   // Parse query params to get "status"
   const queryParams = new URLSearchParams(location.search);
@@ -79,11 +80,11 @@ const Projects = () => {
   //   { id: 3, title: "Skyline Apartment", status: "Ongoing" },
   // ];
 
-  const mockUsers = [
-    { id: 1, name: "Jonathan Swift", avatar: "https://placehold.co/40x40" },
-    { id: 2, name: "Emily Carter", avatar: "https://placehold.co/40x40" },
-    { id: 3, name: "David Miller", avatar: "https://placehold.co/40x40" },
-  ];
+  // const mockUsers = [
+  //   { id: 1, name: "Jonathan Swift", avatar: "https://placehold.co/40x40" },
+  //   { id: 2, name: "Emily Carter", avatar: "https://placehold.co/40x40" },
+  //   { id: 3, name: "David Miller", avatar: "https://placehold.co/40x40" },
+  // ];
 
   const handleMoreClick = (key: string, projectId: number) => {
     // Simulate fetch or set dummy data for now
@@ -236,9 +237,8 @@ const Projects = () => {
         }}
       >
         <CustomShareSelector
-          roles={["Admin", "Editor", "Client"]}
-          users={mockUsers}
-          onShare={handleShare}
+          roles={["Prime-Admin", "Basic-Admin", "Client"]}
+           onShare={(selectedIds) => console.log("Shared with IDs:", selectedIds)}
         />
       </Modal>
 
