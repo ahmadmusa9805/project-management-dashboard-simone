@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { Input, Select, type GetProps } from "antd";
 import CustomSearchInput from "../../components/CustomSearchInput";
 import CustomCreateButton from "../../components/CustomCreateButton";
@@ -9,6 +10,7 @@ import getStatusClasses from "../../utils/getStatusClasses";
 import type { StatusType } from "../../types/userAllTypes/user";
 import { useLocation } from "react-router-dom";
 import UserDetailsModal from "./UserDetailModal";
+import { useGetAllUsersQuery } from "../../Redux/features/users/usersApi";
 // adjust the path if needed
 
 interface DataItem {
@@ -24,47 +26,6 @@ interface DataItem {
 
 type SearchProps = GetProps<typeof Input.Search>;
 
-// Sample data
-const initialData: DataItem[] = [
-  {
-    id: 1,
-    name: "Daniel Carter",
-    email: "danielcarter@gmail.com",
-    phone: "+44 7911 123456",
-    status: "Active",
-    role: "prime-admin",
-  },
-  {
-    id: 2,
-    name: "Sophia Mitchell",
-    email: "sophiamitchess@gmail.com",
-    phone: "+44 7911 123457",
-    status: "In pipeline",
-    role: "client",
-    quoteValue: "$5000",
-    projectName: "E-commerce Site",
-  },
-  {
-    id: 3,
-    name: "Liam Bennett",
-    email: "liambennet@gmail.com",
-    phone: "+44 7911 123458",
-    status: "Disable",
-    role: "basic-admin",
-  },
-  {
-    id: 4,
-    name: "Emily Harrison",
-    email: "emilyharrison@gmail.com",
-    phone: "+44 7911 123459",
-    status: "Suspended",
-    role: "client",
-    quoteValue: "$3000",
-    projectName: "CRM System",
-  },
-  // ...
-];
-
 const ITEMS_PER_PAGE = 5;
 
 const AdminTable = () => {
@@ -73,7 +34,30 @@ const AdminTable = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<DataItem | null>(null);
-  const [userData, setUserData] = useState<DataItem[]>(initialData);
+  const { data, isLoading, error } = useGetAllUsersQuery();
+
+  const [userData, setUserData] = useState<DataItem[]>([]); // start empty
+
+  // When API data arrives, update userData state with mapped data
+  useEffect(() => {
+    if (data?.data && Array.isArray(data.data)) {
+      // Map the API data to your DataItem interface,
+      // assuming the API returns compatible fields
+      const mappedData: DataItem[] = data.data.map((user: any) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.contact, // your API uses "contact" instead of "phone"
+        status: "Active", // your API doesn't have status field, you can set default or map if you add it later
+        role: user.role,
+        quoteValue: user.estimateNumber || undefined,
+        projectName: user.projectType || undefined,
+        // Add other fields as needed
+      }));
+      setUserData(mappedData);
+    }
+  }, [data]);
+
   const location = useLocation();
   const pathname = location.pathname;
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);

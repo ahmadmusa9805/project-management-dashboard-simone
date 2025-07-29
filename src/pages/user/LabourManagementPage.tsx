@@ -1,14 +1,15 @@
-// src/pages/LaborManagement/LaborTable.tsx
-import React, { useState } from "react";
-import { Input } from "antd";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useState } from "react";
+import { Input, Drawer, Spin } from "antd";
+import type { GetProps } from "antd";
+import type { UploadFile } from "antd";
+
 import CustomSearchInput from "../../components/CustomSearchInput";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
-import { Drawer } from "antd";
 import LaborCreateEdit from "./LaborCreateEdit";
 import LaborDetailModal from "./LaborDetailModal";
-import type { GetProps } from "antd";
-import type { UploadFile } from "antd";
+import { useGetAllUsersQuery } from "../../Redux/features/users/usersApi";
 
 interface LaborItem {
   id: number;
@@ -20,40 +21,43 @@ interface LaborItem {
   vatRate: number;
   description?: string;
   uploadedFile?: UploadFile;
+  role?: string;
 }
-
-const initialData: LaborItem[] = [
-  {
-    id: 1,
-    type: "Labor",
-    name: "John Doe",
-    rate: 200,
-    quantity: 2,
-    date: "2025‑01‑26",
-    vatRate: 20,
-    description: "Site labor",
-  },
-  {
-    id: 2,
-    type: "Material",
-    name: "Cement Bags",
-    rate: 5,
-    quantity: 50,
-    date: "2025‑01‑27",
-    vatRate: 15,
-  },
-];
 
 const ITEMS_PER_PAGE = 5;
 type SearchProps = GetProps<typeof Input.Search>;
 
 const LaborTable: React.FC = () => {
+  const { data, isLoading, error } = useGetAllUsersQuery();
+  console.log("data in labor components after call hook", data?.data[0]);
+  // const rowDataByUserRole = data?.data.filter((user) => user.role === "labor");
+  // console.log(rowDataByUserRole);
+  const [laborData, setLaborData] = useState<LaborItem[]>([]);
+  useEffect(() => {
+    if (data?.data && Array.isArray(data.data)) {
+      const filteredLabor = data.data
+        .filter((user: any) => user.role === "labor")
+        .map((user: any) => ({
+          id: user.id,
+          type: user.type,
+          name: user.name,
+          rate: user.rate ?? 0,
+          quantity: user.quantity ?? 0,
+          date: user.date ?? "",
+          vatRate: user.vatRate ?? 0,
+          description: user.description,
+          uploadedFile: user.uploadedFile,
+          role: user.role,
+        }));
+      setLaborData(filteredLabor);
+    }
+  }, [data]);
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [selected, setSelected] = useState<LaborItem | null>(null);
-  const [laborData, setLaborData] = useState<LaborItem[]>(initialData);
+
   const [detailOpen, setDetailOpen] = useState(false);
   const [viewItem, setViewItem] = useState<LaborItem | null>(null);
 
@@ -91,80 +95,90 @@ const LaborTable: React.FC = () => {
           />
         </div>
 
-        <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="px-4 py-2 text-left">Type</th>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Rate</th>
-              <th className="px-4 py-2 text-left">Quantity</th>
-              <th className="px-4 py-2 text-left">Date</th>
-              <th className="px-4 py-2 text-left">VAT%</th>
-              <th className="px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentData.map((item) => (
-              <tr
-                key={item.id}
-                className="border-b border-gray-100 hover:bg-gray-50"
-              >
-                <td className="px-4 py-3">{item.type}</td>
-                <td className="px-4 py-3">{item.name}</td>
-                <td className="px-4 py-3">{item.rate}</td>
-                <td className="px-4 py-3">{item.quantity}</td>
-                <td className="px-4 py-3">{item.date}</td>
-                <td className="px-4 py-3">{item.vatRate}%</td>
-                <td className="px-4 py-3">
-                  <CustomViewMoreButton
-                    items={[
-                      { key: "view", label: "View Details" },
-                      { key: "edit", label: "Edit Entry" },
-                    ]}
-                    onClick={(key) => {
-                      if (key === "view" && item) {
-                        setViewItem(item);
-                        setDetailOpen(true);
-                      } else if (key === "edit") {
-                        setMode("edit");
-                        setSelected(item);
-                        setDrawerOpen(true);
-                      }
-                    }}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="flex justify-between items-center mt-4">
-          <button
-            onClick={() => setPage(page - 1)}
-            disabled={page <= 1}
-            className={`px-4 py-2 rounded border ${
-              page <= 1
-                ? "text-gray-400 border-gray-300"
-                : "text-blue-600 border-blue-600 hover:bg-blue-50"
-            }`}
-          >
-            Previous
-          </button>
-          <div className="text-gray-700">
-            Page {page} of {totalPages}
+        {isLoading ? (
+          <div className="text-center my-8">
+            <Spin size="large" />
           </div>
-          <button
-            onClick={() => setPage(page + 1)}
-            disabled={page >= totalPages}
-            className={`px-4 py-2 rounded border ${
-              page >= totalPages
-                ? "text-gray-400 border-gray-300"
-                : "text-blue-600 border-blue-600 hover:bg-blue-50"
-            }`}
-          >
-            Next
-          </button>
-        </div>
+        ) : error ? (
+          <p className="text-red-600">Failed to load labor data</p>
+        ) : (
+          <>
+            <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-2 text-left">Type</th>
+                  <th className="px-4 py-2 text-left">Name</th>
+                  <th className="px-4 py-2 text-left">Rate</th>
+                  <th className="px-4 py-2 text-left">Quantity</th>
+                  <th className="px-4 py-2 text-left">Date</th>
+                  <th className="px-4 py-2 text-left">VAT%</th>
+                  <th className="px-4 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentData.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-3">{item.type}</td>
+                    <td className="px-4 py-3">{item.name}</td>
+                    <td className="px-4 py-3">{item.rate}</td>
+                    <td className="px-4 py-3">{item.quantity}</td>
+                    <td className="px-4 py-3">{item.date}</td>
+                    <td className="px-4 py-3">{item.vatRate}%</td>
+                    <td className="px-4 py-3">
+                      <CustomViewMoreButton
+                        items={[
+                          { key: "view", label: "View Details" },
+                          { key: "edit", label: "Edit Entry" },
+                        ]}
+                        onClick={(key) => {
+                          if (key === "view" && item) {
+                            setViewItem(item);
+                            setDetailOpen(true);
+                          } else if (key === "edit") {
+                            setMode("edit");
+                            setSelected(item);
+                            setDrawerOpen(true);
+                          }
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="flex justify-between items-center mt-4">
+              <button
+                onClick={() => setPage(page - 1)}
+                disabled={page <= 1}
+                className={`px-4 py-2 rounded border ${
+                  page <= 1
+                    ? "text-gray-400 border-gray-300"
+                    : "text-blue-600 border-blue-600 hover:bg-blue-50"
+                }`}
+              >
+                Previous
+              </button>
+              <div className="text-gray-700">
+                Page {page} of {totalPages}
+              </div>
+              <button
+                onClick={() => setPage(page + 1)}
+                disabled={page >= totalPages}
+                className={`px-4 py-2 rounded border ${
+                  page >= totalPages
+                    ? "text-gray-400 border-gray-300"
+                    : "text-blue-600 border-blue-600 hover:bg-blue-50"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <Drawer

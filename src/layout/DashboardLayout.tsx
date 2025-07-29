@@ -74,14 +74,16 @@ const DashboardLayout: React.FC = () => {
         <Link to={redirectPath} className="block">
           <div className="flex items-center justify-center m-8 cursor-pointer">
             <img src={logo} alt="Logo" className="w-10 h-10 mr-2" />
-            <span className="text-3xl text-[#0d542b] font-bold leading-none">MVV Portal</span>
+            <span className="text-3xl text-[#0d542b] font-bold leading-none">
+              MVV Portal
+            </span>
           </div>
         </Link>
 
         <div className="flex items-center justify-between mt-2 ">
           <div className="relative">
             <Button
-            className="text-[#0d542b]"
+              className="text-[#0d542b]"
               type="text"
               onClick={() => {
                 setIsNotificationModalOpen(true);
@@ -137,19 +139,18 @@ const DashboardLayout: React.FC = () => {
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
-         style={{ background: "#ffffff", position: "relative" }} 
+          style={{ background: "#ffffff", position: "relative" }}
         >
           <div className="custom-sidebar-menu-wrapper">
-  <Menu
-            selectedKeys={[location.pathname]}
-            defaultSelectedKeys={[path]}
-            onClick={({ key }) => navigate(key)}
-            mode="inline"
-            items={mainItems}
-            className="custom-sidebar-menu"
-          />
+            <Menu
+              selectedKeys={[location.pathname + location.search]}
+              defaultSelectedKeys={[path + location.search]}
+              onClick={({ key }) => navigate(key)}
+              mode="inline"
+              items={mainItems}
+              className="custom-sidebar-menu"
+            />
           </div>
-        
 
           {/* Add this inline style block inside your component (just after return) */}
         </Sider>
@@ -171,7 +172,6 @@ const DashboardLayout: React.FC = () => {
         open={isNotificationModalOpen}
         onClose={() => setIsNotificationModalOpen(false)}
         notifications={notifications}
-        
       />
     </>
   );

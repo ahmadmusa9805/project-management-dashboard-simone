@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { authApi } from "../features/auth/authApi";
 import authReducer from "../features/auth/authSlice";
-import { baseApi } from "./api/baseApi";
 
 import userReducer from "../features/users/usersSlice";
 import earningsReducer from "../features/projects/dashbordSlice";
 import documentReducer from "../features/projects/project/shared/documentSlice";
 import paymentReducer from "../features/payments/paymentSlice";
+import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
   reducer: {
@@ -25,8 +25,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(authApi.middleware)
-      .concat(baseApi.middleware)
-      
+      .concat(baseApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
