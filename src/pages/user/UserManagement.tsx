@@ -34,7 +34,7 @@ const AdminTable = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<DataItem | null>(null);
-  const { data, isLoading, error } = useGetAllUsersQuery();
+  const { data } = useGetAllUsersQuery();
 
   const [userData, setUserData] = useState<DataItem[]>([]); // start empty
 
