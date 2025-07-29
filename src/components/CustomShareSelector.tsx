@@ -116,10 +116,11 @@ const CustomShareSelector = ({
                   <span className="text-[#172B4D] text-base font-medium">
                     {user.name}
                   </span>
-                  <div className="text-xs text-[#6B7374]">{user.role}</div>
+                  <div className="text-xs text-[#6B7374] ">{user.role.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}</div>
                 </div>
               </div>
               <Checkbox
+              className="border-[#E6E7E7]"
                 checked={selectedUserIds.includes(user.id)}
                 onChange={() => handleToggleUser(user.id)}
               />
