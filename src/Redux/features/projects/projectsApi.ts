@@ -1,20 +1,56 @@
-import { baseApi } from '../../app/api/baseApi';
+// src/Redux/features/projects/projectsApi.ts
+
+import { baseApi } from "../../app/api/baseApi";
+
 
 export const projectsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProjects: builder.query<any[], { status?: string } | void>({
       query: (params) => {
-        console.log(params?.status)
-        const queryString = params?.status ;
+        const queryString = params?.status ? `?status=${params.status}` : '';
         return `/projects${queryString}`;
       },
       providesTags: ['Projects'],
       transformResponse: (response: { status: string; data: any[] }) => {
-        // Your mock returns { status, data: [...] }, so return only data array
-        return response.data;
+        return Array.isArray(response.data) ? response.data : [];
       },
+    }),
+
+    createProject: builder.mutation<any, any>({
+    query: (data) => {
+    // console.log("Creating Project with Data:", data);
+    return {
+    url: '/projects',
+    method: 'POST',
+    body: data,
+  };
+},
+      invalidatesTags: ['Projects'],
+    }),
+
+    updateProject: builder.mutation<any, { id: number; data: any }>({
+      query: ({ id, data }) => ({
+        url: `/projects/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['Projects'],
+    }),
+
+
+      deleteProject: builder.mutation<any, number>({
+      query: (id) => ({
+        url: `/projects/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Projects'],
     }),
   }),
 });
 
-export const { useGetProjectsQuery } = projectsApi;
+export const {
+  useGetProjectsQuery,
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
+} = projectsApi;

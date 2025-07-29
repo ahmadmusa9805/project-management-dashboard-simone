@@ -1,45 +1,69 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Drawer, Modal } from "antd";
+import { RefreshCw, ShieldCheckIcon } from "lucide-react";
+
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
-import CreateProjectForm from "./CreatedAndEditProjectForm";
-import { Drawer, Modal } from "antd";
 import CustomShareSelector from "../../components/CustomShareSelector";
-import { useGetProjectsQuery } from "../../Redux/features/projects/projectsApi";
-import { RefreshCw, ShieldCheckIcon } from "lucide-react";
+import CreateProjectForm from "./CreatedAndEditProjectForm";
+
+import {
+  useCreateProjectMutation,
+  useDeleteProjectMutation,
+  useGetProjectsQuery,
+  useUpdateProjectMutation,
+} from "../../Redux/features/projects/projectsApi";
+
 import { showDeleteAlert } from "../../utils/deleteAlert";
+import { successAlert } from "../../utils/alerts";
 
 const Projects = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const [sharedProjectId, setSharedProjectId] = useState<number | null>(null);
+  const [, setSharedProjectId] = useState<number | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editProject, setEditProject] = useState<any>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
+ 
   const statusFilter = queryParams.get("status") || "ongoing";
-
+  console.log(statusFilter)
   const {
     data: projects = [],
     refetch,
   } = useGetProjectsQuery({ status: statusFilter });
 
-  const deleteProject = (projectId: number) => {
+  console.log(projects)
+
+  const [createProject] = useCreateProjectMutation();
+  const [updateProject] = useUpdateProjectMutation();
+  const [deleteProject] = useDeleteProjectMutation();
+
+  // ✅ DELETE Handler using showDeleteAlert + RTK Mutation
+  const handleDelete = (projectId: number) => {
+    const projectToDelete = projects.find((p) => p.id === projectId);
+    if (!projectToDelete) return;
+
     showDeleteAlert({
       title: "Do you really want to delete this project?",
       text: "You won’t be able to recover this project!",
-      onConfirm: () => {
-        const projectToDelete = projects.find((p) => p.id === projectId);
-        if (!projectToDelete) return;
-
-        console.log("Deleting project ID:", projectId);
-        refetch();
+      onConfirm: async () => {
+        try {
+          await deleteProject(projectId).unwrap();
+          successAlert("Project deleted successfully!");
+          refetch();
+        } catch (error) {
+          console.error("Delete failed:", error);
+        }
       },
     });
   };
 
+  // Handle "View More" actions from dropdown
   const handleMoreClick = (key: string, projectId: number) => {
     const selectedProject = projects.find((p) => p.id === projectId);
     switch (key) {
@@ -60,7 +84,7 @@ const Projects = () => {
         setIsShareOpen(true);
         break;
       case "delete":
-        deleteProject(projectId);
+        handleDelete(projectId);
         break;
     }
   };
@@ -76,10 +100,17 @@ const Projects = () => {
         </div>
 
         {projects?.map((project) => (
-          <div className="hover:bg-[#e6f4ea] bg-[#f1f1f1]" key={project.id}>
+          <div
+            key={project.id}
+            className="hover:bg-[#e6f4ea] bg-[#f1f1f1]"
+          >
             <div className="w-full px-4 py-2.5 flex items-center gap-2.5">
               <div className="w-6 h-6 relative overflow-hidden">
-                {project.timeline.status === "ongoing" ? <RefreshCw /> : <ShieldCheckIcon />}
+                {project.timeline.status === "ongoing" ? (
+                  <RefreshCw />
+                ) : (
+                  <ShieldCheckIcon />
+                )}
               </div>
               <div className="flex-1 flex items-center gap-2.5">
                 <div className="text-[#2B3738] text-base font-ibm font-medium">
@@ -113,6 +144,7 @@ const Projects = () => {
         ))}
       </div>
 
+      {/* Share Modal */}
       <Modal
         open={isShareOpen}
         footer={null}
@@ -127,6 +159,7 @@ const Projects = () => {
         />
       </Modal>
 
+      {/* Create Drawer */}
       <Drawer
         title="Create Project"
         placement="right"
@@ -135,9 +168,24 @@ const Projects = () => {
         open={isCreateOpen}
         destroyOnClose
       >
-        <CreateProjectForm onSubmit={() => {}} submitText="Create Project" />
+        <CreateProjectForm
+          onSubmit={async (data) => {
+            console.log("Created: data", data);
+            try {
+              const result = await createProject(data).unwrap();
+              console.log("Created:", result);
+              successAlert("Project created successfully");
+              setIsCreateOpen(false);
+              refetch();
+            } catch (err) {
+              console.error("Create failed:", err);
+            }
+          }}
+          submitText="Create Project"
+        />
       </Drawer>
 
+      {/* Edit Drawer */}
       <Drawer
         title="Edit Project"
         placement="right"
@@ -148,10 +196,24 @@ const Projects = () => {
       >
         {editProject && (
           <CreateProjectForm
-            onSubmit={() => {}}
             defaultValues={editProject}
+            isEdit
             submitText="Update Project"
-            isEdit={true}
+            onSubmit={async (data) => {
+              console.log("Updated data:", data);
+              try {
+                const result = await updateProject({
+                  id: editProject.id,
+                  data,
+                }).unwrap();
+                console.log("Updated:", result);
+                successAlert("Project updated successfully");
+                setIsEditOpen(false);
+                refetch();
+              } catch (err) {
+                console.error("Update failed:", err);
+              }
+            }}
           />
         )}
       </Drawer>

@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { Input, Select, type GetProps } from "antd";
+import { Select,  Button } from "antd";
 import CustomSearchInput from "../../components/CustomSearchInput";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
@@ -10,8 +9,7 @@ import getStatusClasses from "../../utils/getStatusClasses";
 import type { StatusType } from "../../types/userAllTypes/user";
 import { useLocation } from "react-router-dom";
 import UserDetailsModal from "./UserDetailModal";
-import { useGetAllUsersQuery } from "../../Redux/features/users/usersApi";
-// adjust the path if needed
+import { useGetAllUsersQuery,  } from "../../Redux/features/users/usersApi";
 
 interface DataItem {
   id: number;
@@ -24,8 +22,6 @@ interface DataItem {
   projectName?: string;
 }
 
-type SearchProps = GetProps<typeof Input.Search>;
-
 const ITEMS_PER_PAGE = 10;
 
 const AdminTable = () => {
@@ -34,42 +30,24 @@ const AdminTable = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<DataItem | null>(null);
-  const { data } = useGetAllUsersQuery();
+  const { data, refetch } = useGetAllUsersQuery();
 
-  const [userData, setUserData] = useState<DataItem[]>([]); // start empty
 
-  // When API data arrives, update userData state with mapped data
-  useEffect(() => {
-    if (data?.data && Array.isArray(data.data)) {
-      // Map the API data to your DataItem interface,
-      // assuming the API returns compatible fields
-      const mappedData: DataItem[] = data.data.map((user: any) => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.contact, // your API uses "contact" instead of "phone"
-        status: "Active", // your API doesn't have status field, you can set default or map if you add it later
-        role: user.role,
-        quoteValue: user.estimateNumber || undefined,
-        projectName: user.projectType || undefined,
-        // Add other fields as needed
-      }));
-      setUserData(mappedData);
-    }
-  }, [data]);
-
-  const location = useLocation();
-  const pathname = location.pathname;
+  const [userData, setUserData] = useState<DataItem[]>([]);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [viewUser, setViewUser] = useState<DataItem | null>(null);
 
-  let routeUserType: DataItem["role"] | null = null;
+  const location = useLocation();
+  const pathname = location.pathname;
 
+  // Determine user role for the route
+  let routeUserType: DataItem["role"] | null = null;
   if (pathname === "/clients") routeUserType = "client";
   else if (pathname === "/prime-admins") routeUserType = "prime-admin";
   else if (pathname === "/basic-admins") routeUserType = "basic-admin";
-  else routeUserType = null; // fallback or handle error
+  else routeUserType = null;
 
+  // Check authorization (only super-admin allowed)
   const role = localStorage.getItem("role") as DataItem["role"] | null;
   if (role !== "super-admin") {
     return (
@@ -79,6 +57,24 @@ const AdminTable = () => {
     );
   }
 
+  // Map API data to your userData state
+  useEffect(() => {
+    if (data?.data && Array.isArray(data.data)) {
+      const mappedData: DataItem[] = data.data.map((user: any) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.contact,
+        status: "Active", // Default or from backend if available
+        role: user.role,
+        quoteValue: user.estimateNumber || undefined,
+        projectName: user.projectType || undefined,
+      }));
+      setUserData(mappedData);
+    }
+  }, [data]);
+
+  // Filter userData by role & search text
   const filteredData = userData
     .filter((user) => user.role === routeUserType)
     .filter(
@@ -88,38 +84,50 @@ const AdminTable = () => {
         item.phone.includes(searchText)
     );
 
+  // Pagination slice
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const currentData = filteredData.slice(
     (page - 1) * ITEMS_PER_PAGE,
     page * ITEMS_PER_PAGE
   );
-  const onSearch: SearchProps["onSearch"] = (value) => {
-    setSearchText(value);
-    setPage(1); // reset to page 1 on search
-  };
 
-  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage);
     }
   };
-  console.log(routeUserType);
+
+  // Search input handler
+  const onSearch = (value: string) => {
+    setSearchText(value);
+    setPage(1);
+  };
+
+  // Delete user handler
+  // const handleDeleteUser = async (id: number) => {
+  //   try {
+  //     await deleteUser(id).unwrap();
+  //     message.success("User deleted successfully");
+  //     refetch(); // refetch user list after deletion
+  //   } catch (error) {
+  //     message.error("Failed to delete user");
+  //   }
+  // };
+
+  // Title based on route
   let title = "";
-  if (routeUserType === "prime-admin") {
-    title = "Prime Admins";
-  } else if (routeUserType === "basic-admin") {
-    title = "Basic Admins";
-  } else if (routeUserType === "client") {
-    title = "Clients";
-  }
+  if (routeUserType === "prime-admin") title = "Prime Admins";
+  else if (routeUserType === "basic-admin") title = "Basic Admins";
+  else if (routeUserType === "client") title = "Clients";
 
   return (
     <>
       <div className="w-full mx-auto p-4 bg-white min-h-screen">
-        <div className="flex  justify-between">
-          <h1 className="text-2xl font-semibold mb-4">Manage {title} </h1>{" "}
+        <div className="flex justify-between">
+          <h1 className="text-2xl font-semibold mb-4">Manage {title}</h1>
           <CustomSearchInput onSearch={onSearch} />
         </div>
+
         <div className="py-2 justify-end flex">
           <CustomCreateButton
             title="Create User"
@@ -136,18 +144,11 @@ const AdminTable = () => {
             <tr>
               <th className="text-left px-4 py-2 text-gray-700">Name</th>
               <th className="text-left px-4 py-2 text-gray-700">Email</th>
-              <th className="text-left px-4 py-2 text-gray-700">
-                Contact Number
-              </th>
-
+              <th className="text-left px-4 py-2 text-gray-700">Contact Number</th>
               {routeUserType === "client" && (
                 <>
-                  <th className="text-left px-4 py-2 text-gray-700">
-                    Quote Value
-                  </th>
-                  <th className="text-left px-4 py-2 text-gray-700">
-                    Project Name
-                  </th>
+                  <th className="text-left px-4 py-2 text-gray-700">Quote Value</th>
+                  <th className="text-left px-4 py-2 text-gray-700">Project Name</th>
                 </>
               )}
               <th className="text-left px-4 py-2 text-gray-700">Status</th>
@@ -155,7 +156,7 @@ const AdminTable = () => {
             </tr>
           </thead>
 
-          <tbody className="">
+          <tbody>
             {currentData.map(
               ({
                 id,
@@ -181,6 +182,7 @@ const AdminTable = () => {
                       <td className="px-4 py-3 text-gray-900">{projectName}</td>
                     </>
                   )}
+
                   <td className="px-4 py-3">
                     <div
                       className={`inline-block px-3 py-1 rounded text-sm font-medium ${getStatusClasses(
@@ -193,63 +195,55 @@ const AdminTable = () => {
                         onChange={(newStatus: StatusType) => {
                           setUserData((prevData) =>
                             prevData.map((user) =>
-                              user.id === id
-                                ? { ...user, status: newStatus }
-                                : user
+                              user.id === id ? { ...user, status: newStatus } : user
                             )
                           );
                         }}
                       >
                         <Select.Option value="Active">Active</Select.Option>
                         <Select.Option value="Disable">Disable</Select.Option>
-                        <Select.Option value="Suspended">
-                          Suspended
-                        </Select.Option>
-                        <Select.Option value="In pipeline">
-                          In pipeline
-                        </Select.Option>
+                        <Select.Option value="Suspended">Suspended</Select.Option>
+                        <Select.Option value="In pipeline">In pipeline</Select.Option>
                       </Select>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+
+                  <td className="px-4 py-3 flex gap-2">
                     <CustomViewMoreButton
                       items={[
                         { key: "view", label: "View User Details" },
                         { key: "edit", label: "Edit User" },
                       ]}
                       onClick={(key) => {
-                        switch (key) {
-                          case "view":
-                            setViewUser({
-                              id,
-                              name,
-                              email,
-                              phone,
-                              status,
-                              quoteValue,
-                              projectName,
-                              role,
-                            });
-                            setDetailsModalOpen(true);
-                            break;
-                          case "edit":
-                            setMode("edit");
-                            setSelectedUser({
-                              id,
-                              name,
-                              email,
-                              phone,
-                              status,
-                              quoteValue,
-                              projectName,
-                              role,
-                            });
-
-                            setOpenDrawer(true);
-                            break;
+                        if (key === "view") {
+                          setViewUser({
+                            id,
+                            name,
+                            email,
+                            phone,
+                            status,
+                            quoteValue,
+                            projectName,
+                            role,
+                          });
+                          setDetailsModalOpen(true);
+                        } else if (key === "edit") {
+                          setMode("edit");
+                          setSelectedUser({
+                            id,
+                            name,
+                            email,
+                            phone,
+                            status,
+                            quoteValue,
+                            projectName,
+                            role,
+                          });
+                          setOpenDrawer(true);
                         }
                       }}
                     />
+                    
                   </td>
                 </tr>
               )
@@ -257,54 +251,48 @@ const AdminTable = () => {
           </tbody>
         </table>
 
-        {/* Pagination controls */}
+        {/* Pagination */}
         <div className="flex justify-evenly items-center mt-4">
-          <button
+          <Button
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1}
-            className={`px-4 py-2 rounded border ${
-              page === 1
-                ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                : "text-blue-600 border-blue-600 hover:bg-blue-50"
-            }`}
           >
             Previous
-          </button>
+          </Button>
 
           <div className="text-gray-700">
             Page {page} of {totalPages}
           </div>
 
-          <button
+          <Button
             onClick={() => handlePageChange(page + 1)}
             disabled={page === totalPages}
-            className={`px-4 py-2 rounded border ${
-              page === totalPages
-                ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                : "text-blue-600 border-blue-600 hover:bg-blue-50"
-            }`}
           >
             Next
-          </button>
+          </Button>
         </div>
       </div>
 
+      {/* Drawer for Create/Edit */}
       <Drawer
         open={openDrawer}
         onClose={() => setOpenDrawer(false)}
         width={720}
         title={mode === "create" ? "Create New User" : "Edit User"}
+        destroyOnClose
       >
         <UserCreateEditPage
           mode={mode}
           defaultValues={selectedUser ?? undefined}
           onSubmitSuccess={() => {
-            // Optional: reload or update data
             setOpenDrawer(false);
+            refetch(); // Refresh user list after create/edit
           }}
           onCancel={() => setOpenDrawer(false)}
         />
       </Drawer>
+
+      {/* View Details Modal */}
       {viewUser && (
         <UserDetailsModal
           visible={detailsModalOpen}

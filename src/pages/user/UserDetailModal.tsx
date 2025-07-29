@@ -37,9 +37,8 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
       footer={null}
       width={600}
       centered
-      
     >
-      <div className="w-full h-full p-4 bg-white  rounded flex flex-col gap-4">
+      <div className="w-full h-full p-4 bg-white rounded flex flex-col gap-4">
         {/* Profile Header */}
         <div className="inline-flex items-center gap-2">
           <img
@@ -53,8 +52,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
           </div>
         </div>
 
-        <div className="w-full h-px bg-[#E6E7E7]" />
-
         {/* Personal Details */}
         <div className="flex flex-col gap-2">
           <div className="text-base font-medium text-[#000E0F]">Personal details</div>
@@ -66,29 +63,25 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
           </div>
         </div>
 
-       
+        {/* Account Details - Only for client users */}
+        {userData.role === 'client' && (
+          <>
+            <div className="w-full h-px bg-[#E6E7E7]" />
 
-       
-     {/* Account Details - Only for client users */}
-{userData.role === 'client' && (
-  <>
-    <div className="w-full h-px bg-[#E6E7E7]" />
-
-    <div className="flex flex-col gap-2">
-      <div className="text-base font-medium text-[#000E0F]">Account details</div>
-      <div className="flex flex-col gap-2">
-        {renderDetailRow('Estimate number', userData.estimateNumber)}
-        {renderDetailRow('Project type', userData.projectType)}
-      </div>
-    </div>
-  </>
-)}
-
+            <div className="flex flex-col gap-2">
+              <div className="text-base font-medium text-[#000E0F]">Account details</div>
+              <div className="flex flex-col gap-2">
+                {renderDetailRow('Estimate number', userData.estimateNumber)}
+                {renderDetailRow('Project type', userData.projectType)}
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="w-full h-px bg-[#E6E7E7]" />
 
         {/* Footer Buttons */}
-        <div className="w-full flex gap-3">
+        <div className="w-full flex gap-3 ">
           <button
             onClick={onClose}
             className="h-12 px-6 bg-[rgba(23,43,77,0.06)] rounded flex items-center justify-center gap-1 text-[#001D01] text-base font-medium"
@@ -97,9 +90,11 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
           </button>
 
           <button
-            className="h-12 px-6 bg-[#001D01] rounded flex items-center justify-center gap-2 text-white text-base font-medium flex-1"
+            className="h-12 px-6 bg-[#0d542b] rounded flex items-center justify-center  gap-2  text-base font-medium flex-1"
           >
-            Download PDF <Download size={16} />
+            <span className='text-white h-12 px-6 bg-[#0d542b] rounded flex items-center justify-center  gap-2  text-base font-medium flex-1'>
+              Download PDF <Download size={16} />
+            </span>
           </button>
         </div>
       </div>
