@@ -57,7 +57,7 @@ const AdminTable = () => {
     );
   }
 
-  // Map API data to your userData state
+
   useEffect(() => {
     if (data?.data && Array.isArray(data.data)) {
       const mappedData: DataItem[] = data.data.map((user: any) => ({
@@ -84,7 +84,7 @@ const AdminTable = () => {
         item.phone.includes(searchText)
     );
 
-  // Pagination slice
+
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const currentData = filteredData.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -97,7 +97,7 @@ const AdminTable = () => {
     }
   };
 
-  // Search input handler
+
   const onSearch = (value: string) => {
     setSearchText(value);
     setPage(1);
