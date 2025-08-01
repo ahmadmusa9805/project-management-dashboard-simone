@@ -3,7 +3,8 @@ import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../Redux/app/store";
-type Role = "super-admin" | "prime-admin" | "basic-admin" | "client";
+import { USER_ROLE } from "../types/userAllTypes/user";
+type Role = "superAdmin" | "primeAdmin" | "basicAdmin" | "client";
 const ProjectDefaultRedirect: React.FC = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
@@ -15,9 +16,10 @@ const ProjectDefaultRedirect: React.FC = () => {
     const role = user.role as Role;
 
     // Match sidebar default page logic
-    if (["super-admin", "prime-admin"].includes(role)) {
+    if (([USER_ROLE.superAdmin, USER_ROLE.primeAdmin] as Role[]).includes(role)) {
+ 
       navigate(`/projects/${projectId}/dashboard`, { replace: true });
-    } else if (role === "client" || role === "basic-admin") {
+    } else if (role === USER_ROLE.client || role === USER_ROLE.basicAdmin) {
       navigate(`/projects/${projectId}/site-pictures-reports`, {
         replace: true,
       });

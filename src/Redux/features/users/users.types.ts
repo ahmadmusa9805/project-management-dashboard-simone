@@ -1,30 +1,18 @@
-import type { UploadFile } from "antd";
+
 
 export interface User {
-  id: number;
-  name: string;
-  email?: string;
-  contact?: string;
-  address?: string;
-  postalCode?: string;
-  password?: string;
-  role: string; // e.g. "prime-admin", "basic-admin", "client", "labor", etc.
-  photo?: string;
-
-  // Client-specific fields
-  estimateNumber?: string;
-  projectType?: string;
-
-  // Labor/Subcontractor specific fields
-  type?: "Labor" | "SubContractor" | "Material";
-  rate?: number;
-  quantity?: number;
-  date?: string;
-  vatRate?: number;
-  description?: string;
-
-  // uploadedFile in your original example is a URL string here:
-  uploadedFile?: string | UploadFile;
+ _id: string;
+    name: string;
+    email: string;
+    contactNo: string;
+    role: "superAdmin" | "primeAdmin" | "basicAdmin" | "client" | "labor";
+    profileImg: string;
+    status: string;
+    otpVerified: boolean;
+    isDeleted: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
 }
 
 export interface UserApiResponse {

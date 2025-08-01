@@ -3,23 +3,16 @@ export interface LoginPayload {
   password: string;
 }
 
+// Only accessToken is received, no user object
 export interface AuthResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    role: 'super-admin' | 'prime-admin' | 'basic-admin' | 'client';
-  };
+  accessToken: string;
 }
 
-
+// This must be extracted from the token
 export interface User {
-  id: string;
   email: string;
-  role: "super-admin" | "prime-admin" | "basic-admin" | "client";
+  role: "superAdmin" | "primeAdmin" | "basicAdmin" | "client";
 }
-
-
 
 export interface AuthState {
   user: User | null;

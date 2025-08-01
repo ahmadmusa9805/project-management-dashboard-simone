@@ -5,7 +5,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 interface IUser {
   name: string;
   email: string;
-  role: 'client' | 'prime-admin' | 'basic-admin';
+  role: "superAdmin" | "primeAdmin" | "basicAdmin" | "client";
 }
 
 interface IUserState {

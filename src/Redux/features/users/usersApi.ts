@@ -44,11 +44,12 @@
 // features/users/usersApi.ts
 
 import { baseApi } from "../../app/api/baseApi";
-import type { SingleUserResponse, UserApiResponse } from "./users.types";
+import type { SingleUserResponse, User, UserApiResponse } from "./users.types";
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // 👇 This is the part you need to modify
 
+    
     getAllUsers: builder.query<UserApiResponse, void>({
       query: () => "/users",
       transformResponse: (response: any) => {
@@ -62,31 +63,21 @@ export const usersApi = baseApi.injectEndpoints({
       transformResponse: (res: any) => res.data,
       providesTags: (_result, _error, id) => [{ type: "Users", id }],
     }),
-    createClient: builder.mutation({
-      query: (userData) => ({
-        url: "/users/create-client",
-        method: "POST",
-        body: userData,
-      }),
-      invalidatesTags: ["Users"],
-    }),
-    createPrimeAdmin: builder.mutation({
-      query: (userData) => ({
-        url: "/users/create-prime-admin",
-        method: "POST",
-        body: userData,
-      }),
-      invalidatesTags: ["Users"],
-    }),
-    createBasicAdmin: builder.mutation({
-      query: (userData) => ({
-        url: "/users/create-basic-admin",
-        method: "POST",
-        body: userData,
-      }),
-      invalidatesTags: ["Users"],
-    }),
+   getMeUser: builder.query<User, void>({
+  query: () => `/users/me`,
+  transformResponse: (response: SingleUserResponse): User => response.data,
+  providesTags: ["Users"],
+}),
 
+    createUser: builder.mutation({
+      query: (userData) => ({
+        url: "/users/create-user",
+        method: "POST",
+        body: userData,
+      }),
+      invalidatesTags: ["Users"],
+    }),
+   
     // ✅ Create Labor user
     createLaborUser: builder.mutation({
       query: (userData) => ({
@@ -111,7 +102,7 @@ export const usersApi = baseApi.injectEndpoints({
     }),
 
     updateUser: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ id,data }) => ({
         url: `/users/${id}`,
         method: "PATCH",
         body: data,
@@ -134,9 +125,8 @@ export const usersApi = baseApi.injectEndpoints({
 export const {
   useGetAllUsersQuery,
   useGetUserByIdQuery,
-  useCreateClientMutation,
-  useCreatePrimeAdminMutation,
-  useCreateBasicAdminMutation,
+  useCreateUserMutation,
+useGetMeUserQuery,
   useCreateLaborUserMutation,
   useUpdateLaborUserMutation,
   useUpdateUserMutation,

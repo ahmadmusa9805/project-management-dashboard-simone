@@ -6,7 +6,7 @@ import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 import { Drawer } from "antd";
 import UserCreateEditPage from "./UserCreateEditPage";
 import getStatusClasses from "../../utils/getStatusClasses";
-import type { StatusType } from "../../types/userAllTypes/user";
+import { USER_ROLE, type StatusType, type TRole } from "../../types/userAllTypes/user";
 import { useLocation } from "react-router-dom";
 import UserDetailsModal from "./UserDetailModal";
 import { useGetAllUsersQuery,  } from "../../Redux/features/users/usersApi";
@@ -17,7 +17,7 @@ interface DataItem {
   email: string;
   phone: string;
   status: StatusType;
-  role: "super-admin" | "prime-admin" | "basic-admin" | "client";
+  role: TRole;
   quoteValue?: string;
   projectName?: string;
 }
@@ -42,14 +42,14 @@ const AdminTable = () => {
 
   // Determine user role for the route
   let routeUserType: DataItem["role"] | null = null;
-  if (pathname === "/clients") routeUserType = "client";
-  else if (pathname === "/prime-admins") routeUserType = "prime-admin";
-  else if (pathname === "/basic-admins") routeUserType = "basic-admin";
+  if (pathname === "/clients") routeUserType = USER_ROLE.client;
+  else if (pathname === "/prime-admins") routeUserType = USER_ROLE.primeAdmin;
+  else if (pathname === "/basic-admins") routeUserType = USER_ROLE.basicAdmin;
   else routeUserType = null;
 
   // Check authorization (only super-admin allowed)
   const role = localStorage.getItem("role") as DataItem["role"] | null;
-  if (role !== "super-admin") {
+  if (role !== USER_ROLE.superAdmin) {
     return (
       <div className="text-red-600 p-4">
         You are not authorized to access this page.
@@ -116,9 +116,9 @@ const AdminTable = () => {
 
   // Title based on route
   let title = "";
-  if (routeUserType === "prime-admin") title = "Prime Admins";
-  else if (routeUserType === "basic-admin") title = "Basic Admins";
-  else if (routeUserType === "client") title = "Clients";
+  if (routeUserType === USER_ROLE.primeAdmin) title = "Prime Admins";
+  else if (routeUserType === USER_ROLE.basicAdmin) title = "Basic Admins";
+  else if (routeUserType === USER_ROLE.client) title = "Clients";
 
   return (
     <>

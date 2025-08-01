@@ -1,6 +1,7 @@
 import { Modal } from 'antd';
 import React from 'react';
 import { Download, ArrowLeft } from 'lucide-react';
+import type { TRole } from '../../types/userAllTypes/user';
 
 interface UserData {
   name: string;
@@ -13,7 +14,7 @@ interface UserData {
   estimateNumber?: string;
   projectType?: string;
   password?: string;
-  role?: 'super-admin'|'prime-admin' | 'basic-admin' | 'client';
+  role?:TRole
 }
 
 interface UserDetailsModalProps {

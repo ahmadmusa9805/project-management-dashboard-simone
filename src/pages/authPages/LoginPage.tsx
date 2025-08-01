@@ -11,6 +11,8 @@ import { setCredentials } from "../../Redux/features/auth/authSlice";
 import { useLoginMutation } from "../../Redux/features/auth/authApi";
 import type { AppDispatch } from "../../Redux/app/store";
 import { successAlert } from "../../utils/alerts";
+import { jwtDecode } from "jwt-decode";
+import { USER_ROLE } from "../../types/userAllTypes/user";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,33 +23,33 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const result = await login({ email, password }).unwrap();
-      dispatch(setCredentials(result));
-      console.log("Login successful:", result);
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const result = await login({ email, password }).unwrap();
 
-      localStorage.setItem("token", result.token);
-      localStorage.setItem("user", JSON.stringify(result.user));
-      localStorage.setItem("role", result.user.role);
+    // Dispatch to Redux, which decodes and stores user info
+    dispatch(setCredentials(result));
 
-      successAlert("Login successful", "You have successfully logged in.");
+    // Decode manually here if you want to store email/role separately in localStorage
+    const decoded = jwtDecode<{ userEmail: string; role: string }>(result.accessToken);
+    
+    successAlert("Login successful", "You have successfully logged in.");
 
-      // ✅ Redirect based on role
-      if (result.user.role === "super-admin") {
-        navigate("/dashboard");
-      } else {
-        navigate("/projects?status=ongoing");
-      }
-    } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Credentials",
-        text: error?.data?.error || "Email or password is incorrect.",
-      });
+    // ✅ Redirect based on role
+    if (decoded.role === USER_ROLE.superAdmin) {
+      navigate("/dashboard");
+    } else {
+      navigate("/projects?status=ongoing");
     }
-  };
+  } catch (error: any) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Credentials",
+      text: error?.data?.error || "Email or password is incorrect.",
+    });
+  }
+};
 
   return (
     <div className="flex flex-col items-center gap-14 self-stretch min-h-screen bg-white px-4 py-8">
