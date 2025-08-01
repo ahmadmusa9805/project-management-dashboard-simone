@@ -43,42 +43,8 @@
 
 // features/users/usersApi.ts
 
-import type { UploadFile } from "antd";
-
-interface User {
-  id: number;
-  name: string;
-  email?: string;
-  contact?: string;
-  address?: string;
-  postalCode?: string;
-  password?: string;
-  role: string; // e.g. "prime-admin", "basic-admin", "client", "labor", etc.
-  photo?: string;
-
-  // Client-specific fields
-  estimateNumber?: string;
-  projectType?: string;
-
-  // Labor/Subcontractor specific fields
-  type?: "Labor" | "SubContractor" | "Material";
-  rate?: number;
-  quantity?: number;
-  date?: string;
-  vatRate?: number;
-  description?: string;
-
-  // uploadedFile in your original example is a URL string here:
-  uploadedFile?: string | UploadFile;
-}
-
-interface UserApiResponse {
-  success: boolean;
-  message: string;
-  data: User[];
-}
-
 import { baseApi } from "../../app/api/baseApi";
+import type { SingleUserResponse, UserApiResponse } from "./users.types";
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // 👇 This is the part you need to modify
@@ -91,8 +57,9 @@ export const usersApi = baseApi.injectEndpoints({
       providesTags: ["Users"],
     }),
 
-    getUserById: builder.query({
-      query: (id: string | number) => `/users/${id}`,
+    getUserById: builder.query<SingleUserResponse, string>({
+      query: (id) => `/users/?id=${id}`,
+      transformResponse: (res: any) => res.data,
       providesTags: (_result, _error, id) => [{ type: "Users", id }],
     }),
     createClient: builder.mutation({
@@ -120,7 +87,7 @@ export const usersApi = baseApi.injectEndpoints({
       invalidatesTags: ["Users"],
     }),
 
-  // ✅ Create Labor user
+    // ✅ Create Labor user
     createLaborUser: builder.mutation({
       query: (userData) => ({
         url: "/users/create-labor", // you must define this route in your backend
@@ -142,7 +109,6 @@ export const usersApi = baseApi.injectEndpoints({
         { type: "Users", id },
       ],
     }),
-
 
     updateUser: builder.mutation({
       query: ({ id, ...data }) => ({
@@ -171,7 +137,7 @@ export const {
   useCreateClientMutation,
   useCreatePrimeAdminMutation,
   useCreateBasicAdminMutation,
-  useCreateLaborUserMutation,      
+  useCreateLaborUserMutation,
   useUpdateLaborUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,

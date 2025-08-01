@@ -22,6 +22,7 @@ import {
   getSidebarMenuItems,
 } from "../utils/sidebarItems";
 import UserProfileEdit from "../pages/user/UserProfileEdit";
+import { useGetUserByIdQuery } from "../Redux/features/users/usersApi";
 
 const { Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
@@ -41,7 +42,11 @@ const DashboardLayout: React.FC = () => {
   const path = location.pathname;
   const userRole = user?.role;
   const validRoles = ["super-admin", "prime-admin", "basic-admin", "client"];
-
+  const { data: allProfileInfo } = useGetUserByIdQuery(String(user?.id), {
+    skip: !user?.id,
+  });
+  const profileInfo = allProfileInfo?.data;
+  console.log(profileInfo);
   if (!userRole || !validRoles.includes(userRole)) {
     return null; // Don't render hooks or layout before navigating
   }
