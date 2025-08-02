@@ -1,29 +1,23 @@
-import { Modal } from 'antd';
+import { Modal, Spin } from 'antd';
 import React from 'react';
 import { Download, ArrowLeft } from 'lucide-react';
-import type { TRole } from '../../types/userAllTypes/user';
-
-interface UserData {
-  name: string;
-  email: string;
-  avatar?: string;
-  phone?: string;
-  address?: string;
-  region?: string;
-  postCode?: string;
-  estimateNumber?: string;
-  projectType?: string;
-  password?: string;
-  role?:TRole
-}
+import { useGetUserByIdQuery } from '../../Redux/features/users/usersApi';
 
 interface UserDetailsModalProps {
   visible: boolean;
   onClose: () => void;
-  userData: UserData;
+  userId: string;
 }
 
-const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, userData }) => {
+const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, userId }) => {
+  const { data, isLoading, error } = useGetUserByIdQuery(userId);
+
+  console.log('Modal userId:', userId);
+  console.log('Fetched user data:', data);
+
+  if (isLoading) return <Spin />;
+  if (error || !data) return <div>Failed to load user details.</div>;
+
   const renderDetailRow = (label: string, value?: string) => (
     <div className="w-full inline-flex justify-start items-center gap-3">
       <div className="flex-1 text-sm text-gray-700 font-normal">{label}</div>
@@ -43,13 +37,13 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
         {/* Profile Header */}
         <div className="inline-flex items-center gap-2">
           <img
-            src={userData.avatar || 'https://placehold.co/40x40'}
+            src={data.profileImg || 'https://placehold.co/40x40'}
             alt="avatar"
             className="w-10 h-10 rounded-full bg-gray-300"
           />
           <div className="flex flex-col">
-            <div className="text-base font-medium text-[#000E0F]">{userData.name}</div>
-            <div className="text-xs font-medium text-[#2B3738] tracking-wide">{userData.email}</div>
+            <div className="text-base font-medium text-[#000E0F]">{data.name}</div>
+            <div className="text-xs font-medium text-[#2B3738] tracking-wide">{data.email}</div>
           </div>
         </div>
 
@@ -57,23 +51,21 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
         <div className="flex flex-col gap-2">
           <div className="text-base font-medium text-[#000E0F]">Personal details</div>
           <div className="flex flex-col gap-2">
-            {renderDetailRow('Contact number', userData.phone)}
-            {renderDetailRow('Address', userData.address)}
-            {renderDetailRow('Region', userData.region)}
-            {renderDetailRow('Post code', userData.postCode)}
+            {renderDetailRow('Contact number', data.contactNo)}
+            {renderDetailRow('Address', data.address)}
+            {renderDetailRow('Post code', data.postCode)}
           </div>
         </div>
 
         {/* Account Details - Only for client users */}
-        {userData.role === 'client' && (
+        {data.role === 'client' && (
           <>
             <div className="w-full h-px bg-[#E6E7E7]" />
-
             <div className="flex flex-col gap-2">
               <div className="text-base font-medium text-[#000E0F]">Account details</div>
               <div className="flex flex-col gap-2">
-                {renderDetailRow('Estimate number', userData.estimateNumber)}
-                {renderDetailRow('Project type', userData.projectType)}
+                {renderDetailRow('Estimate number', data.estimateNumber)}
+                {renderDetailRow('Project type', data.projectType)}
               </div>
             </div>
           </>
@@ -82,7 +74,7 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
         <div className="w-full h-px bg-[#E6E7E7]" />
 
         {/* Footer Buttons */}
-        <div className="w-full flex gap-3 ">
+        <div className="w-full flex gap-3">
           <button
             onClick={onClose}
             className="h-12 px-6 bg-[rgba(23,43,77,0.06)] rounded flex items-center justify-center gap-1 text-[#001D01] text-base font-medium"
@@ -90,12 +82,8 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
             <ArrowLeft size={18} /> Go back
           </button>
 
-          <button
-            className="h-12 px-6 bg-[#0d542b] rounded flex items-center justify-center  gap-2  text-base font-medium flex-1"
-          >
-            <span className='text-white h-12 px-6 bg-[#0d542b] rounded flex items-center justify-center  gap-2  text-base font-medium flex-1'>
-              Download PDF <Download size={16} />
-            </span>
+          <button className="h-12 px-6 bg-[#0d542b] rounded flex items-center justify-center gap-2 text-white text-base font-medium flex-1">
+            Download PDF <Download size={16} />
           </button>
         </div>
       </div>

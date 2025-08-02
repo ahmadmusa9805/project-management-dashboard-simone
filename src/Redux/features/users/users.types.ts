@@ -1,3 +1,4 @@
+import type { TRole } from "../../../types/userAllTypes/user";
 
 
 export interface User {
@@ -5,12 +6,17 @@ export interface User {
     name: string;
     email: string;
     contactNo: string;
-    role: "superAdmin" | "primeAdmin" | "basicAdmin" | "client" | "labor";
+    role: TRole
     profileImg: string;
     status: string;
+    postCode:string;
+    address:string;
+    region:string;
     otpVerified: boolean;
     isDeleted: boolean;
     createdAt: string;
+    estimateNumber:string;
+    projectType:string;
     updatedAt: string;
     __v: number;
 }

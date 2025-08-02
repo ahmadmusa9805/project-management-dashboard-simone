@@ -1,4 +1,4 @@
-export type StatusType = 'Active' | 'In pipeline' | 'Disable' | 'Suspended';
+export type StatusType = 'active' |  'blocked';
 export type TRole = "superAdmin" | "primeAdmin" | "basicAdmin" | "client";
 
 export const USER_ROLE: { [key in TRole]: TRole } = {
