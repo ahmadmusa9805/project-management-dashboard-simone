@@ -49,7 +49,6 @@ export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // 👇 This is the part you need to modify
 
-    
     getAllUsers: builder.query<UserApiResponse, void>({
       query: () => "/users",
       transformResponse: (response: any) => {
@@ -63,32 +62,30 @@ export const usersApi = baseApi.injectEndpoints({
       transformResponse: (res: any) => res.data,
       providesTags: (_result, _error, id) => [{ type: "Users", id }],
     }),
-   getMeUser: builder.query<User, void>({
-  query: () => `/users/me`,
-  transformResponse: (response: SingleUserResponse): User => response.data,
-  providesTags: ["Users"],
-}),
+    getMeUser: builder.query<User, void>({
+      query: () => `/users/me`,
+      transformResponse: (response: SingleUserResponse): User => response.data,
+      providesTags: ["Users"],
+    }),
 
     createUser: builder.mutation({
-      query: (userData) => ({
+      query: (formData) => ({
         url: "/users/create-user",
         method: "POST",
-        body: userData,
+        body: formData,
       }),
       invalidatesTags: ["Users"],
     }),
+
     updateUser: builder.mutation({
-      query: ({ id,data }) => ({
+      query: ({ id, body }) => ({
         url: `/users/${id}`,
         method: "PATCH",
-        body: data,
+        body: body,
       }),
-      invalidatesTags: (_result, _error, { id }) => [
-        "Users",
-        { type: "Users", id },
-      ],
+      invalidatesTags: ["Users"],
     }),
-   
+
     // ✅ Create Labor user
     createLaborUser: builder.mutation({
       query: (userData) => ({
@@ -112,7 +109,6 @@ export const usersApi = baseApi.injectEndpoints({
       ],
     }),
 
-    
     deleteUser: builder.mutation({
       query: (id) => ({
         url: `/users/${id}`,
@@ -127,7 +123,7 @@ export const {
   useGetAllUsersQuery,
   useGetUserByIdQuery,
   useCreateUserMutation,
-useGetMeUserQuery,
+  useGetMeUserQuery,
   useCreateLaborUserMutation,
   useUpdateLaborUserMutation,
   useUpdateUserMutation,

@@ -1,18 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { Select,  Button } from "antd";
+import { Select, Button } from "antd";
 import CustomSearchInput from "../../components/CustomSearchInput";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 import { Drawer } from "antd";
 import UserCreateEditPage from "./UserCreateEditPage";
 import getStatusClasses from "../../utils/getStatusClasses";
-import { USER_ROLE, type StatusType, type TRole } from "../../types/userAllTypes/user";
+import {
+  USER_ROLE,
+  type StatusType,
+  type TRole,
+} from "../../types/userAllTypes/user";
 import { useLocation } from "react-router-dom";
 import UserDetailsModal from "./UserDetailModal";
-import { useGetAllUsersQuery,  } from "../../Redux/features/users/usersApi";
+import { useGetAllUsersQuery } from "../../Redux/features/users/usersApi";
 
 interface DataItem {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -31,7 +36,7 @@ const AdminTable = () => {
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<DataItem | null>(null);
   const { data, refetch } = useGetAllUsersQuery();
-console.log(data)
+  console.log(data);
 
   const [userData, setUserData] = useState<DataItem[]>([]);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -47,21 +52,10 @@ console.log(data)
   else if (pathname === "/basic-admins") routeUserType = USER_ROLE.basicAdmin;
   else routeUserType = null;
 
-  // Check authorization (only super-admin allowed)
-  const role = localStorage.getItem("role") as DataItem["role"] | null;
-  if (role !== USER_ROLE.superAdmin) {
-    return (
-      <div className="text-red-600 p-4">
-        You are not authorized to access this page.
-      </div>
-    );
-  }
-
-
   useEffect(() => {
     if (data?.data && Array.isArray(data.data)) {
       const mappedData: DataItem[] = data.data.map((user: any) => ({
-        id: user.id,
+        id: user._id,
         name: user.name,
         email: user.email,
         phone: user.contact,
@@ -73,6 +67,15 @@ console.log(data)
       setUserData(mappedData);
     }
   }, [data]);
+  // Check authorization (only super-admin allowed)
+  const role = localStorage.getItem("role") as DataItem["role"] | null;
+  if (role !== USER_ROLE.superAdmin) {
+    return (
+      <div className="text-red-600 p-4">
+        You are not authorized to access this page.
+      </div>
+    );
+  }
 
   // Filter userData by role & search text
   const filteredData = userData
@@ -83,7 +86,6 @@ console.log(data)
         item.email.toLowerCase().includes(searchText.toLowerCase()) ||
         item.phone.includes(searchText)
     );
-
 
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const currentData = filteredData.slice(
@@ -96,7 +98,6 @@ console.log(data)
       setPage(newPage);
     }
   };
-
 
   const onSearch = (value: string) => {
     setSearchText(value);
@@ -144,11 +145,17 @@ console.log(data)
             <tr>
               <th className="text-left px-4 py-2 text-gray-700">Name</th>
               <th className="text-left px-4 py-2 text-gray-700">Email</th>
-              <th className="text-left px-4 py-2 text-gray-700">Contact Number</th>
+              <th className="text-left px-4 py-2 text-gray-700">
+                Contact Number
+              </th>
               {routeUserType === "client" && (
                 <>
-                  <th className="text-left px-4 py-2 text-gray-700">Quote Value</th>
-                  <th className="text-left px-4 py-2 text-gray-700">Project Name</th>
+                  <th className="text-left px-4 py-2 text-gray-700">
+                    Quote Value
+                  </th>
+                  <th className="text-left px-4 py-2 text-gray-700">
+                    Project Name
+                  </th>
                 </>
               )}
               <th className="text-left px-4 py-2 text-gray-700">Status</th>
@@ -195,15 +202,21 @@ console.log(data)
                         onChange={(newStatus: StatusType) => {
                           setUserData((prevData) =>
                             prevData.map((user) =>
-                              user.id === id ? { ...user, status: newStatus } : user
+                              user.id === id
+                                ? { ...user, status: newStatus }
+                                : user
                             )
                           );
                         }}
                       >
                         <Select.Option value="Active">Active</Select.Option>
                         <Select.Option value="Disable">Disable</Select.Option>
-                        <Select.Option value="Suspended">Suspended</Select.Option>
-                        <Select.Option value="In pipeline">In pipeline</Select.Option>
+                        <Select.Option value="Suspended">
+                          Suspended
+                        </Select.Option>
+                        <Select.Option value="In pipeline">
+                          In pipeline
+                        </Select.Option>
                       </Select>
                     </div>
                   </td>
@@ -239,11 +252,11 @@ console.log(data)
                             projectName,
                             role,
                           });
+
                           setOpenDrawer(true);
                         }
                       }}
                     />
-                    
                   </td>
                 </tr>
               )
@@ -308,7 +321,3 @@ console.log(data)
 };
 
 export default AdminTable;
-
-
-
-
