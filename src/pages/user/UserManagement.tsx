@@ -31,7 +31,7 @@ const AdminTable = () => {
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<DataItem | null>(null);
   const { data, refetch } = useGetAllUsersQuery();
-
+console.log(data)
 
   const [userData, setUserData] = useState<DataItem[]>([]);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -308,3 +308,7 @@ const AdminTable = () => {
 };
 
 export default AdminTable;
+
+
+
+

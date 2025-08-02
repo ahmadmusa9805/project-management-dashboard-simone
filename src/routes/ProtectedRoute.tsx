@@ -23,6 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/dashboard" replace />;
   }
 
+  
   return <>{children}</>;
 };
 

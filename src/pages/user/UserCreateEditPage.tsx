@@ -1,4 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
+
+// /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -18,6 +20,7 @@ import { USER_ROLE } from "../../types/userAllTypes/user";
 const { Option } = Select;
 
 const schema = z.object({
+   _id: z.string().optional(),
   name: z.string().min(2, "Name is required"),
   email: z.string().email("Invalid email"),
   contactNo: z.string().min(6, "Contact number required"),
@@ -108,9 +111,9 @@ const UserCreateEditPage = ({
   const handleFormSubmit = async (data: FormData) => {
     console.log("before create users data :", data);
     try {
-      if (mode === "edit" && defaultValues?.id) {
+      if (mode === "edit" && defaultValues?._id) {
         // Edit/update logic
-        const updateData = { id: defaultValues.id, ...data };
+        const updateData = { id: defaultValues._id, ...data };
         console.log("before update users data :", updateData);
         const response = await updateUser(updateData).unwrap();
         successAlert("Success", response.message);
@@ -133,6 +136,10 @@ const UserCreateEditPage = ({
       errorAlert("Error", err?.data?.message || err.message);
     }
   };
+
+
+
+
 
   return (
     <form
@@ -227,33 +234,35 @@ const UserCreateEditPage = ({
       </div>
 
       {/* Role */}
-      <div className="flex flex-col gap-2">
-        <h3 className="text-lg font-medium">User Type</h3>
+     {/* Role */}
+<div className="flex flex-col gap-2">
+  <h3 className="text-lg font-medium">User Type</h3>
 
-        <Controller
-          control={control}
-          name="role"
-          render={({ field }) => {
-            if (allowedRoles.length === 1) {
-              return <Input value={allowedRoles[0]} disabled />;
-            }
-
-            return (
-              <Select {...field} placeholder="Select user type">
-                {allowedRoles.map((r) => (
-                  <Option key={r} value={r}>
-                    {r === USER_ROLE.primeAdmin
-                      ? "Prime Admin"
-                      : r === USER_ROLE.basicAdmin
-                      ? "Basic Admin"
-                      : "Client"}
-                  </Option>
-                ))}
-              </Select>
-            );
-          }}
+  <Controller
+    control={control}
+    name="role"
+    render={({ field }) => {
+      return (
+        <Input
+          value={
+            field.value === USER_ROLE.primeAdmin
+              ? "Prime Admin"
+              : field.value === USER_ROLE.basicAdmin
+              ? "Basic Admin"
+              : field.value === USER_ROLE.superAdmin
+              ? "Super Admin"
+              : field.value === USER_ROLE.client
+              ? "Client"
+             
+              : ""
+          }
+          disabled
         />
-      </div>
+      );
+    }}
+  />
+</div>
+
 
       {/* Client specific */}
       {showClientFields && role === "client" && (
@@ -361,3 +370,8 @@ const UserCreateEditPage = ({
 };
 
 export default UserCreateEditPage;
+
+
+
+
+

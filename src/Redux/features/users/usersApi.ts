@@ -77,6 +77,17 @@ export const usersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Users"],
     }),
+    updateUser: builder.mutation({
+      query: ({ id,data }) => ({
+        url: `/users/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "Users",
+        { type: "Users", id },
+      ],
+    }),
    
     // ✅ Create Labor user
     createLaborUser: builder.mutation({
@@ -101,17 +112,7 @@ export const usersApi = baseApi.injectEndpoints({
       ],
     }),
 
-    updateUser: builder.mutation({
-      query: ({ id,data }) => ({
-        url: `/users/${id}`,
-        method: "PATCH",
-        body: data,
-      }),
-      invalidatesTags: (_result, _error, { id }) => [
-        "Users",
-        { type: "Users", id },
-      ],
-    }),
+    
     deleteUser: builder.mutation({
       query: (id) => ({
         url: `/users/${id}`,
