@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Drawer, Modal } from "antd";
+import { Drawer, Modal, Spin } from "antd";
 import { RefreshCw, ShieldCheckIcon } from "lucide-react";
 
 import CustomCreateButton from "../../components/CustomCreateButton";
@@ -11,7 +12,7 @@ import CreateProjectForm from "./CreatedAndEditProjectForm";
 import {
   useCreateProjectMutation,
   useDeleteProjectMutation,
-  useGetProjectsQuery,
+  useGetProjectsWithstatusQuery,
   useUpdateProjectMutation,
 } from "../../Redux/features/projects/projectsApi";
 
@@ -23,28 +24,39 @@ const Projects = () => {
   const location = useLocation();
 
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const [, setSharedProjectId] = useState<number | null>(null);
+  const [, setSharedProjectId] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editProject, setEditProject] = useState<any>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const queryParams = new URLSearchParams(location.search);
- 
-  const statusFilter = queryParams.get("status") || "ongoing";
-  console.log(statusFilter)
+
+  const statusFilter = queryParams.get("status") ?? "pending";
+  console.log(statusFilter);
   const {
     data: projects = [],
+    isLoading,
     refetch,
-  } = useGetProjectsQuery({ status: statusFilter });
+  } = useGetProjectsWithstatusQuery({
+    status: statusFilter,
+  });
 
-  console.log(projects)
+  console.log(projects);
 
   const [createProject] = useCreateProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
   const [deleteProject] = useDeleteProjectMutation();
 
+  if (isLoading) {
+    return (
+      <div>
+        <Spin></Spin>
+      </div>
+    );
+  }
+
   // ✅ DELETE Handler using showDeleteAlert + RTK Mutation
-  const handleDelete = (projectId: number) => {
+  const handleDelete = (projectId: string) => {
     const projectToDelete = projects.find((p) => p.id === projectId);
     if (!projectToDelete) return;
 
@@ -64,7 +76,7 @@ const Projects = () => {
   };
 
   // Handle "View More" actions from dropdown
-  const handleMoreClick = (key: string, projectId: number) => {
+  const handleMoreClick = (key: string, projectId: string) => {
     const selectedProject = projects.find((p) => p.id === projectId);
     switch (key) {
       case "view":
@@ -100,13 +112,10 @@ const Projects = () => {
         </div>
 
         {projects?.map((project) => (
-          <div
-            key={project.id}
-            className="hover:bg-[#e6f4ea] bg-[#f1f1f1]"
-          >
+          <div key={project._id} className="hover:bg-[#e6f4ea] bg-[#f1f1f1]">
             <div className="w-full px-4 py-2.5 flex items-center gap-2.5">
               <div className="w-6 h-6 relative overflow-hidden">
-                {project.timeline.status === "ongoing" ? (
+                {project.status === "pending" ? (
                   <RefreshCw />
                 ) : (
                   <ShieldCheckIcon />
@@ -119,7 +128,7 @@ const Projects = () => {
               </div>
               <div className="px-1 py-0.5 rounded-full flex items-center">
                 <div className="text-[#457205] text-xs font-ibm font-medium">
-                  {project.timeline.status}
+                  {project.status}
                 </div>
               </div>
               <div
@@ -137,7 +146,7 @@ const Projects = () => {
                   { key: "share", label: "Share Project" },
                   { key: "delete", label: "Delete Project" },
                 ]}
-                onClick={(key) => handleMoreClick(key, project.id)}
+                onClick={(key) => handleMoreClick(key, project._id)}
               />
             </div>
           </div>
@@ -203,7 +212,7 @@ const Projects = () => {
               console.log("Updated data:", data);
               try {
                 const result = await updateProject({
-                  id: editProject.id,
+                  id: editProject._id,
                   data,
                 }).unwrap();
                 console.log("Updated:", result);

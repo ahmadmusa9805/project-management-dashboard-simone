@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +22,7 @@ const schema = z.object({
   email: z.string().email("Invalid email"),
   contactNo: z.string().min(6, "Contact number required"),
   address: z.string().min(3, "Address is required"),
-  postalCode: z.string().min(4, "Postal code is required"),
+  postCode: z.string().min(4, "Postal code is required"),
   estimateNumber: z.string().optional(),
   projectType: z.string().optional(),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -60,9 +61,9 @@ const UserCreateEditPage = ({
     defaultValues: defaultValues || {},
   });
 
-  const editingUserId =defaultValues?.id; // check both
-console.log("Editing user ID:", editingUserId);
-  console.log(editingUserId)
+  const editingUserId = defaultValues?.id; // check both
+  console.log("Editing user ID:", editingUserId);
+  console.log(editingUserId);
 
   const [projectTypes, setProjectTypes] = useState(["Construction", "Repair"]);
   const [newProjectType, setNewProjectType] = useState("");
@@ -75,9 +76,7 @@ console.log("Editing user ID:", editingUserId);
 
   const allowedRoles = useMemo<FormData["role"][]>(() => {
     if (path.includes("prime-admins")) {
-      return mode === "edit"
-        ? [USER_ROLE.primeAdmin]
-        : [USER_ROLE.primeAdmin];
+      return mode === "edit" ? [USER_ROLE.primeAdmin] : [USER_ROLE.primeAdmin];
     } else if (path.includes("basic-admins")) {
       return [USER_ROLE.basicAdmin];
     } else if (path.includes("clients")) {
@@ -119,9 +118,12 @@ console.log("Editing user ID:", editingUserId);
       formData.append("name", data.name);
       formData.append("email", data.email);
       formData.append("contactNo", data.contactNo);
-      formData.append("password", data.password || "");
+      formData.append("password", String(data.password || ""));
+      formData.append("address", data.address);
+      formData.append("postCode", data.postCode);
+      formData.append("estimateNumber", data.estimateNumber);
+      formData.append("projectType", data.projectType);
       formData.append("role", data.role);
-
 
       // Append extra fields for client
       if (data.selectedRole === "client") {
@@ -137,7 +139,7 @@ console.log("Editing user ID:", editingUserId);
       if (editingUserId) {
         // Update user
         await updateUser({ id: editingUserId, body: formData }).unwrap();
-       successAlert("User updated");
+        successAlert("User updated");
       } else {
         // Create user
         await createUser(formData).unwrap();
@@ -220,13 +222,13 @@ console.log("Editing user ID:", editingUserId);
 
         <Controller
           control={control}
-          name="postalCode"
+          name="postCode"
           render={({ field }) => (
             <>
               <Input {...field} placeholder="Postal Code" />
-              {errors.postalCode && (
+              {errors.postCode && (
                 <p className="text-red-600 text-sm">
-                  {errors.postalCode.message}
+                  {errors.postCode.message}
                 </p>
               )}
             </>
@@ -285,13 +287,13 @@ console.log("Editing user ID:", editingUserId);
         <div className="flex flex-col gap-4">
           <h3 className="text-lg font-medium">Account Details</h3>
 
-          <Controller
+          {/* <Controller
             control={control}
             name="estimateNumber"
             render={({ field }) => (
               <Input {...field} placeholder="Estimate Number" />
             )}
-          />
+          /> */}
 
           <Controller
             control={control}
@@ -300,13 +302,13 @@ console.log("Editing user ID:", editingUserId);
               <>
                 <Select
                   {...field}
-                  placeholder="Select project type"
+                  placeholder="Project name or ID"
                   dropdownRender={(menu) => (
                     <div>
                       {menu}
                       <div className="flex items-center p-2 gap-2">
                         <Input
-                          placeholder="Add new type"
+                          placeholder="Add new project name or ID"
                           value={newProjectType}
                           onChange={(e) => setNewProjectType(e.target.value)}
                         />

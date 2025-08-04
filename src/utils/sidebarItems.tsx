@@ -16,6 +16,7 @@ import {
   ImageIcon,
   Layers,
   LayoutDashboardIcon,
+  LayoutList,
   ListChecksIcon,
   ListTodoIcon,
   RefreshCw,
@@ -27,7 +28,7 @@ import {
 } from "lucide-react";
 import { USER_ROLE } from "../types/userAllTypes/user";
 
-type Role ="superAdmin" | "primeAdmin" | "basicAdmin" | "client";
+type Role = "superAdmin" | "primeAdmin" | "basicAdmin" | "client";
 
 // ✅ MenuItem type from Ant Design
 type MenuItem = Required<MenuProps>["items"][number];
@@ -52,20 +53,39 @@ const rawSidebarItems: SidebarItem[] = [
     key: "/projects",
     label: "Projects",
     icon: <Layers />,
-    allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin,USER_ROLE.client],
+    allowedRoles: [
+      USER_ROLE.superAdmin,
+      USER_ROLE.primeAdmin,
+      USER_ROLE.basicAdmin,
+      USER_ROLE.client,
+    ],
     children: [
       {
-  key: "/projects?status=ongoing", // Correct spelling: ongoing (not onging)
-  label: "Ongoing Projects",
-  icon: <RefreshCw />,
-  allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin,],
-},
-{
-  key: "/projects?status=completed",
-  label: "Completed Projects",
-  icon: <ShieldCheckIcon />,
-  allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin,],
-}
+        key: "/projects?status=pending", // Correct spelling: ongoing (not onging)
+        label: "Pending Projects",
+        icon: <LayoutList />,
+        allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
+      },
+      {
+        key: "/projects?status=ongoing", // Correct spelling: ongoing (not onging)
+        label: "Ongoing Projects",
+        icon: <RefreshCw />,
+        allowedRoles: [
+          USER_ROLE.superAdmin,
+          USER_ROLE.primeAdmin,
+          USER_ROLE.basicAdmin,
+        ],
+      },
+      {
+        key: "/projects?status=completed",
+        label: "Completed Projects",
+        icon: <ShieldCheckIcon />,
+        allowedRoles: [
+          USER_ROLE.superAdmin,
+          USER_ROLE.primeAdmin,
+          USER_ROLE.basicAdmin,
+        ],
+      },
     ],
   },
   {
@@ -117,7 +137,7 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
       key: `/projects/${projectId}/dashboard`,
       label: "Dashboard",
       icon: <LayoutDashboardIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,],
+      allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
     },
     // {
     //   key: `/projects/${projectId}/details`,
@@ -128,74 +148,107 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
       key: `/projects/${projectId}/quote-details`,
       label: "Quote Details",
       icon: <ClipboardListIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin, "client"],
+      allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin, "client"],
     },
     {
       key: `/projects/${projectId}/interim-evaluation`,
       label: "Interim Evaluations",
       icon: <ChartBarBigIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,],
+      allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
     },
     {
       key: `/projects/${projectId}/live-project-costs`,
       label: "Live Project Costs",
       icon: <TrendingUp />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,],
+      allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
     },
     {
       key: `/projects/${projectId}/payments-track`,
       label: "Payments Track",
       icon: <BanknoteIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,],
+      allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
     },
     {
       key: `/projects/${projectId}/site-pictures-reports`,
       label: "Site Pictures & Reports",
       icon: <ImageIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin,USER_ROLE.client],
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+        USER_ROLE.client,
+      ],
     },
 
     {
       key: `/projects/${projectId}/certificates`,
       label: "Certificates",
       icon: <FileBadgeIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin],
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+      ],
     },
     {
       key: `/projects/${projectId}/documents`,
       label: "Documents",
       icon: <FolderOpenIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin,USER_ROLE.client],
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+        USER_ROLE.client,
+      ],
     },
     {
       key: `/projects/${projectId}/second-fixed-list-material`,
       label: "Second Fixed List",
       icon: <ListChecksIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin],
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+      ],
     },
     {
       key: `/projects/${projectId}/handover-tool`,
       label: "Handover Tool",
       icon: <HandshakeIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin],
+      allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
     },
     {
       key: `/projects/${projectId}/time-schedule`,
       label: "Time Schedule",
       icon: <CalendarClockIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin,USER_ROLE.client],
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+        USER_ROLE.client,
+      ],
     },
     {
       key: `/projects/${projectId}/snagging-list`,
       label: "Snagging List",
       icon: <ListTodoIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin,USER_ROLE.client],
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+        USER_ROLE.client,
+      ],
     },
     {
       key: `/projects/${projectId}/notes`,
       label: "Notes",
       icon: <FilePenLineIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin,USER_ROLE.basicAdmin,USER_ROLE.client],
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+        USER_ROLE.client,
+      ],
     },
     // {
     //   key: `/projects/${projectId}/labour`,
@@ -206,7 +259,7 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
       key: `/projects/${projectId}/client-details`,
       label: "Client Details",
       icon: <SquareUserRoundIcon />,
-      allowedRoles: [USER_ROLE.superAdmin,USER_ROLE.primeAdmin],
+      allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
     },
   ];
 

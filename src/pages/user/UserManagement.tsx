@@ -1,41 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { Select, Button } from "antd";
+import { Select, Button, Tabs } from "antd";
 import CustomSearchInput from "../../components/CustomSearchInput";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 import { Drawer } from "antd";
 import UserCreateEditPage from "./UserCreateEditPage";
 import getStatusClasses from "../../utils/getStatusClasses";
-import {
-  USER_ROLE,
-  type StatusType,
-  type TRole,
-} from "../../types/userAllTypes/user";
+import { USER_ROLE, type TRole } from "../../types/userAllTypes/user";
 import { useLocation } from "react-router-dom";
 import UserDetailsModal from "./UserDetailModal";
-import { useGetAllUsersQuery } from "../../Redux/features/users/usersApi";
-import { id } from "zod/v4/locales";
+import {
+  useChangeUserStatusMutation,
+  useGetAllUsersQuery,
+} from "../../Redux/features/users/usersApi";
+import { errorAlert, successAlert } from "../../utils/alerts";
+import TabPane from "antd/es/tabs/TabPane";
 
 interface DataItem {
   id: string;
   name: string;
   email: string;
-  profileImg?:string;
+  profileImg?: string;
   contactNo: string;
   status: StatusType;
   role: TRole;
-  quoteValue?: string;
-  projectName?: string;
+  estimateNumber: string;
+  projectType: string;
   address?: string;
   postCode?: string;
 }
-
-
-
+type StatusType = "active" | "blocked";
 const ITEMS_PER_PAGE = 10;
 
-const AdminTable = () => {
+const AdminTable = ({ statusFilter }: { statusFilter?: StatusType }) => {
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -46,7 +44,8 @@ const AdminTable = () => {
 
   const [userData, setUserData] = useState<DataItem[]>([]);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [viewUser, setViewUser] = useState< string | null>(null);
+  const [viewUser, setViewUser] = useState<string | null>(null);
+  const [changeUserStatus] = useChangeUserStatusMutation();
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -61,18 +60,18 @@ const AdminTable = () => {
   useEffect(() => {
     if (data?.data && Array.isArray(data.data)) {
       const mappedData: DataItem[] = data.data.map((user: any) => ({
-  id: user._id,
-  name: user.name,
-  profileImg:user.profileImg,
-  email: user.email,
-  contactNo: user.contactNo,
-  status: "active", // or use user.status if available
-  role: user.role,
-  quoteValue: user.estimateNumber ,
-  projectName: user.projectType ,
-  address: user.address,
-  postCode: user.postCode ,
-}));
+        id: user._id,
+        name: user.name,
+        profileImg: user.profileImg,
+        email: user.email,
+        contactNo: user.contactNo,
+        status: user.status, // or use user.status if available
+        role: user.role,
+        estimateNumber: user.estimateNumber,
+        projectType: user.projectType,
+        address: user.address,
+        postCode: user.postCode,
+      }));
       setUserData(mappedData);
     }
   }, [data]);
@@ -101,8 +100,8 @@ const AdminTable = () => {
     (page - 1) * ITEMS_PER_PAGE,
     page * ITEMS_PER_PAGE
   );
-console.log("Current path:", pathname);
-console.log("routeUserType:", routeUserType);
+  console.log("Current path:", pathname);
+  console.log("routeUserType:", routeUserType);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -131,9 +130,20 @@ console.log("routeUserType:", routeUserType);
   if (routeUserType === USER_ROLE.primeAdmin) title = "Prime Admins";
   else if (routeUserType === USER_ROLE.basicAdmin) title = "Basic Admins";
   else if (routeUserType === USER_ROLE.client) title = "Clients";
-console.log("Opening modal for:", viewUser, detailsModalOpen);
+  console.log("Opening modal for:", viewUser, detailsModalOpen);
   return (
     <>
+      <>
+        <Tabs defaultActiveKey="2">
+          <TabPane tab={<span>Tab 1</span>} key="1">
+            Tab 1
+          </TabPane>
+          <TabPane tab={<span>Tab 2</span>} key="2">
+            Tab 2
+          </TabPane>
+        </Tabs>
+      </>
+
       <div className="w-full mx-auto p-4 bg-white min-h-screen">
         <div className="flex justify-between">
           <h1 className="text-2xl font-semibold mb-4">Manage {title}</h1>
@@ -159,16 +169,13 @@ console.log("Opening modal for:", viewUser, detailsModalOpen);
               <th className="text-left px-4 py-2 text-gray-700">
                 Contact Number
               </th>
-              {routeUserType === "client" && (
+              {/* {routeUserType === "client" && (
                 <>
-                  <th className="text-left px-4 py-2 text-gray-700">
-                    Quote Value
-                  </th>
                   <th className="text-left px-4 py-2 text-gray-700">
                     Project Name
                   </th>
                 </>
-              )}
+              )} */}
               <th className="text-left px-4 py-2 text-gray-700">Status</th>
               <th className="text-left px-4 py-2 text-gray-700">Actions</th>
             </tr>
@@ -177,19 +184,16 @@ console.log("Opening modal for:", viewUser, detailsModalOpen);
           <tbody>
             {currentData.map(
               ({
-              
-  id,
-  name,
-  email,
-  contactNo,
-  status,
-  quoteValue,
-  projectName,
-  role,
-  
-  profileImg, // ✅ Add this line
+                id,
+                name,
+                email,
+                contactNo,
+                status,
+                estimateNumber,
+                projectType,
+                role,
 
-
+                profileImg, // ✅ Add this line
               }) => (
                 <tr
                   key={id}
@@ -199,12 +203,11 @@ console.log("Opening modal for:", viewUser, detailsModalOpen);
                   <td className="px-4 py-3 text-gray-900">{email}</td>
                   <td className="px-4 py-3 text-gray-900">{contactNo}</td>
 
-                  {routeUserType === "client" && (
+                  {/* {routeUserType === "client" && (
                     <>
-                      <td className="px-4 py-3 text-gray-900">{quoteValue}</td>
-                      <td className="px-4 py-3 text-gray-900">{projectName}</td>
+                      <td className="px-4 py-3 text-gray-900">{projectType}</td>
                     </>
-                  )}
+                  )} */}
 
                   <td className="px-4 py-3">
                     <div
@@ -215,19 +218,29 @@ console.log("Opening modal for:", viewUser, detailsModalOpen);
                       <Select
                         size="small"
                         value={status}
-                        onChange={(newStatus: StatusType) => {
-                          setUserData((prevData) =>
-                            prevData.map((user) =>
-                              user.id === id
-                                ? { ...user, status: newStatus }
-                                : user
-                            )
-                          );
+                        onChange={async (newStatus: StatusType) => {
+                          try {
+                            await changeUserStatus({
+                              id,
+                              status: newStatus,
+                            }).unwrap();
+                            successAlert("Status updated successfully");
+
+                            setUserData((prevData) =>
+                              prevData.map((user) =>
+                                user.id === id
+                                  ? { ...user, status: newStatus }
+                                  : user
+                              )
+                            );
+                          } catch (error) {
+                            errorAlert("Failed to update status");
+                            console.error(error);
+                          }
                         }}
                       >
                         <Select.Option value="active">Active</Select.Option>
                         <Select.Option value="blocked">Blocked</Select.Option>
-                        
                       </Select>
                     </div>
                   </td>
@@ -239,10 +252,9 @@ console.log("Opening modal for:", viewUser, detailsModalOpen);
                         { key: "edit", label: "Edit User" },
                       ]}
                       onClick={(key) => {
-                       if (key === "view") {
-  setViewUser( id ); // ✅ Correct
-  setDetailsModalOpen(true);
-
+                        if (key === "view") {
+                          setViewUser(id); // ✅ Correct
+                          setDetailsModalOpen(true);
                         } else if (key === "edit") {
                           setMode("edit");
                           setSelectedUser({
@@ -252,8 +264,8 @@ console.log("Opening modal for:", viewUser, detailsModalOpen);
                             email,
                             contactNo,
                             status,
-                            quoteValue,
-                            projectName,
+                            estimateNumber,
+                            projectType,
                             role,
                           });
 
@@ -311,16 +323,15 @@ console.log("Opening modal for:", viewUser, detailsModalOpen);
 
       {/* View Details Modal */}
       {viewUser && (
-  <UserDetailsModal
-    visible={detailsModalOpen}
-    onClose={() => {
-      setDetailsModalOpen(false);
-      setViewUser(null);
-    }}
-    userId={viewUser}
-  />
-)}
-
+        <UserDetailsModal
+          visible={detailsModalOpen}
+          onClose={() => {
+            setDetailsModalOpen(false);
+            setViewUser(null);
+          }}
+          userId={viewUser}
+        />
+      )}
     </>
   );
 };
