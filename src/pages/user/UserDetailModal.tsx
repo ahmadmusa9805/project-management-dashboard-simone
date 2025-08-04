@@ -30,12 +30,13 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
       open={visible}
       onCancel={onClose}
       footer={null}
-      width={600}
+      width={900}
+      
       centered
     >
-      <div className="w-full h-full p-4 bg-white rounded flex flex-col gap-4">
+      <div className="w-full h-full p-20 bg-white rounded flex flex-col gap-10">
         {/* Profile Header */}
-        <div className="inline-flex items-center gap-2">
+        <div className="inline-flex items-center gap-5">
           <img
             src={data.profileImg || 'https://placehold.co/40x40'}
             alt="avatar"
@@ -48,7 +49,7 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ visible, onClose, u
         </div>
 
         {/* Personal Details */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-5">
           <div className="text-base font-medium text-[#000E0F]">Personal details</div>
           <div className="flex flex-col gap-2">
             {renderDetailRow('Contact number', data.contactNo)}

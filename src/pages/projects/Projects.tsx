@@ -1,8 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
+
+// src/pages/Projects/Projects.tsx
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Drawer, Modal, Spin } from "antd";
-import { RefreshCw, ShieldCheckIcon } from "lucide-react";
+import { HourglassIcon, RefreshCw, ShieldCheckIcon } from "lucide-react";
 
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
@@ -13,11 +15,17 @@ import {
   useCreateProjectMutation,
   useDeleteProjectMutation,
   useGetProjectsWithstatusQuery,
+ 
   useUpdateProjectMutation,
 } from "../../Redux/features/projects/projectsApi";
 
 import { showDeleteAlert } from "../../utils/deleteAlert";
 import { successAlert } from "../../utils/alerts";
+import type { projectSchema } from "../../types/projectAllTypes/projectSchema";
+import type z from "zod";
+import ProjectDetailsModal from "../../Redux/features/projects/SingleProjectDetails";
+
+type ProjectForm = z.infer<typeof projectSchema>;
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -28,11 +36,12 @@ const Projects = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editProject, setEditProject] = useState<any>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-
+const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const queryParams = new URLSearchParams(location.search);
-
+  
   const statusFilter = queryParams.get("status") ?? "pending";
-  console.log(statusFilter);
+const status = queryParams.get("status");
   const {
     data: projects = [],
     isLoading,
@@ -40,24 +49,24 @@ const Projects = () => {
   } = useGetProjectsWithstatusQuery({
     status: statusFilter,
   });
-
-  console.log(projects);
-
+ 
   const [createProject] = useCreateProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
   const [deleteProject] = useDeleteProjectMutation();
 
-  if (isLoading) {
-    return (
-      <div>
-        <Spin></Spin>
-      </div>
-    );
-  }
 
-  // ✅ DELETE Handler using showDeleteAlert + RTK Mutation
+   const handleViewDetails = (id: string) => {
+    setSelectedProjectId(id);
+    setIsModalOpen(true);
+  };
+
+   const handleCloseModal = () => {
+    setSelectedProjectId(null);
+    setIsModalOpen(false);
+  };
+
   const handleDelete = (projectId: string) => {
-    const projectToDelete = projects.find((p) => p.id === projectId);
+    const projectToDelete = projects.find((p) => p._id === projectId);
     if (!projectToDelete) return;
 
     showDeleteAlert({
@@ -75,12 +84,12 @@ const Projects = () => {
     });
   };
 
-  // Handle "View More" actions from dropdown
   const handleMoreClick = (key: string, projectId: string) => {
-    const selectedProject = projects.find((p) => p.id === projectId);
+    const selectedProject = projects.find((p) => p._id === projectId);
     switch (key) {
       case "view":
-        navigate(`/projects/${projectId}`);
+      handleViewDetails(projectId)
+
         break;
       case "edit":
         if (selectedProject) {
@@ -101,43 +110,59 @@ const Projects = () => {
     }
   };
 
+  if (isLoading) return <Spin />;
+
   return (
     <>
-      <div className="w-full px-4 flex flex-col gap-4 bg-white min-h-screen">
-        <div className="w-full flex justify-end mt-3">
-          <CustomCreateButton
-            title="Create Project"
-            onClick={() => setIsCreateOpen(true)}
-          />
-        </div>
+      
+<div className="w-full px-4 flex flex-col gap-4 bg-white min-h-screen pt-3">
 
-        {projects?.map((project) => (
+    {status === 'pending' ? (
+  <h2 className="text-xl font-semibold px-4">
+    Pending Projects
+  </h2>
+) : status === 'ongoing' ? (
+  <h2 className="text-xl font-semibold px-4">
+    Ongoing Projects
+  </h2>
+) : status === 'completed' ? (
+  <h2 className="text-xl font-semibold px-4">
+    Completed Projects
+  </h2>
+) : null}
+
+  
+        {statusFilter === "pending" && (
+  <div className="w-full flex justify-end mt-3">
+    <CustomCreateButton
+      title="Create Project"
+      onClick={() => setIsCreateOpen(true)}
+    />
+  </div>
+)}
+        {projects.map((project) => (
+
+          
           <div key={project._id} className="hover:bg-[#e6f4ea] bg-[#f1f1f1]">
             <div className="w-full px-4 py-2.5 flex items-center gap-2.5">
-              <div className="w-6 h-6 relative overflow-hidden">
-                {project.status === "pending" ? (
-                  <RefreshCw />
-                ) : (
-                  <ShieldCheckIcon />
-                )}
+              <div className="w-6 h-6">
+  {project.status === 'pending' ? (
+    <HourglassIcon className="text-green-500"/>
+  ) : project.status === 'ongoing' ? (
+    <RefreshCw className="text-green-500" />
+  ) : (
+    <ShieldCheckIcon className="text-green-500" />
+  )}
+</div>
+              <div className="flex-1 text-base font-medium">
+                {project.projectName}
               </div>
-              <div className="flex-1 flex items-center gap-2.5">
-                <div className="text-[#2B3738] text-base font-ibm font-medium">
-                  {project.projectName}
-                </div>
-              </div>
-              <div className="px-1 py-0.5 rounded-full flex items-center">
-                <div className="text-[#457205] text-xs font-ibm font-medium">
-                  {project.status}
-                </div>
-              </div>
+              <div className="text-xs text-[#457205]">{project.status}</div>
               <div
-                className="w-[158px] h-full p-2 flex items-center gap-1 cursor-pointer"
+                className="cursor-pointer text-xs"
                 onClick={() => navigate(`/projects/${project.id}`)}
               >
-                <div className="text-black text-xs font-ibm font-medium">
-                  View details
-                </div>
+                View details
               </div>
               <CustomViewMoreButton
                 items={[
@@ -153,7 +178,6 @@ const Projects = () => {
         ))}
       </div>
 
-      {/* Share Modal */}
       <Modal
         open={isShareOpen}
         footer={null}
@@ -168,7 +192,6 @@ const Projects = () => {
         />
       </Modal>
 
-      {/* Create Drawer */}
       <Drawer
         title="Create Project"
         placement="right"
@@ -178,12 +201,22 @@ const Projects = () => {
         destroyOnClose
       >
         <CreateProjectForm
-          onSubmit={async (data) => {
-            console.log("Created: data", data);
+          onSubmit={async (formData: ProjectForm) => {
             try {
-              const result = await createProject(data).unwrap();
-              console.log("Created:", result);
+              const body = new FormData();
+
+              // Append file
+              const fileObj = formData.contractFile?.originFileObj;
+              if (fileObj) {
+                body.append("file", fileObj); // 🟢 backend expects `file`
+              }
+
+              // Append rest of form data as JSON string
+              const { contractFile, ...rest } = formData;
+              body.append("data", JSON.stringify(rest)); // 🟢 backend middlewa
+               await createProject(body).unwrap();
               successAlert("Project created successfully");
+
               setIsCreateOpen(false);
               refetch();
             } catch (err) {
@@ -194,7 +227,6 @@ const Projects = () => {
         />
       </Drawer>
 
-      {/* Edit Drawer */}
       <Drawer
         title="Edit Project"
         placement="right"
@@ -205,17 +237,16 @@ const Projects = () => {
       >
         {editProject && (
           <CreateProjectForm
+            key={editProject._id}
             defaultValues={editProject}
             isEdit
             submitText="Update Project"
             onSubmit={async (data) => {
-              console.log("Updated data:", data);
               try {
-                const result = await updateProject({
+                await updateProject({
                   id: editProject._id,
                   data,
                 }).unwrap();
-                console.log("Updated:", result);
                 successAlert("Project updated successfully");
                 setIsEditOpen(false);
                 refetch();
@@ -226,8 +257,19 @@ const Projects = () => {
           />
         )}
       </Drawer>
+
+
+        <ProjectDetailsModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        projectId={selectedProjectId}
+      />
     </>
   );
 };
 
 export default Projects;
+
+
+
+

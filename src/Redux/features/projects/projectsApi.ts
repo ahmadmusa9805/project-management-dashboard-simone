@@ -1,19 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// src/Redux/features/projects/projectsApi.ts
 
 import { baseApi } from "../../app/api/baseApi";
 
 export const projectsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // getProjects: builder.query<any[], void>({
-    //   query: () => {
-    //     return `/projects`;
-    //   },
-    //   providesTags: ["Projects"],
-    //   transformResponse: (response: { data: any[] }) => {
-    //     return Array.isArray(response.data) ? response.data : [];
-    //   },
-    // }),
     getProjectsWithstatus: builder.query<any[], { status?: string } | void>({
       query: (params) => {
         const queryString = params?.status ? `?status=${params.status}` : "";
@@ -24,23 +13,28 @@ export const projectsApi = baseApi.injectEndpoints({
         return Array.isArray(response.data) ? response.data : [];
       },
     }),
+    getSingleProject: builder.query<any, { id: string }>({
+  query: ({ id }) => `/projects/${id}`,
+  providesTags: ["Projects"],
+  transformResponse: (response: { status: string; data: any }) => {
+    return response.data;
+  },
+}),
+
 
     createProject: builder.mutation<any, any>({
-      query: (data) => {
-        // console.log("Creating Project with Data:", data);
-        return {
-          url: "/projects",
-          method: "POST",
-          body: data,
-        };
-      },
+      query: (data) => ({
+        url: "/projects/create-project",
+        method: "POST",
+        body: data,
+      }),
       invalidatesTags: ["Projects"],
     }),
 
-    updateProject: builder.mutation<any, { id: number; data: any }>({
+    updateProject: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => ({
         url: `/projects/${id}`,
-        method: "PUT",
+        method: "PATCH",
         body: data,
       }),
       invalidatesTags: ["Projects"],
@@ -53,12 +47,12 @@ export const projectsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Projects"],
     }),
-  }),
+  })
 });
 
 export const {
-  // useGetProjectsQuery,
   useGetProjectsWithstatusQuery,
+  useGetSingleProjectQuery,
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,

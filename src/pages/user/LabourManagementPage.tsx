@@ -28,7 +28,7 @@ const ITEMS_PER_PAGE = 10;
 type SearchProps = GetProps<typeof Input.Search>;
 
 const LaborTable: React.FC = () => {
-  const { data, isLoading, error } = useGetAllUsersQuery();
+  const { data, isLoading, error } = useGetAllUsersQuery({});
   console.log("data in labor components after call hook", data?.data[0]);
   // const rowDataByUserRole = data?.data.filter((user) => user.role === "labor");
   // console.log(rowDataByUserRole);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { Select, Button, Tabs } from "antd";
+import { Select, Button, Tabs, ConfigProvider } from "antd";
 import CustomSearchInput from "../../components/CustomSearchInput";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
@@ -33,13 +33,14 @@ interface DataItem {
 type StatusType = "active" | "blocked";
 const ITEMS_PER_PAGE = 10;
 
-const AdminTable = ({ statusFilter }: { statusFilter?: StatusType }) => {
+const AdminTable = () => {
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [openDrawer, setOpenDrawer] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<DataItem | null>(null);
-  const { data, refetch } = useGetAllUsersQuery();
+const [activeTab, setActiveTab] = useState<"active" | "blocked">("active");
+const { data, refetch } = useGetAllUsersQuery({ status: activeTab });
   console.log(data);
 
   const [userData, setUserData] = useState<DataItem[]>([]);
@@ -134,17 +135,7 @@ const AdminTable = ({ statusFilter }: { statusFilter?: StatusType }) => {
   return (
     <>
       <>
-        <Tabs defaultActiveKey="2">
-          <TabPane tab={<span>Tab 1</span>} key="1">
-            Tab 1
-          </TabPane>
-          <TabPane tab={<span>Tab 2</span>} key="2">
-            Tab 2
-          </TabPane>
-        </Tabs>
-      </>
-
-      <div className="w-full mx-auto p-4 bg-white min-h-screen">
+       <div className="w-full mx-auto p-4 bg-white min-h-screen">
         <div className="flex justify-between">
           <h1 className="text-2xl font-semibold mb-4">Manage {title}</h1>
           <CustomSearchInput onSearch={onSearch} />
@@ -160,8 +151,32 @@ const AdminTable = ({ statusFilter }: { statusFilter?: StatusType }) => {
             }}
           />
         </div>
-
-        <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
+ <ConfigProvider theme={{
+        components: {
+           Tabs: {
+        itemColor: "#555", 
+        itemActiveColor: "#0d542b", 
+        itemHoverColor: "#1c7e4f", 
+        itemSelectedColor: "#0d542b", 
+        inkBarColor: "#0d542b",
+        titleFontSize: 16,
+        
+      },
+          
+        },
+      }}>
+  <Tabs  defaultActiveKey="active {}"
+  activeKey={activeTab}
+  onChange={(key) => {
+    setActiveTab(key as "active" | "blocked");
+    setPage(1);
+    
+  }}
+ 
+  
+  >
+          <TabPane   tab={<span> Active {title}</span>} key="active">
+             <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
           <thead className="bg-[#e6f4ea] border-b border-gray-300">
             <tr>
               <th className="text-left px-4 py-2 text-gray-700">Name</th>
@@ -300,7 +315,156 @@ const AdminTable = ({ statusFilter }: { statusFilter?: StatusType }) => {
             Next
           </Button>
         </div>
+          </TabPane>
+          <TabPane tab={<span>Blocked {title}</span>} key="blocked">
+            <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
+          <thead className="bg-[#e6f4ea] border-b border-gray-300">
+            <tr>
+              <th className="text-left px-4 py-2 text-gray-700">Name</th>
+              <th className="text-left px-4 py-2 text-gray-700">Email</th>
+              <th className="text-left px-4 py-2 text-gray-700">
+                Contact Number
+              </th>
+              {/* {routeUserType === "client" && (
+                <>
+                  <th className="text-left px-4 py-2 text-gray-700">
+                    Project Name
+                  </th>
+                </>
+              )} */}
+              <th className="text-left px-4 py-2 text-gray-700">Status</th>
+              <th className="text-left px-4 py-2 text-gray-700">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {currentData.map(
+              ({
+                id,
+                name,
+                email,
+                contactNo,
+                status,
+                estimateNumber,
+                projectType,
+                role,
+
+                profileImg, // ✅ Add this line
+              }) => (
+                <tr
+                  key={id}
+                  className="border-b border-gray-100 hover:bg-[#e6f4ea]"
+                >
+                  <td className="px-4 py-3 text-gray-900">{name}</td>
+                  <td className="px-4 py-3 text-gray-900">{email}</td>
+                  <td className="px-4 py-3 text-gray-900">{contactNo}</td>
+
+                  {/* {routeUserType === "client" && (
+                    <>
+                      <td className="px-4 py-3 text-gray-900">{projectType}</td>
+                    </>
+                  )} */}
+
+                  <td className="px-4 py-3">
+                    <div
+                      className={`inline-block px-3 py-1 rounded text-sm font-medium ${getStatusClasses(
+                        status
+                      )}`}
+                    >
+                      <Select
+                        size="small"
+                        value={status}
+                        onChange={async (newStatus: StatusType) => {
+                          try {
+                            await changeUserStatus({
+                              id,
+                              status: newStatus,
+                            }).unwrap();
+                            successAlert("Status updated successfully");
+
+                            setUserData((prevData) =>
+                              prevData.map((user) =>
+                                user.id === id
+                                  ? { ...user, status: newStatus }
+                                  : user
+                              )
+                            );
+                          } catch (error) {
+                            errorAlert("Failed to update status");
+                            console.error(error);
+                          }
+                        }}
+                      >
+                        <Select.Option value="active">Active</Select.Option>
+                        <Select.Option value="blocked">Blocked</Select.Option>
+                      </Select>
+                    </div>
+                  </td>
+
+                  <td className="px-4 py-3 flex gap-2">
+                    <CustomViewMoreButton
+                      items={[
+                        { key: "view", label: "View User Details" },
+                        { key: "edit", label: "Edit User" },
+                      ]}
+                      onClick={(key) => {
+                        if (key === "view") {
+                          setViewUser(id); // ✅ Correct
+                          setDetailsModalOpen(true);
+                        } else if (key === "edit") {
+                          setMode("edit");
+                          setSelectedUser({
+                            id,
+                            name,
+                            profileImg,
+                            email,
+                            contactNo,
+                            status,
+                            estimateNumber,
+                            projectType,
+                            role,
+                          });
+
+                          setOpenDrawer(true);
+                        }
+                      }}
+                    />
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+
+        {/* Pagination */}
+        <div className="flex justify-evenly items-center mt-4">
+          <Button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+          >
+            Previous
+          </Button>
+
+          <div className="text-gray-700">
+            Page {page} of {totalPages}
+          </div>
+
+          <Button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+          </TabPane>
+        </Tabs>
+ </ConfigProvider>
+       
       </div>
+       
+      </>
+
+     
 
       {/* Drawer for Create/Edit */}
       <Drawer
