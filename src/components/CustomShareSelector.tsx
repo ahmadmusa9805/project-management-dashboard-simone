@@ -3,18 +3,19 @@ import { Input, Checkbox, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useGetAllUsersQuery } from "../Redux/features/users/usersApi";
 
-interface User {
-  id: number;
-  name: string;
-  email?: string;
-  role: string;
-  photo?: string;
-}
+
+// interface User {
+//   id: number;
+//   name: string;
+//   email?: string;
+//   role: string;
+//   photo?: string;
+// }
 
 interface CustomShareSelectorProps {
   title?: string;
   roles: string[]; // Example: ['prime-admin', 'basic-admin', 'client']
-  onShare: (selectedUserIds: number[]) => void;
+  onShare: (selectedUserIds: string[]) => void;
 }
 
 const CustomShareSelector = ({
@@ -22,13 +23,14 @@ const CustomShareSelector = ({
   roles,
   onShare,
 }: CustomShareSelectorProps) => {
-  const { data: response } = useGetAllUsersQuery();
-  const users: User[] = (response?.data || []).filter(
-    (item: any) => item.email && item.photo && item.role && item.name
-  );
+  const { data: response } = useGetAllUsersQuery({ status: 'active' });
+ const users = (response?.data || []).filter(
+  (item: any) => item._id && item.name && item.role && item.email
+);
+
 
   const [searchText, setSearchText] = useState("");
-  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [selectedRole, setSelectedRole] = useState<string>("all");
 
  const filteredUsers = users.filter((user) => {
@@ -39,12 +41,14 @@ const CustomShareSelector = ({
 });
 
 
-  const handleToggleUser = (id: number) => {
+  const handleToggleUser = (id: string) => {
     setSelectedUserIds((prev) =>
       prev.includes(id) ? prev.filter((uid) => uid !== id) : [...prev, id]
     );
   };
 
+
+  
   return (
     <div className="w-full h-full p-4 bg-white rounded flex flex-col gap-4">
       {/* Title */}
@@ -81,9 +85,9 @@ const CustomShareSelector = ({
         <div className="flex items-center gap-1">
           {filteredUsers.slice(0, 3).map((user) => (
             <img
-              key={user.id}
+              key={user._id}
               className="w-6 h-6 rounded-full border border-gray-300"
-              src={user.photo}
+              src={user.profileImg}
               alt={user.name}
             />
           ))}
@@ -103,13 +107,13 @@ const CustomShareSelector = ({
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => (
             <div
-              key={user.id}
+              key={user._id}
               className="w-full flex items-center justify-between gap-4 border-b border-[#E6E7E7] py-4"
             >
               <div className="flex items-center gap-4">
                 <img
                   className="w-10 h-10 p-2 bg-[#E6E7E7] rounded-full"
-                  src={user.photo}
+                  src={user.profileImg}
                   alt={user.name}
                 />
                 <div>
@@ -121,8 +125,8 @@ const CustomShareSelector = ({
               </div>
               <Checkbox
               className="border-[#E6E7E7]"
-                checked={selectedUserIds.includes(user.id)}
-                onChange={() => handleToggleUser(user.id)}
+                checked={selectedUserIds.includes(user._id)}
+                onChange={() => handleToggleUser(user._id)}
               />
             </div>
           ))

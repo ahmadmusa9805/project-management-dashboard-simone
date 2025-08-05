@@ -1,4 +1,3 @@
-
 import { baseApi } from "../../app/api/baseApi";
 
 export const projectsApi = baseApi.injectEndpoints({
@@ -14,13 +13,12 @@ export const projectsApi = baseApi.injectEndpoints({
       },
     }),
     getSingleProject: builder.query<any, { id: string }>({
-  query: ({ id }) => `/projects/${id}`,
-  providesTags: ["Projects"],
-  transformResponse: (response: { status: string; data: any }) => {
-    return response.data;
-  },
-}),
-
+      query: ({ id }) => `/projects/${id}`,
+      providesTags: ["Projects"],
+      transformResponse: (response: { status: string; data: any }) => {
+        return response.data;
+      },
+    }),
 
     createProject: builder.mutation<any, any>({
       query: (data) => ({
@@ -39,7 +37,6 @@ export const projectsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Projects"],
     }),
-
     deleteProject: builder.mutation<any, string>({
       query: (id) => ({
         url: `/projects/${id}`,
@@ -47,7 +44,33 @@ export const projectsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Projects"],
     }),
-  })
+
+  shareProject: builder.mutation<
+  any, // Response type
+  { id: string; sharedWith: string[] } // Argument type
+>({
+  query: ({ id, sharedWith }) => ({
+    url: `/projects/${id}/share`,
+    method: "POST",
+    body: { sharedWith },
+  }),
+  invalidatesTags: ["Projects"],
+}),
+
+unShareProject: builder.mutation<
+  any, // Response type
+  { id: string; userId: string } // Argument type
+>({
+  query: ({ id, userId }) => ({
+    url: `/projects/${id}/unshare`,
+    method: "POST",
+    body: { userId },
+  }),
+  invalidatesTags: ["Projects"],
+}),
+
+
+  }),
 });
 
 export const {
@@ -56,4 +79,6 @@ export const {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useShareProjectMutation,
+  useUnShareProjectMutation
 } = projectsApi;

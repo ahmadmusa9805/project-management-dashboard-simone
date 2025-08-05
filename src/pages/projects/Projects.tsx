@@ -16,6 +16,10 @@ import {
   useDeleteProjectMutation,
   useGetProjectsWithstatusQuery,
  
+  useShareProjectMutation,
+ 
+  useUnShareProjectMutation,
+ 
   useUpdateProjectMutation,
 } from "../../Redux/features/projects/projectsApi";
 
@@ -23,7 +27,8 @@ import { showDeleteAlert } from "../../utils/deleteAlert";
 import { successAlert } from "../../utils/alerts";
 import type { projectSchema } from "../../types/projectAllTypes/projectSchema";
 import type z from "zod";
-import ProjectDetailsModal from "../../Redux/features/projects/SingleProjectDetails";
+import ProjectDetailsModal from "./SingleProjectDetails";
+
 
 type ProjectForm = z.infer<typeof projectSchema>;
 
@@ -32,7 +37,7 @@ const Projects = () => {
   const location = useLocation();
 
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const [, setSharedProjectId] = useState<string | null>(null);
+  const [sharedProjectId, setSharedProjectId] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editProject, setEditProject] = useState<any>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -49,6 +54,9 @@ const status = queryParams.get("status");
   } = useGetProjectsWithstatusQuery({
     status: statusFilter,
   });
+const [shareProject] = useShareProjectMutation();
+
+  const [unShareProject] = useUnShareProjectMutation();
  
   const [createProject] = useCreateProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
@@ -109,6 +117,10 @@ const status = queryParams.get("status");
         break;
     }
   };
+
+
+
+  
 
   if (isLoading) return <Spin />;
 
@@ -187,8 +199,19 @@ const status = queryParams.get("status");
         }}
       >
         <CustomShareSelector
-          roles={["Prime-Admin", "Basic-Admin", "Client"]}
-          onShare={(selectedIds) => console.log("Shared with:", selectedIds)}
+          roles={["primeAdmin", "basicAdmin", "Client"]}
+          onShare={async (selectedUserIds) => {
+    if (!selectedUserIds.length || !sharedProjectId) return;
+    try {
+      await shareProject({ id: sharedProjectId, sharedWith: selectedUserIds }).unwrap();
+      successAlert("Project shared successfully");
+      setIsShareOpen(false);
+      setSharedProjectId(null);
+      refetch(); // optional
+    } catch (error) {
+      console.error("Share failed", error);
+    }
+  }}
         />
       </Modal>
 

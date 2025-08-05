@@ -1,6 +1,8 @@
-import { Modal, Spin, Card, Typography, Divider } from "antd";
-import { useGetSingleProjectQuery } from "./projectsApi";
+import React from "react";
+import { Modal, Spin, Card, Typography, Divider, Button } from "antd";
+import { useGetSingleProjectQuery, useUnShareProjectMutation } from "../../Redux/features/projects/projectsApi";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { successAlert } from "../../utils/alerts";
 
 const { Title, Text } = Typography;
 
@@ -15,11 +17,28 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   onClose,
   projectId,
 }) => {
+  // Fetch single project details
   const {
     data: project,
     isLoading,
     error,
+    refetch,
   } = useGetSingleProjectQuery(projectId ? { id: projectId } : skipToken);
+
+  // Unshare mutation hook
+  const [unShareProject, { isLoading: isUnsharing }] = useUnShareProjectMutation();
+
+  // Handle unshare action
+  const handleUnshare = async (userId: string) => {
+    if (!projectId) return;
+    try {
+      await unShareProject({ id: projectId, userId }).unwrap();
+      successAlert("User unshared from project successfully.");
+      refetch(); // Refresh project details after unsharing
+    } catch (error) {
+      console.error("Failed to unshare user", error);
+    }
+  };
 
   return (
     <Modal
@@ -44,7 +63,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <Text strong>📌 Project Name:</Text> <Text>{project.projectName}</Text>
             <Divider />
             <Text strong>📊 Status:</Text>{" "}
-            <Text type={project.status === "Completed" ? "success" : "warning"}>
+            <Text type={project.status.toLowerCase() === "completed" ? "success" : "warning"}>
               {project.status}
             </Text>
             <Divider />
@@ -62,6 +81,45 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <Text strong>💰 Value:</Text> <Text>${project.value}</Text>
             <Divider />
             <Text strong>📞 Contact:</Text> <Text>{project.contact}</Text>
+
+   {project.sharedWith?.length > 0 && (
+  <>
+    <Divider />
+    <Text strong>🤝 Shared With:</Text>
+    <div style={{ marginTop: 8 }}>
+      {project.sharedWith.map((share: any) => {
+        const user = typeof share.userId === 'object' ? share.userId : { _id: share.userId };
+       const role = share?.role ?? "Unknown";
+
+        return (
+          <div
+            key={share._id}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 6,
+            }}
+          >
+            <span>
+              👤 User ID: {user._id} | Role: <strong>{role}</strong>
+            </span>
+            <Button
+              size="small"
+              danger
+              loading={isUnsharing}
+              onClick={() => handleUnshare(user._id)}
+            >
+              Unshare
+            </Button>
+          </div>
+        );
+      })}
+    </div>
+  </>
+)}
+
+
           </div>
         </Card>
       )}
