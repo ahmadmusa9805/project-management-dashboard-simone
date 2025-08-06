@@ -1,11 +1,15 @@
+
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Input, Button, Upload, Drawer } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Input, Button, Drawer, Upload } from "antd";
 
-// Types
+import { CloudUpload } from "lucide-react";
+
+const { Dragger } = Upload;
+
 type DocumentField = {
   name: string;
   label: string;
@@ -16,7 +20,7 @@ type DocumentFormProps = {
   mode: "create" | "edit";
   fields: DocumentField[];
   defaultValues?: Record<string, any>;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: FormData) => void;
   open: boolean;
   onClose: () => void;
 };
@@ -29,18 +33,28 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
   open,
   onClose,
 }) => {
-  const { control, handleSubmit } = useForm({ defaultValues });
+ const { control, handleSubmit, reset } = useForm();
+
+ useEffect(() => {
+  reset(defaultValues);
+}, [defaultValues, reset]);
+
+  const handleFormSubmit = (values: any) => {
+  
+
+    onSubmit(values);
+  };
 
   return (
     <Drawer
-      title={mode === "create" ? "New Docs" : "Edit Docs"}
+      title={mode === "create" ? "New Quote" : "Edit Quote"}
       placement="right"
       width={480}
       onClose={onClose}
       open={open}
     >
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(handleFormSubmit)}
         className="w-full flex flex-col items-start gap-3"
       >
         {fields.map((field) => (
@@ -66,19 +80,30 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
           </div>
         ))}
 
-        <div className="w-full h-20 flex flex-col gap-2.5">
-          <div className="w-full flex justify-start items-center">
-            <div className="w-full flex justify-center items-center px-2 py-3 border border-[#000E0F1A] gap-1">
-              <Upload beforeUpload={() => false} showUploadList={false}>
-                <Button
-                  icon={<UploadOutlined />}
-                  className="text-[#2B3738] text-base font-medium leading-6"
-                >
-                  Upload docs or drag & drop here
-                </Button>
-              </Upload>
-            </div>
-          </div>
+        <div className="w-full flex flex-col gap-2">
+          <label className="text-[#2B3738] text-xs font-medium">
+            Upload File (PDF only)
+          </label>
+         <Controller
+  control={control}
+  name="file" // ✅ Correct field name for backend
+  render={({ field }) => (
+    <Dragger
+      accept=".pdf"
+      beforeUpload={() => false}
+      multiple={false}
+      onChange={(info) => field.onChange(info.file)}
+      fileList={field.value ? [field.value] : []}
+      onRemove={() => field.onChange(undefined)}
+    >
+      <p className="text-center flex flex-col items-center">
+        <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+      </p>
+      <p className="text-[10px]">Click or drag PDF to upload</p>
+    </Dragger>
+  )}
+/>
+
         </div>
 
         <div className="w-full border-t border-[#E6E7E7]" />

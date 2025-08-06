@@ -172,7 +172,7 @@ const [shareProject] = useShareProjectMutation();
               <div className="text-xs text-[#457205]">{project.status}</div>
               <div
                 className="cursor-pointer text-xs"
-                onClick={() => navigate(`/projects/${project.id}`)}
+                onClick={() => navigate(`/projects/${project._id}`)}
               >
                 View details
               </div>

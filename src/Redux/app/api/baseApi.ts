@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "../store";
 // adjust path if needed
-const musaVaiApi = "http://192.168.0.100:5001";
+const musaVaiApi = "http://192.168.0.101:5001";
 //const myApi = "http://localhost:5001";
 export const baseApi = createApi({
   reducerPath: "baseApi",
@@ -17,6 +17,6 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Dashbord", "Projects", "Users"],
+  tagTypes: ["Dashbord", "Projects", "Users","Quotes"],
   endpoints: () => ({}),
 });
