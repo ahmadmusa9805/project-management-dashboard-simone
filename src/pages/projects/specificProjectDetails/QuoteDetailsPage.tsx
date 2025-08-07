@@ -28,7 +28,7 @@ const QuoteDetailsPage = () => {
   const [quoteToShare, setQuoteToShare] = useState<any | null>(null);
   const [shareMode, setShareMode] = useState<'share' | 'unshare'>('share');
 
-  const { data: quotes = [], isLoading, refetch } = useGetAllQuotesQuery();
+  const { data: quotes = [], isLoading, refetch } = useGetAllQuotesQuery(projectId);
 
   const [createQuote] = useCreateQuoteMutation();
   const [updateQuote] = useUpdateQuoteMutation();

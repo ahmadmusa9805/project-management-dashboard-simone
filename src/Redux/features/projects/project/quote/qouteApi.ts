@@ -2,8 +2,8 @@ import { baseApi } from "../../../../app/api/baseApi";
 
 export const quoteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllQuotes: builder.query<any[], void>({
-      query: () => "/quotes",
+    getAllQuotes: builder.query<any[], string | undefined>({
+      query: (projectId) => `/quotes?projectId=${projectId}`,
       providesTags: ["Quotes"],
       transformResponse: (response: { status: string; data: any[] }) => {
         return Array.isArray(response.data) ? response.data : [];
