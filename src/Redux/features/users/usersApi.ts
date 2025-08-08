@@ -101,30 +101,6 @@ export const usersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Users"],
     }),
-
-    // ✅ Create Labor user
-    createLaborUser: builder.mutation({
-      query: (userData) => ({
-        url: "/users/create-labor", // you must define this route in your backend
-        method: "POST",
-        body: userData,
-      }),
-      invalidatesTags: ["Users"],
-    }),
-
-    // ✅ Update Labor user
-    updateLaborUser: builder.mutation({
-      query: ({ id, ...data }) => ({
-        url: `/users/update-labor/${id}`, // you must define this route in backend
-        method: "PATCH",
-        body: data,
-      }),
-      invalidatesTags: (_result, _error, { id }) => [
-        "Users",
-        { type: "Users", id },
-      ],
-    }),
-
     deleteUser: builder.mutation({
       query: (id) => ({
         url: `/users/${id}`,
@@ -140,8 +116,6 @@ export const {
   useGetUserByIdQuery,
   useCreateUserMutation,
   useGetMeUserQuery,
-  useCreateLaborUserMutation,
-  useUpdateLaborUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
   useChangeUserStatusMutation,

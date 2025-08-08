@@ -198,21 +198,30 @@ const [shareProject] = useShareProjectMutation();
           setSharedProjectId(null);
         }}
       >
-        <CustomShareSelector
-          roles={["primeAdmin", "basicAdmin", "Client"]}
-          onShare={async (selectedUserIds) => {
-    if (!selectedUserIds.length || !sharedProjectId) return;
+
+  <CustomShareSelector
+  roles={["primeAdmin", "basicAdmin", "Client"]}
+  onShare={async (selectedUsers) => {
+    if (!selectedUsers.length || !sharedProjectId) return;
     try {
-      await shareProject({ id: sharedProjectId, sharedWith: selectedUserIds }).unwrap();
+      console.log(selectedUsers, "selectedUsers payload");
+      await shareProject({
+        id: sharedProjectId,
+        sharedWith: selectedUsers, // <-- array of { userId, role }
+      }).unwrap();
+
       successAlert("Project shared successfully");
       setIsShareOpen(false);
       setSharedProjectId(null);
-      refetch(); // optional
+      refetch();
     } catch (error) {
       console.error("Share failed", error);
     }
   }}
-        />
+/>
+
+
+
       </Modal>
 
       <Drawer

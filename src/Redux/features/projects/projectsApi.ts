@@ -1,5 +1,5 @@
 import { baseApi } from "../../app/api/baseApi";
-
+export type SharedUser = { userId: string; role: string };
 export const projectsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProjectsWithstatus: builder.query<any[], { status?: string } | void>({
@@ -45,9 +45,9 @@ export const projectsApi = baseApi.injectEndpoints({
       invalidatesTags: ["Projects"],
     }),
 
-  shareProject: builder.mutation<
-  any, // Response type
-  { id: string; sharedWith: string[] } // Argument type
+ shareProject: builder.mutation<
+  any, // or the response type
+  { id: string; sharedWith: SharedUser[] }
 >({
   query: ({ id, sharedWith }) => ({
     url: `/projects/${id}/share`,
