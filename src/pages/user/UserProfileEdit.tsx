@@ -1,184 +1,216 @@
-// import { Camera } from "lucide-react";
-// import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// export default UserProfileEdit;
+
+// import React, { useState } from "react";
+// import { useForm } from "react-hook-form";
+// import { useUpdateUserMutation } from "../../Redux/features/users/usersApi";
+// import { useChangePasswordMutation } from "../../Redux/features/auth/authApi";
+// import type { User } from "../../Redux/features/users/users.types";
 // import PasswordUpdateModal from "../../components/PasswordUpdateModal";
-// import { useSelector } from "react-redux";
-// import type { RootState } from "../../Redux/app/store";
-// import { USER_ROLE } from "../../types/userAllTypes/user";
+// import { successAlert, errorAlert } from "../../utils/alerts";
+// import { CameraIcon } from "lucide-react";
 
-// const UserProfileEdit = () => {
+// interface UserProfileEditProps {
+//   user: User;
+// }
+
+// type FormData = {
+//   firstName: string;
+//   lastName: string;
+//   phone: string;
+//   email: string;
+// };
+
+// const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
 //   const [isEditing, setIsEditing] = useState(false);
-//   const [profileImage, setProfileImage] = useState(
-//     "https://placehold.co/80x80"
-//   );
 //   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-// const userRole = useSelector((state: RootState) => state.auth.user?.role);
-// console.log("Logged-in role:", userRole);
+//   const [profileImage, setProfileImage] = useState<File | null>(null);
+//   const [profileImagePreview, setProfileImagePreview] = useState(
+//     user.profileImg || "https://placehold.co/80x80"
+//   );
 
-//   const [formData, setFormData] = useState({
-//     firstName: "Sarah",
-//     lastName: "Khan",
-//     phone: "+123 45875 97 5678",
-//     email: "mariapicio@gmail.com",
+//   const [updateUser, { isLoading }] = useUpdateUserMutation();
+//   const [changePassword, { isLoading: isChangingPassword }] =
+//     useChangePasswordMutation();
+
+//   const {
+//     register,
+//     handleSubmit,
+//     getValues,
+//     formState: { errors },
+//   } = useForm<FormData>({
+//     defaultValues: {
+//       firstName: user.name?.split(" ")[0] || "",
+//       lastName: user.name?.split(" ")[1] || "",
+//       phone: user.contactNo,
+//       email: user.email,
+//     },
 //   });
 
-//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({ ...prev, [name]: value }));
-//   };
-
+//   // Handle profile image selection and preview
 //   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
+//     const file = e.target.files?.[0] || null;
 //     if (file) {
-//       const imageUrl = URL.createObjectURL(file);
-//       setProfileImage(imageUrl);
+//       setProfileImage(file);
+//       setProfileImagePreview(URL.createObjectURL(file));
 //     }
 //   };
 
-//  const renderInput = (
-//   label: string,
-//   name: keyof typeof formData,
-//   defaultValue: string,
-//   disabled: boolean = false
-// ) => (
-//   <div className="w-[364px] flex flex-col justify-start items-start gap-4">
-//     <label className="text-[#2B3738] text-sm font-normal">{label}</label>
-//     <input
-//       type="text"
-//       name={name}
-//       value={formData[name] ?? ""}
-//       onChange={handleInputChange}
-//       disabled={!isEditing || disabled}
-//       placeholder={formData[name] || defaultValue}
-//       className="w-full px-3 py-1 border border-gray-300 rounded focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
-//     />
-//   </div>
-// );
+//   const onSubmit = async (data: FormData) => {
+//     if (!user._id) {
+//       alert("User ID not found!");
+//       return;
+//     }
 
+//     const formData = new FormData();
+//     formData.append("name", `${data.firstName} ${data.lastName}`);
+//     formData.append("email", data.email);
+//     formData.append("contactNo", data.phone);
+
+//     if (profileImage) {
+//       formData.append("profileImg", profileImage);
+//     }
+
+//     try {
+//       await updateUser({ id: user._id, data: formData }).unwrap();
+//       successAlert("User updated", "Profile updated successfully.");
+//       setIsEditing(false);
+//     } catch (err) {
+//       console.error(err);
+//       errorAlert("Failed to update user.");
+//     }
+//   };
+
+//   const handleChangePassword = async (
+//     current: string,
+//     newPass: string,
+//     confirm: string
+//   ) => {
+//     if (newPass !== confirm) {
+//       errorAlert("Passwords do not match");
+//       return;
+//     }
+
+//     try {
+//       const payload = { oldPassword: current, newPassword: newPass };
+//       await changePassword(payload).unwrap();
+
+//       successAlert("Password updated", "Password changed successfully.");
+//       setIsPasswordModalOpen(false);
+//     } catch (err: any) {
+//       console.error(err);
+//       errorAlert(err?.data?.message || "Failed to change password.");
+//     }
+//   };
+
+//   // Helper to render input fields with error display
+//   const renderInput = (
+//     label: string,
+//     name: keyof FormData,
+//     disabled: boolean = false,
+//     placeholder?: string
+//   ) => (
+//     <div className="w-[364px] flex flex-col justify-start items-start gap-2">
+//       <label className="text-[#2B3738] text-sm font-normal">{label}</label>
+//       <input
+//         type="text"
+//         {...register(name, { required: `${label} is required` })}
+//         disabled={!isEditing || disabled}
+//         placeholder={placeholder}
+//         className={`w-full px-3 py-1 border border-gray-300 rounded focus:outline-none disabled:bg-gray-100 ${
+//           errors[name] ? "border-red-500" : ""
+//         }`}
+//       />
+//       {errors[name] && (
+//         <span className="text-sm text-red-500">{errors[name]?.message}</span>
+//       )}
+//     </div>
+//   );
 
 //   return (
-//     <div className="w-full h-full px-8 py-6 bg-white flex flex-col justify-start items-end gap-8">
+//     <form
+//       onSubmit={handleSubmit(onSubmit)}
+//       className="w-full h-full px-8 py-6 bg-white flex flex-col justify-start items-end gap-8"
+//     >
 //       {/* Header */}
 //       <div className="w-full flex justify-start items-end gap-8">
-//         <div className="flex justify-start items-center gap-1">
-//           <div className="flex justify-center items-center gap-2.5">
-//             <div className="text-black text-2xl font-medium leading-8 tracking-wide font-ibm">
-//               Account settings
-//             </div>
-//           </div>
+//         <div className="text-black text-2xl font-medium font-ibm leading-8">
+//           Account settings
 //         </div>
 //       </div>
 
-//       {/* Profile Section */}
+//       {/* Profile Info */}
 //       <div className="w-full p-6 bg-[#F7F7F7] rounded border-2 border-[#e6f4ea] flex flex-col justify-start items-start gap-6">
 //         <div className="w-full flex flex-col justify-start items-start gap-12">
-//           <div className="w-full flex flex-col justify-start items-start gap-12">
-//             <div className="w-full flex flex-col justify-start items-start gap-6">
-//               <div className="h-4" />
-//               <div className="w-full relative rounded-2xl flex flex-col justify-center items-center gap-3">
-//                 <div className="w-20 h-20 relative rounded-2xl">
-//                   <div className="w-20 h-20 relative rounded-2xl">
-//                     <img
-//                       src={profileImage}
-//                       alt="profile"
-//                       className="w-20 h-20 rounded"
-//                     />
-//                     <label className="p-1 rounded cursor-pointer flex items-center justify-center absolute bottom-0 right-0 bg-[#F7F7F7]">
-//                       <Camera size={20} color="#83ac72" strokeWidth={2.5} />
-//                       <input
-//                         type="file"
-//                         accept="image/*"
-//                         className="hidden"
-//                         onChange={handlePhotoChange}
-//                       />
-//                     </label>
-//                   </div>
-//                 </div>
+//           <div className="w-full flex flex-col justify-start items-start gap-6">
+//             <div className="h-4" />
+//             <div className="w-full relative rounded-2xl flex flex-col justify-center items-center gap-3">
+//               <div className="w-20 h-20 relative rounded-2xl">
+//                 <img
+//                   src={profileImagePreview}
+//                   alt="profile"
+//                   className="w-20 h-20 rounded"
+//                 />
+//                 <label className="p-1 rounded cursor-pointer flex items-center justify-center absolute bottom-0 right-0 bg-[#F7F7F7]">
+//                   <CameraIcon size={20} color="#83ac72" strokeWidth={2.5} />
+//                   <input
+//                     type="file"
+//                     accept="image/*"
+//                     className="hidden"
+//                     onChange={handlePhotoChange}
+//                     disabled={!isEditing}
+//                   />
+//                 </label>
 //               </div>
 //             </div>
-//           </div>
-//           <div className="w-full flex flex-col justify-start items-center gap-2">
-//             <h2 className="text-center font-bold ">
-//               {formData.firstName + " " + formData.lastName}
-//             </h2>
-//             <h2 className="text-center font-bold ">{formData.email}</h2>
+//             <div className="w-full flex flex-col justify-start items-center gap-2">
+//               <h2 className="text-center font-bold ">
+//                 {getValues("firstName") + " " + getValues("lastName")}
+//               </h2>
+//               <h2 className="text-center font-bold ">{getValues("email")}</h2>
+//             </div>
 //           </div>
 //         </div>
 //       </div>
 
-//       {/* Personal Info */}
+//       {/* Personal Info and Update */}
 //       <div className="w-full flex flex-col justify-start items-start gap-12">
-//         <div className="w-full flex flex-col justify-start items-start gap-6">
-//           <div className="w-full flex justify-start items-center gap-4">
-//             <div className="flex-1 flex flex-col justify-center  text-lg font-medium leading-[24.3px] tracking-tight font-ibm">
-//               Personal Information
-//             </div>
-//             <div className="min-h-[32px] px-4 bg-[#0d542b] rounded flex justify-center items-center gap-1">
-//               <label className="flex items-center gap-2 cursor-pointer">
-//                 <input
-//                   type="checkbox"
-//                   checked={isEditing}
-//                   onChange={(e) => setIsEditing(e.target.checked)}
-//                   className="py-1.5"
-//                 />
-//                 <span className="text-white bg-[#0d542b] font-medium">Enable Edit</span>
-//               </label>
-//             </div>
-//             {isEditing && (
-//               <button
-//                 className=" px-4 py-[5px] bg-[#0d542b] text-white font-semibold rounded"
-//                 onClick={() => {
-//                   console.log("Updated data:", formData);
-//                   setIsEditing(false); // Exit editing mode after submit
-//                 }}
-//               >
-//                 <span className="text-white">Update</span>
-//               </button>
-//             )}
+//         {/* Enable Edit checkbox and Update button */}
+//         <div className="w-full flex gap-65 items-center">
+//           <div className="min-h-[32px] px-4 bg-[#0d542b] rounded flex justify-center items-center gap-1">
+//             <label className="flex items-center gap-2 cursor-pointer">
+//               <input
+//                 type="checkbox"
+//                 checked={isEditing}
+//                 onChange={(e) => setIsEditing(e.target.checked)}
+//               />
+//               <span className="text-white font-medium">Enable Edit</span>
+//             </label>
 //           </div>
-
-//           {/* Fields */}
-//           <div className="w-full flex justify-start items-center gap-[51px]">
-//             <div className="w-[364px] flex flex-col justify-start items-start gap-4">
-//               <div className="w-full flex flex-col justify-start items-start gap-2">
-//                 <div className="w-full flex justify-center flex-col text-sm font-medium leading-[16.24px] font-ibm">
-//                   {" "}
-//                   {renderInput("First Name", "firstName", "John")}
-//                 </div>
-//               </div>
-//             </div>
-//             <div className="w-[364px] flex flex-col justify-start items-start gap-4">
-//               <div className="w-full flex flex-col justify-start items-start gap-2">
-//                 <div className="w-full flex justify-center flex-col text-black text-sm font-medium leading-[16.24px] font-ibm">
-//                   {" "}
-//                   {renderInput("Last Name", "lastName", "Doe")}
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           <div className="w-full flex justify-start items-center gap-[51px]">
-//             <div className="w-[364px] flex flex-col justify-start items-start gap-4">
-//               <div className="w-full flex flex-col justify-start items-start gap-2">
-//                 <div className="w-full flex justify-center flex-col text-black text-sm font-medium leading-[16.24px] font-ibm">
-//                   {renderInput("Phone Number", "phone", "+8801XXXXXXXXX")}
-//                 </div>
-//               </div>
-//             </div>
-//             <div className="w-[364px] flex flex-col justify-start items-start gap-4">
-//               <div className="w-full flex flex-col justify-start items-start gap-2">
-//                 <div className="w-full flex justify-center flex-col text-black disabled text-sm font-medium leading-[16.24px] font-ibm">
-//                   {" "}
-//                   {renderInput("E-mail", "email", "example@example.com", userRole !== USER_ROLE.superAdmin)}
-
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
+//           {isEditing && (
+//             <button
+//               type="submit"
+//               className="px-4 py-[5px] bg-[#0d542b] text-white font-semibold rounded"
+//               disabled={isLoading}
+//             >
+//               {isLoading ? "Updating..." : "Update"}
+//             </button>
+//           )}
 //         </div>
 
-//         {/* Update Password Button */}
+//         {/* Inputs */}
+//         <div className="w-full flex justify-start items-center gap-[51px]">
+//           {renderInput("First Name", "firstName", false, "John")}
+//           {renderInput("Last Name", "lastName", false, "Doe")}
+//         </div>
+//         <div className="w-full flex justify-start items-center gap-[51px]">
+//           {renderInput("Phone Number", "phone", false, "+8801XXXXXXXXX")}
+//           {renderInput("Email", "email", false, "example@example.com")}
+//         </div>
+
+//         {/* Password Update */}
 //         <div className="w-full flex flex-col justify-start items-start gap-6">
-//           <div className="w-full flex gap-65 items-center ">
+//           <div className="w-full flex gap-65 items-center">
 //             <div className="min-h-[32px] px-6 bg-[#0d542b] rounded font-medium text-white flex justify-center items-center gap-1 cursor-pointer">
 //               <button
 //                 onClick={(e) => {
@@ -186,26 +218,21 @@
 //                   setIsPasswordModalOpen(true);
 //                 }}
 //               >
-//                 Update password
+//                 Change password
 //               </button>
 //             </div>
 //           </div>
 //         </div>
 //       </div>
 
+//       {/* Password Modal */}
 //       <PasswordUpdateModal
 //         isOpen={isPasswordModalOpen}
 //         onClose={() => setIsPasswordModalOpen(false)}
-//         onSave={(current, newPass, confirm) => {
-//           if (newPass !== confirm) {
-//             alert("Passwords do not match");
-//             return;
-//           }
-//           console.log("Password Updated:", { current, newPass });
-//           setIsPasswordModalOpen(false);
-//         }}
+//         onSave={handleChangePassword}
+//         isSaving={isChangingPassword}
 //       />
-//     </div>
+//     </form>
 //   );
 // };
 
@@ -214,10 +241,11 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUpdateUserMutation } from "../../Redux/features/users/usersApi";
+import { useChangePasswordMutation } from "../../Redux/features/auth/authApi";
 import type { User } from "../../Redux/features/users/users.types";
-import { USER_ROLE } from "../../types/userAllTypes/user";
-import { CameraIcon } from "lucide-react";
 import PasswordUpdateModal from "../../components/PasswordUpdateModal";
+import { successAlert, errorAlert } from "../../utils/alerts";
+import { CameraIcon } from "lucide-react";
 
 interface UserProfileEditProps {
   user: User;
@@ -233,11 +261,15 @@ type FormData = {
 const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [updateUser, { isLoading }] = useUpdateUserMutation();
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profileImagePreview, setProfileImagePreview] = useState(
     user.profileImg || "https://placehold.co/80x80"
   );
+
+  // RTK Query mutations
+  const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
+  const [changePassword, { isLoading: isChangingPassword }] =
+    useChangePasswordMutation();
 
   const {
     register,
@@ -253,7 +285,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
     },
   });
 
-  // When file input changes, save the file and preview URL
+  // Handle profile image selection and preview
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
@@ -262,13 +294,13 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
     }
   };
 
-  const onSubmit = async (data: FormData) => {
+  // Handler for user details update
+  const onSubmitUserDetails = async (data: FormData) => {
     if (!user._id) {
       alert("User ID not found!");
       return;
     }
 
-    // Use FormData to handle file + fields together
     const formData = new FormData();
     formData.append("name", `${data.firstName} ${data.lastName}`);
     formData.append("email", data.email);
@@ -279,23 +311,45 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
     }
 
     try {
-      // Pass FormData as 'data' in mutation payload
-      await updateUser({ id: user._id, data: formData }).unwrap();
-      alert("User updated successfully.");
+      await updateUser({ id: user._id, body: formData }).unwrap();
+      successAlert("User updated", "Profile updated successfully.");
       setIsEditing(false);
     } catch (err) {
       console.error(err);
-      alert("Failed to update user.");
+      errorAlert("Failed to update user.");
     }
   };
 
+  // Handler for password change (passed to modal)
+  const handleChangePassword = async (
+    current: string,
+    newPass: string,
+    confirm: string
+  ) => {
+    if (newPass !== confirm) {
+      errorAlert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const payload = { oldPassword: current, newPassword: newPass };
+      await changePassword(payload).unwrap();
+      successAlert("Password updated", "Password changed successfully.");
+      setIsPasswordModalOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      errorAlert(err?.data?.message || "Failed to change password.");
+    }
+  };
+
+  // Helper to render input fields with validation error display
   const renderInput = (
     label: string,
     name: keyof FormData,
     disabled: boolean = false,
     placeholder?: string
   ) => (
-    <div className="w-[364px] flex flex-col justify-start items-start gap-4">
+    <div className="w-[364px] flex flex-col justify-start items-start gap-2">
       <label className="text-[#2B3738] text-sm font-normal">{label}</label>
       <input
         type="text"
@@ -314,7 +368,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmitUserDetails)}
       className="w-full h-full px-8 py-6 bg-white flex flex-col justify-start items-end gap-8"
     >
       {/* Header */}
@@ -358,51 +412,42 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
         </div>
       </div>
 
-      {/* Personal Info */}
+      {/* Personal Info and Update */}
       <div className="w-full flex flex-col justify-start items-start gap-12">
-        <div className="w-full flex flex-col justify-start items-start gap-6">
-          <div className="w-full flex justify-start items-center gap-4">
-            <div className="flex-1 flex flex-col justify-center text-lg font-medium leading-[24.3px] tracking-tight font-ibm">
-              Personal Information
-            </div>
-            <div className="min-h-[32px] px-4 bg-[#0d542b] rounded flex justify-center items-center gap-1">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isEditing}
-                  onChange={(e) => setIsEditing(e.target.checked)}
-                />
-                <span className="text-white font-medium">Enable Edit</span>
-              </label>
-            </div>
-            {isEditing && (
-              <button
-                type="submit"
-                className="px-4 py-[5px] bg-[#0d542b] text-white font-semibold rounded"
-                disabled={isLoading}
-              >
-                {isLoading ? "Updating..." : "Update"}
-              </button>
-            )}
+        {/* Enable Edit toggle and Update button */}
+        <div className="w-full flex gap-65 items-center">
+          <div className="min-h-[32px] px-4 bg-[#0d542b] rounded flex justify-center items-center gap-1">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isEditing}
+                onChange={(e) => setIsEditing(e.target.checked)}
+              />
+              <span className="text-white font-medium">Enable Edit</span>
+            </label>
           </div>
-
-          {/* Inputs */}
-          <div className="w-full flex justify-start items-center gap-[51px]">
-            {renderInput("First Name", "firstName", false, "John")}
-            {renderInput("Last Name", "lastName", false, "Doe")}
-          </div>
-          <div className="w-full flex justify-start items-center gap-[51px]">
-            {renderInput("Phone Number", "phone", false, "+8801XXXXXXXXX")}
-            {renderInput(
-              "Email",
-              "email",
-              user.role !== USER_ROLE.superAdmin,
-              "example@example.com"
-            )}
-          </div>
+          {isEditing && (
+            <button
+              type="submit"
+              className="px-4 py-[5px] bg-[#0d542b] text-white font-semibold rounded"
+              disabled={isUpdatingUser}
+            >
+              {isUpdatingUser ? "Updating..." : "Update Details"}
+            </button>
+          )}
         </div>
 
-        {/* Password Update */}
+        {/* Inputs */}
+        <div className="w-full flex justify-start items-center gap-[51px]">
+          {renderInput("First Name", "firstName", false, "John")}
+          {renderInput("Last Name", "lastName", false, "Doe")}
+        </div>
+        <div className="w-full flex justify-start items-center gap-[51px]">
+          {renderInput("Phone Number", "phone", false, "+8801XXXXXXXXX")}
+          {renderInput("Email", "email", false, "example@example.com")}
+        </div>
+
+        {/* Change Password Button */}
         <div className="w-full flex flex-col justify-start items-start gap-6">
           <div className="w-full flex gap-65 items-center">
             <div className="min-h-[32px] px-6 bg-[#0d542b] rounded font-medium text-white flex justify-center items-center gap-1 cursor-pointer">
@@ -412,7 +457,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
                   setIsPasswordModalOpen(true);
                 }}
               >
-                Update password
+                Change Password
               </button>
             </div>
           </div>
@@ -423,22 +468,11 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
       <PasswordUpdateModal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
-        onSave={(current, newPass, confirm) => {
-          if (newPass !== confirm) {
-            alert("Passwords do not match");
-            return;
-          }
-          console.log("Password Updated:", { current, newPass });
-          setIsPasswordModalOpen(false);
-        }}
+        onSave={handleChangePassword}
+        isSaving={isChangingPassword}
       />
     </form>
   );
 };
 
 export default UserProfileEdit;
-
-
-
-
-

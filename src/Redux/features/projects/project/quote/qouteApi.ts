@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "../../../../app/api/baseApi";
 
 export const quoteApi = baseApi.injectEndpoints({
@@ -13,18 +14,22 @@ export const quoteApi = baseApi.injectEndpoints({
     getSingleQuote: builder.query<any, string>({
       query: (id) => `/quotes/${id}`,
       providesTags: ["Quotes"],
-      transformResponse: (response: { status: string; data: any }) => response.data,
+      transformResponse: (response: { status: string; data: any }) =>
+        response.data,
     }),
 
     createQuote: builder.mutation<any, any>({
       query: (data) => {
         const formData = new FormData();
         formData.append("file", data.file);
-        formData.append("data", JSON.stringify({
-          title: data.title,
-          projectId: data.projectId,
-          value: data.amount,
-        }));
+        formData.append(
+          "data",
+          JSON.stringify({
+            title: data.title,
+            projectId: data.projectId,
+            value: data.amount,
+          })
+        );
         return {
           url: "/quotes/create-quote",
           method: "POST",
@@ -38,11 +43,14 @@ export const quoteApi = baseApi.injectEndpoints({
       query: ({ id, data }) => {
         const formData = new FormData();
         formData.append("file", data.file);
-        formData.append("data", JSON.stringify({
-          title: data.title,
-          projectId: data.projectId,
-          value: data.amount,
-        }));
+        formData.append(
+          "data",
+          JSON.stringify({
+            title: data.title,
+            projectId: data.projectId,
+            value: data.amount,
+          })
+        );
         return {
           url: `/quotes/${id}`,
           method: "PATCH",
@@ -60,24 +68,23 @@ export const quoteApi = baseApi.injectEndpoints({
       invalidatesTags: ["Quotes"],
     }),
 
-   shareQuote: builder.mutation<any, { id: string; sharedWith: string[] }>({
-  query: ({ id, sharedWith }) => ({
-    url: `/quotes/${id}/share`,
-    method: 'POST',
-    body: { sharedWith },
-  }),
-  invalidatesTags: ['Quotes'],
-}),
+    shareQuote: builder.mutation<any, { id: string; sharedWith: string[] }>({
+      query: ({ id, sharedWith }) => ({
+        url: `/quotes/${id}/share`,
+        method: "POST",
+        body: { sharedWith },
+      }),
+      invalidatesTags: ["Quotes"],
+    }),
 
-unShareQuote: builder.mutation<any, { id: string; unShareWith: string[] }>({
-  query: ({ id, unShareWith }) => ({
-    url: `/quotes/${id}/unshare`,
-    method: 'POST',
-    body: { unShareWith },
-  }),
-  invalidatesTags: ['Quotes'],
-}),
-
+    unShareQuote: builder.mutation<any, { id: string; unShareWith: string[] }>({
+      query: ({ id, unShareWith }) => ({
+        url: `/quotes/${id}/unshare`,
+        method: "POST",
+        body: { unShareWith },
+      }),
+      invalidatesTags: ["Quotes"],
+    }),
   }),
 });
 

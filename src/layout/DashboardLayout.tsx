@@ -22,12 +22,12 @@ import {
   getSidebarMenuItems,
 } from "../utils/sidebarItems";
 import UserProfileEdit from "../pages/user/UserProfileEdit";
-import { useGetMeUserQuery} from "../Redux/features/users/usersApi";
+
 import { USER_ROLE } from "../types/userAllTypes/user";
+import { useGetMeUserQuery } from "../Redux/features/users/usersApi";
 
 const { Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
-type Role = "superAdmin" | "primeAdmin" | "basicAdmin" | "client";
 
 const DashboardLayout: React.FC = () => {
   // We'll use a ref to store the previous page URL
@@ -40,9 +40,15 @@ const DashboardLayout: React.FC = () => {
   const { projectId } = useParams();
   const user = useSelector((state: RootState) => state.auth.user);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const { data: userInfo, isLoading: userLoading } = useGetMeUserQuery();
   const path = location.pathname;
   const userRole = user?.role;
-  const validRoles = [USER_ROLE.superAdmin, USER_ROLE.primeAdmin, USER_ROLE.basicAdmin,USER_ROLE.client];
+  const validRoles = [
+    USER_ROLE.superAdmin,
+    USER_ROLE.primeAdmin,
+    USER_ROLE.basicAdmin,
+    USER_ROLE.client,
+  ];
   // const { data: allProfileInfo } = useGetUserByIdQuery(String(user?.id), {
   //   skip: !user?.id,
   // });
@@ -62,8 +68,6 @@ const DashboardLayout: React.FC = () => {
   } else {
     mainItems = getSidebarMenuItems(userRole);
   }
-  const { data: userInfo, isLoading: userLoading } = useGetMeUserQuery();
- 
 
   if (userLoading || !userInfo) return <div>Loading user info...</div>;
 
@@ -76,9 +80,8 @@ const DashboardLayout: React.FC = () => {
     setIsProfileModalOpen(false);
   };
 
-
-
-  const redirectPath = userRole === USER_ROLE.superAdmin ? "/dashboard" : "/projects";
+  const redirectPath =
+    userRole === USER_ROLE.superAdmin ? "/dashboard" : "/projects";
   return (
     <>
       <div className="bg-white h-20 w-full fixed top-0 left-0 z-50 shadow-sm flex items-center justify-between px-6 ">
@@ -111,38 +114,36 @@ const DashboardLayout: React.FC = () => {
               )}
             </Button>
           </div>
-<div
-  className="flex items-center gap-2 mr-8 ml-4 cursor-pointer text-[#0d542b]"
-  onClick={handleAvatarClick}
->
-  {userInfo?.profileImg ? (
-    <img
-      src={userInfo.profileImg}
-      className="w-8 h-8 object-cover rounded-full"
-      alt="profile"
-    />
-  ) : (
-    <div className="w-8 h-8 flex items-center justify-center border rounded-full">
-      <FaRegUser />
-    </div>
-  )}
+          <div
+            className="flex items-center gap-2 mr-8 ml-4 cursor-pointer text-[#0d542b]"
+            onClick={handleAvatarClick}
+          >
+            {userInfo?.profileImg ? (
+              <img
+                src={userInfo.profileImg}
+                className="w-8 h-8 object-cover rounded-full"
+                alt="profile"
+              />
+            ) : (
+              <div className="w-8 h-8 flex items-center justify-center border rounded-full">
+                <FaRegUser />
+              </div>
+            )}
 
-  <span className="font-medium">{userInfo?.name}</span>
-</div>
-
+            <span className="font-medium">{userInfo?.name}</span>
+          </div>
         </div>
       </div>
 
       <Modal
-  title="Edit Profile"
-  visible={isProfileModalOpen}
-  onCancel={handleProfileModalClose}
-  footer={null}
-  width={900}
->
-  <UserProfileEdit user={userInfo} />
-</Modal>
-
+        title="Edit Profile"
+        visible={isProfileModalOpen}
+        onCancel={handleProfileModalClose}
+        footer={null}
+        width={900}
+      >
+        <UserProfileEdit user={userInfo} />
+      </Modal>
 
       <Layout style={{ minHeight: "100vh", paddingTop: 64 }}>
         <Sider
