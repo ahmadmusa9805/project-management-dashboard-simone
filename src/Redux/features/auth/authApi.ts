@@ -99,8 +99,8 @@ import type {
   OtpResponse,
 } from "./auth.types";
 
-// const apiBase = "http://192.168.0.100:5001";
-const apiBase = "http://localhost:5001";
+ const apiBase = "http://192.168.0.100:5001";
+//const apiBase = "http://localhost:5001";
 
 export const authApi = createApi({
   reducerPath: "authApi",
