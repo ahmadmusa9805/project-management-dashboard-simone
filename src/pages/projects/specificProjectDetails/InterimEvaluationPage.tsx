@@ -11,7 +11,7 @@ const { Option } = Select;
 
 interface DocumentType {
   id: number;
-  folderName: string;
+  intrerimTitle: string;
   reference: string;
   amount: string;
   status: "pending" | "paid";
@@ -53,14 +53,14 @@ const InterimEvaluationPage = () => {
   };
 
   const handleShare = (doc: DocumentType) => {
-    message.info(`Sharing "${doc.folderName}" (mock functionality)`);
+    message.info(`Sharing "${doc.intrerimTitle}" (mock functionality)`);
   };
 
   const handleViewMoreAction = (key: string, doc: DocumentType) => {
     if (key === "view document") {
       navigate(`/projects/${projectId}/interim-documents`, {
         state: {
-          quoteTitle: doc.folderName,
+          quoteTitle: doc.intrerimTitle,
           documents: [
             {
               id: 1,
@@ -141,7 +141,7 @@ const InterimEvaluationPage = () => {
             </div>
 
             <h3 className="text-lg font-semibold text-gray-800 truncate mt-2">
-              📁 {doc.folderName}
+              <span className="text-5xl mr-4">📁</span>{doc.intrerimTitle}
             </h3>
             <p className="text-sm text-gray-600 mt-1">
               Reference: {doc.reference}
@@ -177,7 +177,7 @@ const InterimEvaluationPage = () => {
         defaultValues={
           editDoc
             ? {
-                folderName: editDoc.folderName,
+                intrerimTitle: editDoc.intrerimTitle,
                 reference: editDoc.reference,
                 amount: editDoc.amount,
               }
@@ -185,9 +185,9 @@ const InterimEvaluationPage = () => {
         }
         fields={[
           {
-            name: "folderName",
-            label: "Folder Name",
-            placeholder: "Enter folder name",
+            name: "intrerimTitle",
+            label: "Interim Title",
+            placeholder: "Enter Interim Title",
           },
           {
             name: "reference",
