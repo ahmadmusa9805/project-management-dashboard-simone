@@ -8,8 +8,10 @@ export interface LoginPayload {
 }
 
 export interface ChangePasswordPayload {
-  oldPassword: string;
+ 
+ oldPassword: string;
   newPassword: string;
+
 }
 
 export interface ForgetPasswordPayload {

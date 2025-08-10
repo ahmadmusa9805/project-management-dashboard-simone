@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// export default UserProfileEdit;
+
 
 // import React, { useState } from "react";
 // import { useForm } from "react-hook-form";
@@ -9,6 +8,7 @@
 // import PasswordUpdateModal from "../../components/PasswordUpdateModal";
 // import { successAlert, errorAlert } from "../../utils/alerts";
 // import { CameraIcon } from "lucide-react";
+
 
 // interface UserProfileEditProps {
 //   user: User;
@@ -23,13 +23,16 @@
 
 // const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
 //   const [isEditing, setIsEditing] = useState(false);
+//   const [actionType, setActionType] = useState<"updateDetails" | "changePassword" | null>(null);
+
 //   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 //   const [profileImage, setProfileImage] = useState<File | null>(null);
 //   const [profileImagePreview, setProfileImagePreview] = useState(
 //     user.profileImg || "https://placehold.co/80x80"
 //   );
 
-//   const [updateUser, { isLoading }] = useUpdateUserMutation();
+//   // RTK Query mutations
+//   const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
 //   const [changePassword, { isLoading: isChangingPassword }] =
 //     useChangePasswordMutation();
 
@@ -56,7 +59,8 @@
 //     }
 //   };
 
-//   const onSubmit = async (data: FormData) => {
+//   // Handler for user details update
+//   const onSubmitUserDetails = async (data: FormData) => {
 //     if (!user._id) {
 //       alert("User ID not found!");
 //       return;
@@ -72,7 +76,7 @@
 //     }
 
 //     try {
-//       await updateUser({ id: user._id, data: formData }).unwrap();
+//       await updateUser({ id: user._id, body: formData }).unwrap();
 //       successAlert("User updated", "Profile updated successfully.");
 //       setIsEditing(false);
 //     } catch (err) {
@@ -81,6 +85,7 @@
 //     }
 //   };
 
+//   // Handler for password change (passed to modal)
 //   const handleChangePassword = async (
 //     current: string,
 //     newPass: string,
@@ -92,9 +97,8 @@
 //     }
 
 //     try {
-//       const payload = { oldPassword: current, newPassword: newPass };
-//       await changePassword(payload).unwrap();
-
+//       const data = { oldPassword: current, newPassword: newPass };
+//       await changePassword(data).unwrap();
 //       successAlert("Password updated", "Password changed successfully.");
 //       setIsPasswordModalOpen(false);
 //     } catch (err: any) {
@@ -103,7 +107,7 @@
 //     }
 //   };
 
-//   // Helper to render input fields with error display
+//   // Helper to render input fields with validation error display
 //   const renderInput = (
 //     label: string,
 //     name: keyof FormData,
@@ -129,7 +133,7 @@
 
 //   return (
 //     <form
-//       onSubmit={handleSubmit(onSubmit)}
+//       onSubmit={handleSubmit(onSubmitUserDetails)}
 //       className="w-full h-full px-8 py-6 bg-white flex flex-col justify-start items-end gap-8"
 //     >
 //       {/* Header */}
@@ -175,7 +179,7 @@
 
 //       {/* Personal Info and Update */}
 //       <div className="w-full flex flex-col justify-start items-start gap-12">
-//         {/* Enable Edit checkbox and Update button */}
+//         {/* Enable Edit toggle and Update button */}
 //         <div className="w-full flex gap-65 items-center">
 //           <div className="min-h-[32px] px-4 bg-[#0d542b] rounded flex justify-center items-center gap-1">
 //             <label className="flex items-center gap-2 cursor-pointer">
@@ -191,9 +195,9 @@
 //             <button
 //               type="submit"
 //               className="px-4 py-[5px] bg-[#0d542b] text-white font-semibold rounded"
-//               disabled={isLoading}
+//               disabled={isUpdatingUser}
 //             >
-//               {isLoading ? "Updating..." : "Update"}
+//               {isUpdatingUser ? "Updating..." : "Update Details"}
 //             </button>
 //           )}
 //         </div>
@@ -208,7 +212,7 @@
 //           {renderInput("Email", "email", false, "example@example.com")}
 //         </div>
 
-//         {/* Password Update */}
+//         {/* Change Password Button */}
 //         <div className="w-full flex flex-col justify-start items-start gap-6">
 //           <div className="w-full flex gap-65 items-center">
 //             <div className="min-h-[32px] px-6 bg-[#0d542b] rounded font-medium text-white flex justify-center items-center gap-1 cursor-pointer">
@@ -218,7 +222,7 @@
 //                   setIsPasswordModalOpen(true);
 //                 }}
 //               >
-//                 Change password
+//                 Change Password
 //               </button>
 //             </div>
 //           </div>
@@ -237,6 +241,9 @@
 // };
 
 // export default UserProfileEdit;
+
+
+
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -260,16 +267,16 @@ type FormData = {
 
 const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [actionType, setActionType] = useState<"updateDetails" | "changePassword" | null>(null);
+
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profileImagePreview, setProfileImagePreview] = useState(
     user.profileImg || "https://placehold.co/80x80"
   );
 
-  // RTK Query mutations
   const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
-  const [changePassword, { isLoading: isChangingPassword }] =
-    useChangePasswordMutation();
+  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
 
   const {
     register,
@@ -285,7 +292,6 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
     },
   });
 
-  // Handle profile image selection and preview
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
@@ -294,33 +300,36 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
     }
   };
 
-  // Handler for user details update
   const onSubmitUserDetails = async (data: FormData) => {
     if (!user._id) {
-      alert("User ID not found!");
+      // You can handle this silently or with a UI message if needed
       return;
     }
+
+    setActionType("updateDetails"); // track action before the API call
 
     const formData = new FormData();
     formData.append("name", `${data.firstName} ${data.lastName}`);
     formData.append("email", data.email);
     formData.append("contactNo", data.phone);
-
-    if (profileImage) {
-      formData.append("profileImg", profileImage);
-    }
+    if (profileImage) formData.append("profileImg", profileImage);
 
     try {
       await updateUser({ id: user._id, body: formData }).unwrap();
-      successAlert("User updated", "Profile updated successfully.");
+
+      // Show success alert only if actionType is updateDetails
+      if (actionType === "updateDetails") {
+        successAlert("User updated", "Profile updated successfully.");
+      }
       setIsEditing(false);
+      setActionType(null); // reset after success
     } catch (err) {
       console.error(err);
       errorAlert("Failed to update user.");
+      setActionType(null);
     }
   };
 
-  // Handler for password change (passed to modal)
   const handleChangePassword = async (
     current: string,
     newPass: string,
@@ -331,18 +340,24 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
       return;
     }
 
+    setActionType("changePassword"); // track action
+
     try {
-      const payload = { oldPassword: current, newPassword: newPass };
-      await changePassword(payload).unwrap();
-      successAlert("Password updated", "Password changed successfully.");
+      const data = { oldPassword: current, newPassword: newPass };
+      await changePassword(data).unwrap();
+
+      if (actionType === "changePassword") {
+        successAlert("Password updated", "Password changed successfully.");
+      }
       setIsPasswordModalOpen(false);
+      setActionType(null); // reset after success
     } catch (err: any) {
       console.error(err);
       errorAlert(err?.data?.message || "Failed to change password.");
+      setActionType(null);
     }
   };
 
-  // Helper to render input fields with validation error display
   const renderInput = (
     label: string,
     name: keyof FormData,

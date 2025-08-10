@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { AuthResponse, AuthState, User } from "./auth.types";
+import type { AuthResponse,  User } from "./auth.types";
 import { jwtDecode } from "jwt-decode"; // ✅ Correct import
 
 interface JwtPayload {
@@ -10,9 +10,16 @@ interface JwtPayload {
   exp: number;
 }
 
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  // <-- add this line
+}
+
 const initialState: AuthState = {
   user: null,
   token: null,
+    // <-- add initial value
 };
 
 const authSlice = createSlice({
@@ -39,16 +46,22 @@ const authSlice = createSlice({
       localStorage.setItem("user", JSON.stringify(user));
     },
 
+    
+
     clearCredentials: (state) => {
       state.token = null;
       state.user = null;
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+   
+      localStorage.removeItem("resetToken");
     },
 
     loadFromStorage: (state) => {
       const token = localStorage.getItem("token");
       const user = localStorage.getItem("user");
+       
+     
 
       if (token && user) {
         state.token = token;
@@ -58,5 +71,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, clearCredentials, loadFromStorage } = authSlice.actions;
+export const { setCredentials, clearCredentials, loadFromStorage, } = authSlice.actions;
 export default authSlice.reducer;

@@ -336,6 +336,7 @@ const LoginPage = () => {
           setMode("resetPassword");
           return;
         }
+        console.log(token);
         setResetToken(token);
         successAlert("OTP Verified", "Now set your new password.");
         setMode("resetPassword");
@@ -350,6 +351,7 @@ const LoginPage = () => {
         errorAlert("Passwords do not match");
         return;
       }
+      console.log(resetToken);
 
       try {
         // call resetPassword — pass token in headers param

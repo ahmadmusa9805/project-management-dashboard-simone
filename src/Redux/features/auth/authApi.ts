@@ -88,7 +88,10 @@
 
 //------------------//--------------------------------//--------------------------------
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Adjust path if needed
+
+import { baseApi } from "../../app/api/baseApi";
 import type {
   AuthResponse,
   LoginPayload,
@@ -99,12 +102,7 @@ import type {
   OtpResponse,
 } from "./auth.types";
 
- const apiBase = "http://192.168.0.100:5001";
-//const apiBase = "http://localhost:5001";
-
-export const authApi = createApi({
-  reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({ baseUrl: `${apiBase}/api/v1` }),
+export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<AuthResponse, LoginPayload>({
       query: (credentials) => ({
@@ -131,19 +129,20 @@ export const authApi = createApi({
       }),
     }),
 
-    resetPassword: builder.mutation<
-      any,
-      { email: string; newPassword: string; token: string }
-    >({
-      query: ({ email, newPassword, token }) => ({
-        url: "/auth/reset-password",
-        method: "POST",
-        body: { email, newPassword },
-        headers: {
-          Authorization: token, // or `Bearer ${token}` if needed
-        },
-      }),
-    }),
+resetPassword: builder.mutation<
+  any,
+  { email: string; newPassword: string; token: string }
+>({
+  query: (arg) => ({
+    url: "/auth/reset-password",
+    method: "POST",
+    body: {
+      email: arg.email,
+      newPassword: arg.newPassword,
+    },
+    // DO NOT set headers here
+  }),
+}),
 
     refreshToken: builder.mutation<RefreshTokenResponse, void>({
       query: () => ({
@@ -173,3 +172,4 @@ export const {
   useRefreshTokenMutation,
   useOtpVerifyForgetPasswordMutation,
 } = authApi;
+

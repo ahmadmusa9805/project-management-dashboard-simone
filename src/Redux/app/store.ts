@@ -1,5 +1,4 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { authApi } from "../features/auth/authApi";
 import authReducer from "../features/auth/authSlice";
 
 import userReducer from "../features/users/usersSlice";
@@ -12,7 +11,7 @@ export const store = configureStore({
   reducer: {
     // RTK Query APIs
     [baseApi.reducerPath]: baseApi.reducer,
-    [authApi.reducerPath]: authApi.reducer,
+ 
 
     // Normal Slices
     auth: authReducer,
@@ -24,7 +23,6 @@ export const store = configureStore({
 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
-      .concat(authApi.middleware)
       .concat(baseApi.middleware),
 });
 
