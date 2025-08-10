@@ -1,4 +1,3 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import ResuableDocumentForm from "../../../components/ResuableDocumentForm";
@@ -26,9 +25,13 @@ const QuoteDetailsPage = () => {
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [quoteToShare, setQuoteToShare] = useState<any | null>(null);
-  const [shareMode, setShareMode] = useState<'share' | 'unshare'>('share');
+  const [shareMode, setShareMode] = useState<"share" | "unshare">("share");
 
-  const { data: quotes = [], isLoading, refetch } = useGetAllQuotesQuery(projectId);
+  const {
+    data: quotes = [],
+    isLoading,
+    refetch,
+  } = useGetAllQuotesQuery(projectId);
 
   const [createQuote] = useCreateQuoteMutation();
   const [updateQuote] = useUpdateQuoteMutation();
@@ -82,7 +85,10 @@ const QuoteDetailsPage = () => {
         successAlert(result.message);
         refetch();
       } else if (mode === "edit" && editQuote) {
-        const result = await updateQuote({ id: editQuote._id, data: formData }).unwrap();
+        const result = await updateQuote({
+          id: editQuote._id,
+          data: formData,
+        }).unwrap();
         successAlert(result.message);
         refetch();
       }
@@ -101,20 +107,26 @@ const QuoteDetailsPage = () => {
   const handleShare = async (selectedUserIds: string[]) => {
     if (!selectedUserIds.length || !quoteToShare?._id) return;
     try {
-      if (shareMode === 'share') {
-        const res = await shareQuote({ id: quoteToShare._id, sharedWith: selectedUserIds }).unwrap();
-        successAlert(res.message || 'Quote shared successfully!');
+      if (shareMode === "share") {
+        const res = await shareQuote({
+          id: quoteToShare._id,
+          sharedWith: selectedUserIds,
+        }).unwrap();
+        successAlert(res.message || "Quote shared successfully!");
       } else {
-        const res = await unShareQuote({ id: quoteToShare._id, unShareWith: selectedUserIds }).unwrap();
-        successAlert(res.message || 'Quote unshared successfully!');
+        const res = await unShareQuote({
+          id: quoteToShare._id,
+          unShareWith: selectedUserIds,
+        }).unwrap();
+        successAlert(res.message || "Quote unshared successfully!");
       }
       setShareModalOpen(false);
       setQuoteToShare(null);
       refetch();
     } catch (err: any) {
       errorAlert(
-        'Sharing Error',
-        err?.data?.message || 'Failed to process share action'
+        "Sharing Error",
+        err?.data?.message || "Failed to process share action"
       );
     }
   };
@@ -123,7 +135,7 @@ const QuoteDetailsPage = () => {
     <div className="w-full px-4  gap-4 bg-white min-h-screen pt-3">
       <div className="flex justify-between">
         <h1 className="text-2xl font-semibold mb-4">Manage Quote</h1>
-        <CustomSearchInput onSearch={() => { }} />
+        <CustomSearchInput onSearch={() => {}} />
       </div>
 
       <div className="flex justify-end mr-4 mb-4">
@@ -161,7 +173,7 @@ const QuoteDetailsPage = () => {
             .map((quote: any) => (
               <div
                 key={quote._id}
-                className="p-4 bg-gray-100 border border-gray-300 rounded w-60 flex flex-col gap-4 cursor-pointer hover:bg-gray-200 transition"
+                className="p-4 bg-[#F1F1F1] border  rounded w-60 flex flex-col gap-4 cursor-pointer  transition"
               >
                 <div className="flex justify-between items-start w-full">
                   <h3 className="text-lg font-medium text-gray-900 w-36 truncate">
@@ -183,13 +195,13 @@ const QuoteDetailsPage = () => {
                         case "edit":
                           handleEditClick(quote);
                           break;
-                        case 'share':
-                          setShareMode('share');
+                        case "share":
+                          setShareMode("share");
                           setQuoteToShare(quote);
                           setShareModalOpen(true);
                           break;
-                        case 'unshare':
-                          setShareMode('unshare');
+                        case "unshare":
+                          setShareMode("unshare");
                           setQuoteToShare(quote);
                           setShareModalOpen(true);
                           break;
@@ -223,8 +235,10 @@ const QuoteDetailsPage = () => {
         onCancel={() => setShareModalOpen(false)}
       >
         <CustomShareSelector
-          title={shareMode === 'share' ? 'Share Quote With' : 'Unshare Quote With'}
-          roles={['superAdmin', 'primeAdmin', 'basicAdmin', 'client']}
+          title={
+            shareMode === "share" ? "Share Quote With" : "Unshare Quote With"
+          }
+          roles={["superAdmin", "primeAdmin", "basicAdmin", "client"]}
           onShare={handleShare}
         />
       </Modal>
