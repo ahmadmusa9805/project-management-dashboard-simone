@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/features/labour/labourApi.ts
 import { baseApi } from "../../app/api/baseApi";
 
@@ -58,4 +59,3 @@ export const {
   useUpdateLabourMutation,
   useDeleteLabourMutation,
 } = labourApi;
-

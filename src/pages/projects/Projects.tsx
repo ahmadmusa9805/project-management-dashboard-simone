@@ -1,4 +1,5 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 // src/pages/Projects/Projects.tsx
 import { useState } from "react";
@@ -15,11 +16,8 @@ import {
   useCreateProjectMutation,
   useDeleteProjectMutation,
   useGetProjectsWithstatusQuery,
- 
   useShareProjectMutation,
- 
-  useUnShareProjectMutation,
- 
+  // useUnShareProjectMutation,
   useUpdateProjectMutation,
 } from "../../Redux/features/projects/projectsApi";
 
@@ -28,7 +26,6 @@ import { successAlert } from "../../utils/alerts";
 import type { projectSchema } from "../../types/projectAllTypes/projectSchema";
 import type z from "zod";
 import ProjectDetailsModal from "./SingleProjectDetails";
-
 
 type ProjectForm = z.infer<typeof projectSchema>;
 
@@ -41,12 +38,14 @@ const Projects = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editProject, setEditProject] = useState<any>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryParams = new URLSearchParams(location.search);
-  
+
   const statusFilter = queryParams.get("status") ?? "pending";
-const status = queryParams.get("status");
+  const status = queryParams.get("status");
   const {
     data: projects = [],
     isLoading,
@@ -54,21 +53,20 @@ const status = queryParams.get("status");
   } = useGetProjectsWithstatusQuery({
     status: statusFilter,
   });
-const [shareProject] = useShareProjectMutation();
+  const [shareProject] = useShareProjectMutation();
 
-  const [unShareProject] = useUnShareProjectMutation();
- 
+  // const [unShareProject] = useUnShareProjectMutation();
+
   const [createProject] = useCreateProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
   const [deleteProject] = useDeleteProjectMutation();
 
-
-   const handleViewDetails = (id: string) => {
+  const handleViewDetails = (id: string) => {
     setSelectedProjectId(id);
     setIsModalOpen(true);
   };
 
-   const handleCloseModal = () => {
+  const handleCloseModal = () => {
     setSelectedProjectId(null);
     setIsModalOpen(false);
   };
@@ -96,7 +94,7 @@ const [shareProject] = useShareProjectMutation();
     const selectedProject = projects.find((p) => p._id === projectId);
     switch (key) {
       case "view":
-      handleViewDetails(projectId)
+        handleViewDetails(projectId);
 
         break;
       case "edit":
@@ -118,54 +116,39 @@ const [shareProject] = useShareProjectMutation();
     }
   };
 
-
-
-  
-
   if (isLoading) return <Spin />;
 
   return (
     <>
-      
-<div className="w-full px-4 flex flex-col gap-4 bg-white min-h-screen pt-3">
+      <div className="w-full px-4 flex flex-col gap-4 bg-white min-h-screen pt-3">
+        {status === "pending" ? (
+          <h2 className="text-xl font-semibold px-4">Pending Projects</h2>
+        ) : status === "ongoing" ? (
+          <h2 className="text-xl font-semibold px-4">Ongoing Projects</h2>
+        ) : status === "completed" ? (
+          <h2 className="text-xl font-semibold px-4">Completed Projects</h2>
+        ) : null}
 
-    {status === 'pending' ? (
-  <h2 className="text-xl font-semibold px-4">
-    Pending Projects
-  </h2>
-) : status === 'ongoing' ? (
-  <h2 className="text-xl font-semibold px-4">
-    Ongoing Projects
-  </h2>
-) : status === 'completed' ? (
-  <h2 className="text-xl font-semibold px-4">
-    Completed Projects
-  </h2>
-) : null}
-
-  
         {statusFilter === "pending" && (
-  <div className="w-full flex justify-end mt-3">
-    <CustomCreateButton
-      title="Create Project"
-      onClick={() => setIsCreateOpen(true)}
-    />
-  </div>
-)}
+          <div className="w-full flex justify-end mt-3">
+            <CustomCreateButton
+              title="Create Project"
+              onClick={() => setIsCreateOpen(true)}
+            />
+          </div>
+        )}
         {projects.map((project) => (
-
-          
           <div key={project._id} className="hover:bg-[#e6f4ea] bg-[#f1f1f1]">
             <div className="w-full px-4 py-2.5 flex items-center gap-2.5">
               <div className="w-6 h-6">
-  {project.status === 'pending' ? (
-    <HourglassIcon className="text-green-500"/>
-  ) : project.status === 'ongoing' ? (
-    <RefreshCw className="text-green-500" />
-  ) : (
-    <ShieldCheckIcon className="text-green-500" />
-  )}
-</div>
+                {project.status === "pending" ? (
+                  <HourglassIcon className="text-green-500" />
+                ) : project.status === "ongoing" ? (
+                  <RefreshCw className="text-green-500" />
+                ) : (
+                  <ShieldCheckIcon className="text-green-500" />
+                )}
+              </div>
               <div className="flex-1 text-base font-medium">
                 {project.projectName}
               </div>
@@ -198,30 +181,26 @@ const [shareProject] = useShareProjectMutation();
           setSharedProjectId(null);
         }}
       >
+        <CustomShareSelector
+          roles={["primeAdmin", "basicAdmin", "Client"]}
+          onShare={async (selectedUsers) => {
+            if (!selectedUsers.length || !sharedProjectId) return;
+            try {
+              console.log(selectedUsers, "selectedUsers payload");
+              await shareProject({
+                id: sharedProjectId,
+                sharedWith: selectedUsers, // <-- array of { userId, role }
+              }).unwrap();
 
-  <CustomShareSelector
-  roles={["primeAdmin", "basicAdmin", "Client"]}
-  onShare={async (selectedUsers) => {
-    if (!selectedUsers.length || !sharedProjectId) return;
-    try {
-      console.log(selectedUsers, "selectedUsers payload");
-      await shareProject({
-        id: sharedProjectId,
-        sharedWith: selectedUsers, // <-- array of { userId, role }
-      }).unwrap();
-
-      successAlert("Project shared successfully");
-      setIsShareOpen(false);
-      setSharedProjectId(null);
-      refetch();
-    } catch (error) {
-      console.error("Share failed", error);
-    }
-  }}
-/>
-
-
-
+              successAlert("Project shared successfully");
+              setIsShareOpen(false);
+              setSharedProjectId(null);
+              refetch();
+            } catch (error) {
+              console.error("Share failed", error);
+            }
+          }}
+        />
       </Modal>
 
       <Drawer
@@ -246,7 +225,7 @@ const [shareProject] = useShareProjectMutation();
               // Append rest of form data as JSON string
               const { contractFile, ...rest } = formData;
               body.append("data", JSON.stringify(rest)); // 🟢 backend middlewa
-               await createProject(body).unwrap();
+              await createProject(body).unwrap();
               successAlert("Project created successfully");
 
               setIsCreateOpen(false);
@@ -290,8 +269,7 @@ const [shareProject] = useShareProjectMutation();
         )}
       </Drawer>
 
-
-        <ProjectDetailsModal
+      <ProjectDetailsModal
         open={isModalOpen}
         onClose={handleCloseModal}
         projectId={selectedProjectId}
@@ -301,7 +279,3 @@ const [shareProject] = useShareProjectMutation();
 };
 
 export default Projects;
-
-
-
-

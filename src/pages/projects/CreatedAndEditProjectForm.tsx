@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // import { useForm, Controller, useFieldArray } from 'react-hook-form';
 // import { zodResolver } from '@hookform/resolvers/zod';
@@ -295,15 +296,9 @@
 
 // export default CreateProjectForm;
 
-
-
-
-
-
-
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Input,
   Select,
@@ -314,11 +309,11 @@ import {
   Col,
   Upload,
   Typography,
-} from 'antd';
-import { CloudUpload } from 'lucide-react';
-import moment from 'moment';
-import { projectSchema } from '../../types/projectAllTypes/projectSchema';
-import { useState } from 'react';
+} from "antd";
+import { CloudUpload } from "lucide-react";
+import moment from "moment";
+import { projectSchema } from "../../types/projectAllTypes/projectSchema";
+import { useState } from "react";
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -336,7 +331,7 @@ interface CreateProjectFormProps {
 const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
   onSubmit,
   defaultValues,
-  submitText = 'Create Project',
+  submitText = "Create Project",
   isEdit = false,
 }) => {
   const {
@@ -351,36 +346,53 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
       ...defaultValues,
     },
   });
-const defaultTypes = ['Renovation', 'New Build', 'Extension'];
-const [projectTypes, setProjectTypes] = useState(defaultTypes);
-const handleAddType = (field: any) => {
-  const trimmed = customType.trim();
-  if (trimmed && !projectTypes.includes(trimmed)) {
-    const updated = [...projectTypes, trimmed];
-    setProjectTypes(updated);
-    field.onChange(trimmed); // auto-select newly added
-  }
-  setCustomType('');
-};
+  const defaultTypes = ["Renovation", "New Build", "Extension"];
+  const [projectTypes, setProjectTypes] = useState(defaultTypes);
+  const handleAddType = (field: any) => {
+    const trimmed = customType.trim();
+    if (trimmed && !projectTypes.includes(trimmed)) {
+      const updated = [...projectTypes, trimmed];
+      setProjectTypes(updated);
+      field.onChange(trimmed); // auto-select newly added
+    }
+    setCustomType("");
+  };
 
-const [customType, setCustomType] = useState('');
+  const [customType, setCustomType] = useState("");
   const renderError = (name: keyof ProjectForm) =>
-    errors[name] && <Text type="danger">{(errors[name]?.message as string) || 'Required'}</Text>;
+    errors[name] && (
+      <Text type="danger">
+        {(errors[name]?.message as string) || "Required"}
+      </Text>
+    );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full bg-white p-6 flex flex-col gap-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full bg-white p-6 flex flex-col gap-6"
+    >
       <h2 className="text-2xl font-semibold text-[#000E0F]">{submitText}</h2>
 
       <div className="flex flex-col gap-3">
         {/* BASIC FIELDS */}
-        {[['projectName', 'Project Name'], ['clientName', 'Client Name'], ['clientEmail', 'Client Email'], ['description', 'Description'], ['reference', 'Contract Reference'], ['address', 'Project Address'], ['contact', 'Primary Contact']].map(([name, label]) => (
+        {[
+          ["projectName", "Project Name"],
+          ["clientName", "Client Name"],
+          ["clientEmail", "Client Email"],
+          ["description", "Description"],
+          ["reference", "Contract Reference"],
+          ["address", "Project Address"],
+          ["contact", "Primary Contact"],
+        ].map(([name, label]) => (
           <div key={name} className="flex flex-col gap-1">
-            <label htmlFor={name} className="font-medium">{label}</label>
+            <label htmlFor={name} className="font-medium">
+              {label}
+            </label>
             <Controller
               control={control}
               name={name as keyof ProjectForm}
               render={({ field }) =>
-                name === 'description' ? (
+                name === "description" ? (
                   <Input.TextArea {...field} id={name} rows={4} />
                 ) : (
                   <Input {...field} id={name} />
@@ -392,77 +404,81 @@ const [customType, setCustomType] = useState('');
         ))}
 
         {/* TYPE & DATE FIELDS */}
-  <Controller
-  control={control}
-  name="type"
-  render={({ field }) => (
-    <div className="flex flex-col gap-1">
-      <label htmlFor="type" className="font-medium">Project Type</label>
-      <Select
-        {...field}
-        id="type"
-        placeholder="Select or add Project Type"
-        dropdownRender={(menu) => (
-          <>
-             {menu}
-    <div className="p-2 border-t">
-      <div className="flex gap-2">
-        <Input
-          placeholder="Add new type"
-          value={customType}
-          onChange={(e) => setCustomType(e.target.value)}
-          onPressEnter={() => handleAddType(field)}
-        />
-        <Button
-          type="primary"
-          disabled={!customType.trim()}
-          onClick={() => handleAddType(field)}
-        >
-          + Add
-        </Button>
-      </div>
-    </div>
+        <Controller
+          control={control}
+          name="type"
+          render={({ field }) => (
+            <div className="flex flex-col gap-1">
+              <label htmlFor="type" className="font-medium">
+                Project Type
+              </label>
+              <Select
+                {...field}
+                id="type"
+                placeholder="Select or add Project Type"
+                dropdownRender={(menu) => (
+                  <>
+                    {menu}
+                    <div className="p-2 border-t">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add new type"
+                          value={customType}
+                          onChange={(e) => setCustomType(e.target.value)}
+                          onPressEnter={() => handleAddType(field)}
+                        />
+                        <Button
+                          type="primary"
+                          disabled={!customType.trim()}
+                          onClick={() => handleAddType(field)}
+                        >
+                          + Add
+                        </Button>
+                      </div>
+                    </div>
 
-    {projectTypes.length > defaultTypes.length && (
-      <div className="p-2 border-t">
-        <span className="text-xs font-medium">Custom Types:</span>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {projectTypes
-            .filter((type) => !defaultTypes.includes(type))
-            .map((type) => (
-              <Button
-                key={type}
-                size="small"
-                onClick={() => {
-                  const updated = projectTypes.filter((t) => t !== type);
-                  setProjectTypes(updated);
-                  if (field.value === type) {
-                    field.onChange('');
-                  }
-                }}
-                className="!bg-red-100 !text-red-600 !border-red-300"
+                    {projectTypes.length > defaultTypes.length && (
+                      <div className="p-2 border-t">
+                        <span className="text-xs font-medium">
+                          Custom Types:
+                        </span>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {projectTypes
+                            .filter((type) => !defaultTypes.includes(type))
+                            .map((type) => (
+                              <Button
+                                key={type}
+                                size="small"
+                                onClick={() => {
+                                  const updated = projectTypes.filter(
+                                    (t) => t !== type
+                                  );
+                                  setProjectTypes(updated);
+                                  if (field.value === type) {
+                                    field.onChange("");
+                                  }
+                                }}
+                                className="!bg-red-100 !text-red-600 !border-red-300"
+                              >
+                                {type} ✕
+                              </Button>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               >
-                {type} ✕
-              </Button>
-            ))}
-        </div>
-      </div>
-    )}
-          </>
-        )}
-      >
-        {projectTypes.map((type) => (
-          <Option key={type} value={type}>
-            {type}
-          </Option>
-        ))}
-      </Select>
-      {renderError('type')}
-    </div>
-  )}
-/>
-
-
+                {projectTypes.map((type) => (
+                  <Option key={type} value={type}>
+                    {type}
+                  </Option>
+                ))}
+              </Select>
+              {renderError("type")}
+            </div>
+          )}
+        />
 
         <Row gutter={16}>
           <Col span={12}>
@@ -477,9 +493,9 @@ const [customType, setCustomType] = useState('');
                     {...field}
                     value={field.value ? moment(field.value) : null}
                     onChange={(_, dateString) => field.onChange(dateString)}
-                    style={{ width: '100%' }}
+                    style={{ width: "100%" }}
                   />
-                  {renderError('startDate')}
+                  {renderError("startDate")}
                 </div>
               )}
             />
@@ -497,9 +513,9 @@ const [customType, setCustomType] = useState('');
                     {...field}
                     value={field.value ? moment(field.value) : null}
                     onChange={(_, dateString) => field.onChange(dateString)}
-                    style={{ width: '100%' }}
+                    style={{ width: "100%" }}
                   />
-                  {renderError('endDate')}
+                  {renderError("endDate")}
                 </div>
               )}
             />
@@ -523,14 +539,14 @@ const [customType, setCustomType] = useState('');
                 multiple={false}
                 fileList={field.value ? [field.value] : []}
                 onRemove={() => field.onChange(undefined)}
-                style={{ padding: '8px' }}
+                style={{ padding: "8px" }}
               >
                 <p className="text-center flex flex-col items-center">
                   <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
                 </p>
                 <p className="text-[10px]">Click or drag PDF to upload</p>
               </Dragger>
-              {renderError('contractFile')}
+              {renderError("contractFile")}
             </div>
           )}
         />
@@ -541,9 +557,11 @@ const [customType, setCustomType] = useState('');
           name="value"
           render={({ field }) => (
             <div className="flex flex-col gap-1">
-              <label htmlFor="value" className="font-medium">Project Value</label>
-              <InputNumber {...field} style={{ width: '100%' }} id="value" />
-              {renderError('value')}
+              <label htmlFor="value" className="font-medium">
+                Project Value
+              </label>
+              <InputNumber {...field} style={{ width: "100%" }} id="value" />
+              {renderError("value")}
             </div>
           )}
         />
@@ -555,14 +573,20 @@ const [customType, setCustomType] = useState('');
             name="status"
             render={({ field }) => (
               <div className="flex flex-col gap-1">
-                <label htmlFor="status" className="font-medium">Project Status</label>
-                <Select {...field} id="status" placeholder="Select Project Status">
+                <label htmlFor="status" className="font-medium">
+                  Project Status
+                </label>
+                <Select
+                  {...field}
+                  id="status"
+                  placeholder="Select Project Status"
+                >
                   <Option value="ongoing">Ongoing</Option>
                   <Option value="completed">Completed</Option>
                   <Option value="pending">Pending</Option>
                   <Option value="cancelled">Cancelled</Option>
                 </Select>
-                {renderError('status')}
+                {renderError("status")}
               </div>
             )}
           />

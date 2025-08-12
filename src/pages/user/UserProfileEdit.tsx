@@ -1,4 +1,4 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // import React, { useState } from "react";
 // import { useForm } from "react-hook-form";
@@ -8,7 +8,6 @@
 // import PasswordUpdateModal from "../../components/PasswordUpdateModal";
 // import { successAlert, errorAlert } from "../../utils/alerts";
 // import { CameraIcon } from "lucide-react";
-
 
 // interface UserProfileEditProps {
 //   user: User;
@@ -242,9 +241,6 @@
 
 // export default UserProfileEdit;
 
-
-
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUpdateUserMutation } from "../../Redux/features/users/usersApi";
@@ -267,7 +263,9 @@ type FormData = {
 
 const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [actionType, setActionType] = useState<"updateDetails" | "changePassword" | null>(null);
+  const [actionType, setActionType] = useState<
+    "updateDetails" | "changePassword" | null
+  >(null);
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -276,7 +274,8 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
   );
 
   const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
-  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
+  const [changePassword, { isLoading: isChangingPassword }] =
+    useChangePasswordMutation();
 
   const {
     register,
