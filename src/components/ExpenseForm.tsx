@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useEffect } from "react";
@@ -70,28 +69,24 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     ];
   }
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<ExpenseFormValues>({
-    defaultValues: defaultValues ?? {
-      _id: "",
-      type: defaultTypeValue,
-      name: "",
-      quantity: 0,
-      unit: "",
-      unitPrice: 0,
-      days: 0,
-      vat: 0,
-      ratePerDay: 0,
-      amount: 0,
-      date: dayjs().format("YYYY-MM-DD"),
-      description: "",
-    },
-  });
+  const { control, handleSubmit, setValue, watch } = useForm<ExpenseFormValues>(
+    {
+      defaultValues: defaultValues ?? {
+        _id: "",
+        type: defaultTypeValue,
+        name: "",
+        quantity: 0,
+        unit: "",
+        unitPrice: 0,
+        days: 0,
+        vat: 0,
+        ratePerDay: 0,
+        amount: 0,
+        date: dayjs().format("YYYY-MM-DD"),
+        description: "",
+      },
+    }
+  );
 
   // Fetch labour list from backend
   const { data: labourList, isLoading: labourLoading } =
@@ -231,7 +226,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               <Controller
                 control={control}
                 name="name"
-                render={() => null} // no UI, just for storing the name
+                render={() => null as unknown as React.ReactElement} // no UI, just for storing the name
               />
             </>
           )
