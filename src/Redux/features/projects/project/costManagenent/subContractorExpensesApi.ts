@@ -37,15 +37,10 @@ export const subContractorExpensesApi = baseApi.injectEndpoints({
 
     updateSubContractor: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => {
-        const formData = new FormData();
-        if (data.file) {
-          formData.append("file", data.file);
-        }
-        formData.append("data", JSON.stringify(data));
         return {
           url: `/sub-contractor-expenses/${id}`,
           method: "PATCH",
-          body: formData,
+          body: data,
         };
       },
       invalidatesTags: ["SubContractorsExpenses"],
@@ -63,7 +58,7 @@ export const subContractorExpensesApi = baseApi.injectEndpoints({
 
 export const {
   useGetAllSubContractorsQuery,
-  useGetSingleSubContractorQuery,
+  useLazyGetSingleSubContractorQuery,
   useCreateSubContractorMutation,
   useUpdateSubContractorMutation,
   useDeleteSubContractorMutation,

@@ -37,15 +37,10 @@ export const labourExpensesApi = baseApi.injectEndpoints({
 
     updateLabourExpense: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => {
-        const formData = new FormData();
-        if (data.file) {
-          formData.append("file", data.file);
-        }
-        formData.append("data", JSON.stringify(data));
         return {
           url: `/labour-expenses/${id}`,
           method: "PATCH",
-          body: formData,
+          body: data,
         };
       },
       invalidatesTags: ["LabourExpenses"],
@@ -64,7 +59,7 @@ export const labourExpensesApi = baseApi.injectEndpoints({
 export const {
   // Labour
   useGetAllLabourExpensesQuery,
-  useGetSingleLabourExpenseQuery,
+  useLazyGetSingleLabourExpenseQuery,
   useCreateLabourExpenseMutation,
   useUpdateLabourExpenseMutation,
   useDeleteLabourExpenseMutation,

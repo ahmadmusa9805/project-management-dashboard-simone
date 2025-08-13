@@ -38,15 +38,10 @@ export const materialExpensesApi = baseApi.injectEndpoints({
 
     updateMaterialExpense: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => {
-        const formData = new FormData();
-        if (data.file) {
-          formData.append("file", data.file);
-        }
-        formData.append("data", JSON.stringify(data));
         return {
           url: `/material-expenses/${id}`,
           method: "PATCH",
-          body: formData,
+          body: data,
         };
       },
       invalidatesTags: ["MaterialExpenses"],
@@ -65,7 +60,7 @@ export const materialExpensesApi = baseApi.injectEndpoints({
 export const {
   // Material
   useGetAllMaterialExpensesQuery,
-  useGetSingleMaterialExpenseQuery,
+  useLazyGetSingleMaterialExpenseQuery,
   useCreateMaterialExpenseMutation,
   useUpdateMaterialExpenseMutation,
   useDeleteMaterialExpenseMutation,
