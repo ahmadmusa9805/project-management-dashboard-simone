@@ -49,17 +49,16 @@ export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // 👇 This is the part you need to modify
 
-  getAllUsers: builder.query<UserApiResponse, { status?: string }>({
-  query: ({ status }) => {
-    const params = new URLSearchParams();
-    params.append("sort", "-createdAt");
-    if (status) params.append("status", status);
-    return `/users?${params.toString()}`;
-  },
-  transformResponse: (response: any) => response,
-  providesTags: ["Users"],
-}),
-
+    getAllUsers: builder.query<UserApiResponse, { status?: string }>({
+      query: ({ status }) => {
+        const params = new URLSearchParams();
+        params.append("sort", "-createdAt");
+        if (status) params.append("status", status);
+        return `/users?${params.toString()}`;
+      },
+      transformResponse: (response: any) => response,
+      providesTags: ["Users"],
+    }),
 
     getUserById: builder.query<User, string>({
       query: (id) => `/users/${id}`,
@@ -73,10 +72,10 @@ export const usersApi = baseApi.injectEndpoints({
     }),
 
     createUser: builder.mutation({
-      query: (formData) => ({
+      query: (userData) => ({
         url: "/users/create-user",
         method: "POST",
-        body: formData,
+        body: userData,
       }),
       invalidatesTags: ["Users"],
     }),

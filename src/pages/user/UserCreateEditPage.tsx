@@ -114,24 +114,20 @@ const UserCreateEditPage = ({
     try {
       const formData = new FormData();
 
-      // Append string fields
-      formData.append("name", data.name);
-      formData.append("email", data.email);
-      formData.append("contactNo", data.contactNo);
-      formData.append("password", String(data.password || ""));
-      formData.append("address", data.address);
-      formData.append("postCode", data.postCode);
-      formData.append("estimateNumber", data.estimateNumber);
-      formData.append("projectType", data.projectType);
-      formData.append("role", data.role);
+      const payload = {
+        name: data.name,
+        email: data.email,
+        contactNo: data.contactNo,
+        password: data.password,
+        address: data.address,
+        postCode: data.postCode,
+        estimateNumber: data.estimateNumber || "",
+        projectType: data.projectType || "",
+        role: data.role,
+      };
 
-      // Append extra fields for client
-      if (data.selectedRole === "client") {
-        formData.append("estimateNumber", data.estimateNumber || "");
-        formData.append("projectType", data.projectType || "");
-      }
-
-      // Append photo if selected
+      // Append data as JSON
+      formData.append("data", JSON.stringify(payload)); // Append photo if selected
       if (photoFile) {
         formData.append("file", photoFile);
       }
