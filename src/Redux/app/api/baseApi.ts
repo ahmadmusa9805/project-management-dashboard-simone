@@ -28,7 +28,8 @@ export const baseApi = createApi({
         headers.set("Authorization", token);
       }
 
-      headers.set("Content-Type", "application/json");
+      // Only set JSON Content-Type if not sending FormData
+
       return headers;
     },
   }),
