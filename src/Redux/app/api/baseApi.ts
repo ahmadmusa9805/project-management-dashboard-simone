@@ -27,9 +27,6 @@ export const baseApi = createApi({
       if (token) {
         headers.set("Authorization", token);
       }
-
-      // Only set JSON Content-Type if not sending FormData
-
       return headers;
     },
   }),

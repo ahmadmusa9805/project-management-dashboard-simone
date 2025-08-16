@@ -126,8 +126,7 @@ const UserCreateEditPage = ({
         role: data.role,
       };
 
-      // Append data as JSON
-      formData.append("data", JSON.stringify(payload)); // Append photo if selected
+      formData.append("data", JSON.stringify(payload));
       if (photoFile) {
         formData.append("file", photoFile);
       }
