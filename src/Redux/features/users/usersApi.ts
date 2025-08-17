@@ -47,8 +47,6 @@ import { baseApi } from "../../app/api/baseApi";
 import type { SingleUserResponse, User, UserApiResponse } from "./users.types";
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // 👇 This is the part you need to modify
-
     getAllUsers: builder.query<UserApiResponse, { status?: string }>({
       query: ({ status }) => {
         const params = new URLSearchParams();

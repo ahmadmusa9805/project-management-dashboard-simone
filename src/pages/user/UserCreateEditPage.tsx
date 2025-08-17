@@ -3,7 +3,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Input, Select, Button, Upload, message } from "antd";
+import { Input, Select, Button, Upload } from "antd";
 import { UploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -12,7 +12,7 @@ import {
   useUpdateUserMutation,
 } from "../../Redux/features/users/usersApi";
 import { USER_ROLE } from "../../types/userAllTypes/user";
-import { successAlert } from "../../utils/alerts";
+import { errorAlert, successAlert } from "../../utils/alerts";
 
 const { Option } = Select;
 
@@ -146,7 +146,7 @@ const UserCreateEditPage = ({
       setPhotoFile(null);
       // Close drawer/modal
     } catch (error) {
-      message.error("Error while saving user");
+      errorAlert("Error while saving user");
       console.error(error);
     }
   };
