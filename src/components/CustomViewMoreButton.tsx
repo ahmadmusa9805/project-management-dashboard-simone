@@ -5,7 +5,7 @@ import "../pages/projects/css/projects.css";
 
 interface CustomViewMoreButtonProps {
   items: MenuProps["items"]; // Pass an array of menu items
-  onClick?: (key: string) => void; // Handle action based on key
+  onClick?: (key: string) => void;
 }
 
 const CustomViewMoreButton: React.FC<CustomViewMoreButtonProps> = ({

@@ -77,11 +77,11 @@ export const usersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Users"],
     }),
-    // usersApi.ts
+
     changeUserStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/users/change-status/${id}`,
-        method: "POST", // use PATCH if your backend expects it
+        method: "POST",
         body: { status },
       }),
       invalidatesTags: (_result, _error, { id }) => [
