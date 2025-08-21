@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 
@@ -81,43 +82,42 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
       </div>
 
       {/* Start & End Date – Always Visible */}
-     {
-      entityName==='Schedule'&&
-       <div className="flex gap-4">
-        <div className="flex-1">
-          <label className="block text-xs font-semibold text-[#2B3738] mb-1 tracking-wide">
-            Start date
-          </label>
-          <Controller
-            name="startDate"
-            control={control}
-            render={({ field }) => (
-              <input
-                type="date"
-                {...field}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-              />
-            )}
-          />
+      {entityName === "Schedule" && (
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="block text-xs font-semibold text-[#2B3738] mb-1 tracking-wide">
+              Start date
+            </label>
+            <Controller
+              name="startDate"
+              control={control}
+              render={({ field }) => (
+                <input
+                  type="date"
+                  {...field}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                />
+              )}
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-xs font-semibold text-[#2B3738] mb-1 tracking-wide">
+              End date
+            </label>
+            <Controller
+              name="endDate"
+              control={control}
+              render={({ field }) => (
+                <input
+                  type="date"
+                  {...field}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                />
+              )}
+            />
+          </div>
         </div>
-        <div className="flex-1">
-          <label className="block text-xs font-semibold text-[#2B3738] mb-1 tracking-wide">
-            End date
-          </label>
-          <Controller
-            name="endDate"
-            control={control}
-            render={({ field }) => (
-              <input
-                type="date"
-                {...field}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-              />
-            )}
-          />
-        </div>
-      </div>
-     }
+      )}
 
       {/* Description */}
       <div className="w-full">
@@ -138,7 +138,7 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
       </div>
 
       {/* Mark as Completed – Only in Edit */}
-      {mode === "edit" && entityName==='Task'&& (
+      {mode === "edit" && entityName === "Task" && (
         <div className="flex items-center gap-2">
           <Controller
             name="completed"
@@ -153,7 +153,9 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
               />
             )}
           />
-          <label className="text-[#000E0F] font-medium">Mark as Completed</label>
+          <label className="text-[#000E0F] font-medium">
+            Mark as Completed
+          </label>
         </div>
       )}
 

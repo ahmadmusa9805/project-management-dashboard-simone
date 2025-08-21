@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
 import Editor from "@toast-ui/editor";
 import "@toast-ui/editor/dist/toastui-editor.css"; // Light theme
@@ -27,7 +28,7 @@ const ToastEditor: React.FC<ToastEditorProps> = ({
 
     editorRef.current = new Editor({
       el: editorContainerRef.current,
-      
+
       previewStyle,
       initialValue,
       theme,
@@ -36,7 +37,6 @@ const ToastEditor: React.FC<ToastEditorProps> = ({
         ["heading", "bold", "italic", "strike"],
         ["hr", "quote"],
         ["ul", "ol", "task"],
-        ["table", "link", "image"], // Keep default image button here
         ["code", "codeblock"],
       ],
     });
@@ -66,11 +66,6 @@ const ToastEditor: React.FC<ToastEditorProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-
   return (
     <div>
       <div ref={editorContainerRef} />
@@ -82,24 +77,6 @@ const ToastEditor: React.FC<ToastEditorProps> = ({
         ref={fileInputRef}
         onChange={onFileChange}
       />
-
-      <div style={{ marginTop: 12, display: "flex", gap: 12 }}>
-        <button
-          type="button"
-          onClick={handleUploadClick}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#28a745",
-            color: "white",
-            border: "none",
-            borderRadius: 4,
-            cursor: "pointer",
-          }}
-        >
-          Upload Image
-        </button>
-
-      </div>
     </div>
   );
 };
