@@ -1,8 +1,5 @@
 import React from "react";
 
-import type { MenuProps } from "antd";
-import CustomViewMoreButton from "./CustomViewMoreButton";
-
 interface CertificateCardProps {
   title: string;
   size: string;
@@ -10,17 +7,6 @@ interface CertificateCardProps {
 
 const CertificateCard: React.FC<CertificateCardProps> = ({ title, size }) => {
   // Define dropdown actions
-  const menuItems: MenuProps["items"] = [
-    { label: "View", key: "view" },
-    { label: "Share", key: "share" },
-    { label: "Download", key: "download" },
-    { label: "Delete", key: "delete", danger: true },
-  ];
-
-  const handleMenuAction = (key: string) => {
-    console.log(`${key} action triggered for:`, title);
-    // You can handle each action like open modal, download file etc.
-  };
 
   return (
     <div className="p-4 bg-[#F1F1F1] rounded border border-[#E6E7E7] flex flex-col items-start gap-4">
@@ -39,7 +25,6 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ title, size }) => {
         </div>
 
         {/* Dropdown Actions */}
-        <CustomViewMoreButton items={menuItems} onClick={handleMenuAction} />
       </div>
 
       {/* Title and Size */}

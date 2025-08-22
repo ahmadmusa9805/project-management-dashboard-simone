@@ -42,6 +42,7 @@ export const baseApi = createApi({
     "SubContractorsExpenses",
     "ProjectCosts",
     "Notes",
+    "Certificates",
   ],
   endpoints: () => ({}),
 });
