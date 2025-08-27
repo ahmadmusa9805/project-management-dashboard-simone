@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useState } from "react";
 // import { Input, Checkbox, Button } from "antd";
 // import { SearchOutlined } from "@ant-design/icons";
 // import { useGetAllUsersQuery } from "../Redux/features/users/usersApi";
-
 
 // // interface User {
 // //   id: number;
@@ -28,7 +28,6 @@
 //   (item: any) => item._id && item.name && item.role && item.email
 // );
 
-
 //   const [searchText, setSearchText] = useState("");
 //   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 //   const [selectedRole, setSelectedRole] = useState<string>("all");
@@ -40,15 +39,12 @@
 //   return matchesName && matchesRole;
 // });
 
-
 //   const handleToggleUser = (id: string) => {
 //     setSelectedUserIds((prev) =>
 //       prev.includes(id) ? prev.filter((uid) => uid !== id) : [...prev, id]
 //     );
 //   };
 
-
-  
 //   return (
 //     <div className="w-full h-full p-4 bg-white rounded flex flex-col gap-4">
 //       {/* Title */}
@@ -149,9 +145,6 @@
 
 // export default CustomShareSelector;
 
-
-
-
 // components/CustomShareSelector.tsx
 import { useState } from "react";
 import { Input, Checkbox, Button } from "antd";
@@ -183,15 +176,20 @@ const CustomShareSelector = ({
   const [selectedRole, setSelectedRole] = useState<string>("all");
 
   const filteredUsers = users.filter((user) => {
-    const matchesName = user.name.toLowerCase().includes(searchText.toLowerCase());
+    const matchesName = user.name
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
     const matchesRole =
-      selectedRole === "all" || user.role.toLowerCase() === selectedRole.toLowerCase();
+      selectedRole === "all" ||
+      user.role.toLowerCase() === selectedRole.toLowerCase();
     return matchesName && matchesRole;
   });
 
   const handleToggleUser = (id: string, role: string) => {
     setSelectedUsers((prev) =>
-      prev.some((u) => u.userId === id) ? prev.filter((u) => u.userId !== id) : [...prev, { userId: id, role }]
+      prev.some((u) => u.userId === id)
+        ? prev.filter((u) => u.userId !== id)
+        : [...prev, { userId: id, role }]
     );
   };
 
@@ -208,7 +206,9 @@ const CustomShareSelector = ({
         <div
           onClick={() => setSelectedRole("all")}
           className={`px-3 py-2 rounded-full text-sm font-medium cursor-pointer border ${
-            selectedRole === "all" ? "bg-[#e6f4ea] border-[#0d542b]" : "border-[#969C9D]"
+            selectedRole === "all"
+              ? "bg-[#e6f4ea] border-[#0d542b]"
+              : "border-[#969C9D]"
           }`}
         >
           All
@@ -218,7 +218,9 @@ const CustomShareSelector = ({
             key={role}
             onClick={() => setSelectedRole(role)}
             className={`px-3 py-2 rounded-full text-sm font-medium cursor-pointer border ${
-              selectedRole === role ? "bg-[#e6f4ea] border-[#0d542b]" : "border-[#969C9D]"
+              selectedRole === role
+                ? "bg-[#e6f4ea] border-[#0d542b]"
+                : "border-[#969C9D]"
             }`}
           >
             {role.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
@@ -263,9 +265,13 @@ const CustomShareSelector = ({
                   alt={user.name}
                 />
                 <div>
-                  <span className="text-[#172B4D] text-base font-medium">{user.name}</span>
+                  <span className="text-[#172B4D] text-base font-medium">
+                    {user.name}
+                  </span>
                   <div className="text-xs text-[#6B7374] ">
-                    {user.role.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                    {user.role
+                      .replace("-", " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
                   </div>
                 </div>
               </div>
@@ -276,7 +282,9 @@ const CustomShareSelector = ({
             </div>
           ))
         ) : (
-          <div className="text-center text-sm text-gray-500">No users found</div>
+          <div className="text-center text-sm text-gray-500">
+            No users found
+          </div>
         )}
       </div>
 

@@ -251,7 +251,7 @@ import { successAlert, errorAlert } from "../../utils/alerts";
 import { CameraIcon } from "lucide-react";
 
 interface UserProfileEditProps {
-  user: User;
+  user?: User;
 }
 
 type FormData = {
@@ -270,7 +270,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profileImagePreview, setProfileImagePreview] = useState(
-    user.profileImg || "https://placehold.co/80x80"
+    user?.profileImg || "https://placehold.co/80x80"
   );
 
   const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
@@ -284,10 +284,10 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      firstName: user.name?.split(" ")[0] || "",
-      lastName: user.name?.split(" ")[1] || "",
-      phone: user.contactNo,
-      email: user.email,
+      firstName: user?.name?.split(" ")[0] || "",
+      lastName: user?.name?.split(" ")[1] || "",
+      phone: user?.contactNo,
+      email: user?.email,
     },
   });
 
@@ -300,7 +300,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
   };
 
   const onSubmitUserDetails = async (data: FormData) => {
-    if (!user._id) {
+    if (!user?._id) {
       // You can handle this silently or with a UI message if needed
       return;
     }

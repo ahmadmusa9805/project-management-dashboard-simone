@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Modal, Spin, Card, Typography, Divider, Button } from "antd";
-import { useGetSingleProjectQuery, useUnShareProjectMutation } from "../../Redux/features/projects/projectsApi";
+import {
+  useGetSingleProjectQuery,
+  useUnShareProjectMutation,
+} from "../../Redux/features/projects/projectsApi";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { successAlert } from "../../utils/alerts";
 
@@ -26,7 +30,8 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   } = useGetSingleProjectQuery(projectId ? { id: projectId } : skipToken);
 
   // Unshare mutation hook
-  const [unShareProject, { isLoading: isUnsharing }] = useUnShareProjectMutation();
+  const [unShareProject, { isLoading: isUnsharing }] =
+    useUnShareProjectMutation();
 
   // Handle unshare action
   const handleUnshare = async (userId: string) => {
@@ -45,7 +50,11 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
       open={open}
       onCancel={onClose}
       footer={null}
-      title={<Title level={4} style={{ marginBottom: 0 }}>📁 Project Details</Title>}
+      title={
+        <Title level={4} style={{ marginBottom: 0 }}>
+          📁 Project Details
+        </Title>
+      }
       centered
       width={600}
     >
@@ -58,12 +67,22 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           ❌ Failed to load project details.
         </div>
       ) : (
-        <Card bordered={false} style={{ backgroundColor: "#f9f9f9", borderRadius: 8 }}>
+        <Card
+          bordered={false}
+          style={{ backgroundColor: "#f9f9f9", borderRadius: 8 }}
+        >
           <div style={{ padding: "12px 0" }}>
-            <Text strong>📌 Project Name:</Text> <Text>{project.projectName}</Text>
+            <Text strong>📌 Project Name:</Text>{" "}
+            <Text>{project.projectName}</Text>
             <Divider />
             <Text strong>📊 Status:</Text>{" "}
-            <Text type={project.status.toLowerCase() === "completed" ? "success" : "warning"}>
+            <Text
+              type={
+                project.status.toLowerCase() === "completed"
+                  ? "success"
+                  : "warning"
+              }
+            >
               {project.status}
             </Text>
             <Divider />
@@ -81,45 +100,45 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <Text strong>💰 Value:</Text> <Text>${project.value}</Text>
             <Divider />
             <Text strong>📞 Contact:</Text> <Text>{project.contact}</Text>
+            {project.sharedWith?.length > 0 && (
+              <>
+                <Divider />
+                <Text strong>🤝 Shared With:</Text>
+                <div style={{ marginTop: 8 }}>
+                  {project.sharedWith.map((share: any) => {
+                    const user =
+                      typeof share.userId === "object"
+                        ? share.userId
+                        : { _id: share.userId };
+                    const role = share?.role ?? "Unknown";
 
-   {project.sharedWith?.length > 0 && (
-  <>
-    <Divider />
-    <Text strong>🤝 Shared With:</Text>
-    <div style={{ marginTop: 8 }}>
-      {project.sharedWith.map((share: any) => {
-        const user = typeof share.userId === 'object' ? share.userId : { _id: share.userId };
-       const role = share?.role ?? "Unknown";
-
-        return (
-          <div
-            key={share._id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 6,
-            }}
-          >
-            <span>
-              👤 User ID: {user._id} | Role: <strong>{role}</strong>
-            </span>
-            <Button
-              size="small"
-              danger
-              loading={isUnsharing}
-              onClick={() => handleUnshare(user._id)}
-            >
-              Unshare
-            </Button>
-          </div>
-        );
-      })}
-    </div>
-  </>
-)}
-
-
+                    return (
+                      <div
+                        key={share._id}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: 6,
+                        }}
+                      >
+                        <span>
+                          👤 User ID: {user._id} | Role: <strong>{role}</strong>
+                        </span>
+                        <Button
+                          size="small"
+                          danger
+                          loading={isUnsharing}
+                          onClick={() => handleUnshare(user._id)}
+                        >
+                          Unshare
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
         </Card>
       )}
