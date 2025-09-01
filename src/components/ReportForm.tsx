@@ -288,7 +288,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { DatePicker } from "antd";
+import { Button, DatePicker } from "antd";
 import dayjs from "dayjs";
 
 import "antd/dist/reset.css";
@@ -331,9 +331,15 @@ export interface ReportFormData {
 
 interface ReportFormProps {
   onSubmit: (formData: ReportFormData) => Promise<void>;
+  creating?: boolean;
+  onCancel?: () => void;
 }
 
-const ReportForm: React.FC<ReportFormProps> = ({ onSubmit }) => {
+const ReportForm: React.FC<ReportFormProps> = ({
+  onSubmit,
+  creating,
+  onCancel,
+}) => {
   const [overviewContent, setOverviewContent] = useState("");
   const [overviewFiles, setOverviewFiles] = useState<File[]>([]);
   const [weatherFiles, setWeatherFiles] = useState<File[]>([]);
@@ -357,6 +363,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit }) => {
   };
 
   const handleCancel = () => {
+    onCancel?.();
     reset();
     setOverviewContent("");
     setOverviewFiles([]);
@@ -406,7 +413,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit }) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmitHandler)}
-      className="max-w-3xl mx-auto bg-white rounded-md shadow-md p-6"
+      className="max-w-3xl mx-auto bg-white rounded-md"
     >
       {/* Overview */}
       <section style={sectionStyle}>
@@ -502,19 +509,20 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit }) => {
 
       {/* Actions */}
       <section className="flex justify-end gap-4">
-        <button
-          type="button"
+        <Button
           onClick={handleCancel}
-          className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-100 transition"
+          className="flex-1 h-12 px-6 bg-[#172B4D0F] rounded text-[#001D01] text-base font-medium leading-6 "
         >
           Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        </Button>
+        <Button
+          htmlType="submit"
+          type="primary"
+          className="flex-1 h-12 px-6 bg-[#001D01] rounded text-white text-base font-medium leading-6 tracking-wide"
+          loading={creating}
         >
-          Save
-        </button>
+          Create
+        </Button>
       </section>
     </form>
   );

@@ -16,11 +16,16 @@ const ProjectDefaultRedirect: React.FC = () => {
     const role = user.role as Role;
 
     // Match sidebar default page logic
-    if (([USER_ROLE.superAdmin, USER_ROLE.primeAdmin] as Role[]).includes(role)) {
- 
+    if (
+      ([USER_ROLE.superAdmin, USER_ROLE.primeAdmin] as Role[]).includes(role)
+    ) {
       navigate(`/projects/${projectId}/dashboard`, { replace: true });
-    } else if (role === USER_ROLE.client || role === USER_ROLE.basicAdmin) {
+    } else if (role === USER_ROLE.basicAdmin) {
       navigate(`/projects/${projectId}/site-pictures-reports`, {
+        replace: true,
+      });
+    } else if (role === USER_ROLE.client) {
+      navigate(`/projects/${projectId}/client-details`, {
         replace: true,
       });
     } else {

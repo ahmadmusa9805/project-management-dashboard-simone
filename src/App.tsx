@@ -1,22 +1,16 @@
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import AppRoutes from "./routes/route";
-import { useEffect } from "react";
-import { loadFromStorage } from "./Redux/features/auth/authSlice";
-
+import { rehydrateUserFromToken } from "./Redux/features/auth/authSlice";
 
 const App = () => {
+  const dispatch = useDispatch();
 
-const dispatch = useDispatch();
- useEffect(() => {
-    dispatch(loadFromStorage());
+  useEffect(() => {
+    dispatch(rehydrateUserFromToken());
   }, [dispatch]);
 
+  return <AppRoutes />;
+};
 
-  return (
-    <>
-      <AppRoutes />
-      {/* add  */}
-    </>
-  );
-}
 export default App;

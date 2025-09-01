@@ -9,8 +9,8 @@ import {
   useGetAllSitePictureFoldersQuery,
   useCreateSitePictureFolderMutation,
   useDeleteSitePictureFolderMutation,
-  useShareSitePictureFolderMutation,
-  useUnshareSitePictureFolderMutation,
+  // useShareSitePictureFolderMutation,
+  // useUnshareSitePictureFolderMutation,
 } from "../../../Redux/features/projects/project/siteReportPictures/sitePictureFolderApi";
 
 const autoCreateFolders = [
@@ -32,34 +32,14 @@ const SitePicturesReportsPage = () => {
   });
   const [createFolder] = useCreateSitePictureFolderMutation();
   const [deleteFolder] = useDeleteSitePictureFolderMutation();
-  const [shareFolder] = useShareSitePictureFolderMutation();
-  const [unshareFolder] = useUnshareSitePictureFolderMutation();
+  // const [shareFolder] = useShareSitePictureFolderMutation();
+  // const [unshareFolder] = useUnshareSitePictureFolderMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Auto-create static folders (except Report)
   useEffect(() => {
-    if (!isLoading && projectId) {
-      const dbFolders = data?.data?.filter((f: any) => f.isStatic) || [];
-      const existingTitles = dbFolders.map((f: any) => f.title);
-      const foldersToCreate = autoCreateFolders.filter(
-        (f) => !existingTitles.includes(f.title)
-      );
-
-      if (foldersToCreate.length > 0) {
-        (async () => {
-          for (const folder of foldersToCreate) {
-            await createFolder({
-              title: folder.title,
-              projectId,
-              isStatic: true,
-            });
-          }
-          if (refetch) refetch();
-        })();
-      }
-    }
-  }, [isLoading, data, projectId, createFolder, refetch]);
+    refetch();
+  }, [refetch]);
 
   const handleFolderClick = (folderId: string) => {
     navigate(`/projects/${projectId}/site-pictures-reports/${folderId}`);
@@ -88,11 +68,11 @@ const SitePicturesReportsPage = () => {
         refetch();
         break;
       case "share":
-        await shareFolder({ id: folder._id || folder.id, data: {} });
+        // await shareFolder({ id: folder._id || folder.id, data: {} });
         refetch();
         break;
       case "unshare":
-        await unshareFolder({ id: folder._id || folder.id, data: {} });
+        // await unshareFolder({ id: folder._id || folder.id, data: {} });
         refetch();
         break;
       case "edit":
@@ -109,9 +89,9 @@ const SitePicturesReportsPage = () => {
   const allFolders = [...data.data, reportFolder];
 
   return (
-    <div className="self-stretch px-8 py-6 bg-white inline-flex flex-col justify-start items-end gap-8">
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       {/* Header */}
-      <div className="self-stretch inline-flex justify-between items-center">
+      <div className="self-stretch flex justify-between items-center p-3">
         <h1 className="text-gray-950 text-2xl font-medium">
           Site Pictures & Reports
         </h1>
@@ -129,7 +109,7 @@ const SitePicturesReportsPage = () => {
           return (
             <div
               key={folder._id || folder.id}
-              className="w-80 h-28 px-3 py-8 bg-zinc-100 rounded-[3px] flex justify-between items-center gap-4 cursor-pointer hover:bg-zinc-200 transition"
+              className="w-80 h-28 px-3 py-8 bg-gray-100 rounded flex justify-between items-center gap-4 cursor-pointer transition"
             >
               <div
                 className="flex flex-col flex-1"
@@ -143,12 +123,19 @@ const SitePicturesReportsPage = () => {
                 )}
               </div>
 
-              {/* Hide ViewMoreButton for static Report folder */}
               {!(folder.isStatic && folder.id === "report") && (
                 <CustomViewMoreButton
                   items={[
+                    { key: "view quote", label: "👁️ View Quote" },
+                    { key: "edit", label: "✏️ Edit Quote" },
+                    { key: "share", label: "🔗 Share Quote" },
+                    { key: "unshare", label: "🚫 Unshare Quote" },
+                    { key: "delete", label: "🗑️ Delete Quote", danger: true },
+
+                    { label: "View", key: "view" },
                     { label: "Share", key: "share" },
                     { label: "Unshare", key: "unshare" },
+
                     // Only show Edit and Delete for non-static folders
                     ...(isStatic
                       ? []

@@ -33,6 +33,7 @@ import {
 } from "../Redux/features/projects/project/costManagenent/subContractorExpensesApi";
 import { showDeleteAlert } from "../utils/deleteAlert";
 import { errorAlert, successAlert } from "../utils/alerts";
+import { useParams } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -49,23 +50,30 @@ const ExpenseTable = ({
   isLoading = false,
   refetch,
 }: ExpenseTableProps) => {
+  const { projectId } = useParams();
   const [page, setPage] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ExpenseItem | null>(null);
   const [mode, setMode] = useState<"create" | "edit">("edit");
 
-  const [createLabourExpense] = useCreateLabourExpenseMutation();
-  const [updateLabourExpense] = useUpdateLabourExpenseMutation();
+  const [createLabourExpense, { isLoading: creatingLabour }] =
+    useCreateLabourExpenseMutation();
+  const [updateLabourExpense, { isLoading: updatingLabour }] =
+    useUpdateLabourExpenseMutation();
   const [deleteLabourExpense] = useDeleteLabourExpenseMutation();
   const [getSingleLabourExpense] = useLazyGetSingleLabourExpenseQuery();
 
-  const [createMaterialExpense] = useCreateMaterialExpenseMutation();
-  const [updateMaterialExpense] = useUpdateMaterialExpenseMutation();
+  const [createMaterialExpense, { isLoading: creatingMaterial }] =
+    useCreateMaterialExpenseMutation();
+  const [updateMaterialExpense, { isLoading: updatingMaterial }] =
+    useUpdateMaterialExpenseMutation();
   const [deleteMaterialExpense] = useDeleteMaterialExpenseMutation();
   const [getSingleMaterialExpense] = useLazyGetSingleMaterialExpenseQuery();
 
-  const [createSubContractor] = useCreateSubContractorMutation();
-  const [updateSubContractor] = useUpdateSubContractorMutation();
+  const [createSubContractor, { isLoading: creatingSub }] =
+    useCreateSubContractorMutation();
+  const [updateSubContractor, { isLoading: updatingSub }] =
+    useUpdateSubContractorMutation();
   const [deleteSubContractor] = useDeleteSubContractorMutation();
   const [getSingleSubContractor] = useLazyGetSingleSubContractorQuery();
 
@@ -131,6 +139,7 @@ const ExpenseTable = ({
 
       const dataToSend = {
         ...restData,
+        projectId: projectId!,
         days: Number(restData.days) || 0,
         ratePerDay: Number(restData.ratePerDay) || 0,
         vat: restData.vat !== undefined ? Number(restData.vat) : 0,
@@ -292,6 +301,20 @@ const ExpenseTable = ({
       >
         <ExpenseForm
           mode={mode}
+          creating={
+            title === "Labour"
+              ? creatingLabour
+              : title === "Material"
+              ? creatingMaterial
+              : creatingSub
+          }
+          updating={
+            title === "Labour"
+              ? updatingLabour
+              : title === "Material"
+              ? updatingMaterial
+              : updatingSub
+          }
           title={title}
           defaultValues={
             editingItem

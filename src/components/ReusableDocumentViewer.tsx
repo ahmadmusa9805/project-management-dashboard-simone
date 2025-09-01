@@ -1,149 +1,99 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
+import type React from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../Redux/app/store";
+import { Download, FileText } from "lucide-react";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+interface ReusableDocumentViewerProps {
+  quoteTitle?: string;
+}
 
-const ReusableDocumentViewer: React.FC = () => {
+const ReusableDocumentViewer: React.FC<ReusableDocumentViewerProps> = () => {
   const fileUrl = useSelector((state: RootState) => state.document.currentFile);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [scale, setScale] = useState(1.0);
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const isPdf = fileUrl?.endsWith(".pdf");
-
-  useEffect(() => {
-    if (!fileUrl || !isPdf) return;
-
-    setLoading(true);
-    fetch(fileUrl)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch PDF");
-        return res.blob();
-      })
-      .then((blob) => {
-        const blobURL = URL.createObjectURL(blob);
-        setBlobUrl(blobURL);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("PDF loading error:", err);
-        setBlobUrl(null);
-        setLoading(false);
-      });
-
-    return () => {
-      if (blobUrl) URL.revokeObjectURL(blobUrl);
-    };
-  }, [fileUrl]);
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    setPageNumber(1);
-  };
 
   const handleDownload = () => {
     if (fileUrl) {
       const link = document.createElement("a");
       link.href = fileUrl;
-      link.download = fileUrl.split("/").pop() || "document.pdf";
+      link.download = fileUrl.split("/").pop() || "document";
       link.click();
     }
   };
 
+  // Detect file type
+  const isPdf = fileUrl?.toLowerCase().endsWith(".pdf");
+  const isImage = fileUrl?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/);
+
   return (
-    <div className=" p-6 bg-gradient-to-r from-slate-800 to-slate-900 shadow-lg rounded-xl">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-white text-xl font-semibold truncate">
-          {fileUrl ? fileUrl.split("/").pop() : "No File Selected"}
-        </h2>
-        <div className="flex gap-2">
-          <button
-            onClick={handleDownload}
-            className="bg-blue-600 text-white px-4 py-1.5 rounded hover:bg-blue-700 transition"
-          >
-            ⬇️ Download
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="bg-green-600 text-white px-4 py-1.5 rounded hover:bg-green-700 transition"
-          >
-            🖨️ Print
-          </button>
+    <>
+      {/* Add print styles to hide modal elements when printing */}
+      <style>{`
+        @media print {
+          .print-hide {
+            display: none !important;
+          }
+          .print-content {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: white !important;
+          }
+        }
+      `}</style>
+
+      <div className="bg-white">
+        <div className="p-6 bg-gray-50 min-h-[600px] flex justify-center items-center print-content">
+          {!fileUrl ? (
+            <div className="text-center py-12 print-hide">
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 text-lg mb-2">No file selected</p>
+              <p className="text-gray-400 text-sm">
+                Select a document to preview it here
+              </p>
+            </div>
+          ) : isPdf ? (
+            <div className="w-full max-w-4xl">
+              <iframe
+                src={fileUrl}
+                title="PDF Preview"
+                className="w-full h-[600px] rounded-lg shadow-lg border border-gray-200 bg-white print:rounded-none print:shadow-none print:border-none print:h-screen"
+              />
+            </div>
+          ) : isImage ? (
+            <div className="max-w-4xl max-h-[600px] overflow-auto">
+              <img
+                src={fileUrl || "/placeholder.svg"}
+                alt="Document Preview"
+                className="max-w-full h-auto rounded-lg shadow-lg border border-gray-200 print:rounded-none print:shadow-none print:border-none"
+              />
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-yellow-600" />
+              </div>
+              <p className="text-gray-600 text-lg mb-2">
+                Preview not available
+              </p>
+              <p className="text-gray-400 text-sm">
+                This file type cannot be previewed
+              </p>
+              <button
+                onClick={handleDownload}
+                className="mt-4 flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 mx-auto"
+              >
+                <Download className="w-4 h-4" />
+                Download to view
+              </button>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Toolbar */}
-      <div className="flex items-center justify-between text-white mb-4 bg-slate-700 px-4 py-2 rounded-md">
-        <div className="flex gap-4 items-center">
-          <button
-            disabled={pageNumber <= 1}
-            onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
-            className="hover:text-yellow-400 disabled:opacity-40"
-          >
-            ⬅️ Prev
-          </button>
-
-          <span className="text-sm font-medium">
-            Page {pageNumber} of {numPages ?? "..."}
-          </span>
-
-          <button
-            disabled={numPages !== null && pageNumber >= numPages}
-            onClick={() =>
-              setPageNumber((prev) => (numPages ? Math.min(prev + 1, numPages) : prev))
-            }
-            className="hover:text-yellow-400 disabled:opacity-40"
-          >
-            Next ➡️
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setScale((s) => Math.max(0.5, s - 0.1))}
-            className="text-xl hover:text-yellow-400"
-          >
-            ➖
-          </button>
-          <span className="text-sm">{Math.round(scale * 100)}%</span>
-          <button
-            onClick={() => setScale((s) => Math.min(2, s + 0.1))}
-            className="text-xl hover:text-yellow-400"
-          >
-            ➕
-          </button>
-        </div>
-      </div>
-
-      {/* Document Viewer */}
-      <div className="bg-white p-4 rounded-md shadow-inner flex justify-center items-center min-h-[500px]">
-        {loading ? (
-          <p className="text-black text-lg">Loading PDF…</p>
-        ) : blobUrl && isPdf ? (
-          <Document
-            file={blobUrl}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={(err) => console.error("Document error:", err)}
-          >
-            <Page pageNumber={pageNumber} scale={scale} />
-          </Document>
-        ) : fileUrl ? (
-          <img
-            src={fileUrl}
-            alt="Preview"
-            className="max-h-[500px] rounded-lg shadow"
-          />
-        ) : (
-          <p className="text-white text-lg">No document to preview.</p>
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 

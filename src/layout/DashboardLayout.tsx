@@ -39,6 +39,7 @@ const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const { projectId } = useParams();
   const user = useSelector((state: RootState) => state.auth.user);
+  console.log("user from layout:", user?.role);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const { data: userInfo, isLoading: userLoading } = useGetMeUserQuery();
   const path = location.pathname;

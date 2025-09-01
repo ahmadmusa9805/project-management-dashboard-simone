@@ -9,7 +9,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ title, size }) => {
   // Define dropdown actions
 
   return (
-    <div className="p-4 bg-[#F1F1F1] rounded border border-[#E6E7E7] flex flex-col items-start gap-4">
+    <div className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between">
       {/* Top Row */}
       <div className="w-[151px] flex justify-between items-start">
         {/* Icon (mock) */}

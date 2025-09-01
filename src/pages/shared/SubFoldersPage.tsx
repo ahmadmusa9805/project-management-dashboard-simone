@@ -338,7 +338,7 @@ const SubFoldersPage: React.FC<SubFoldersPageProps> = ({
   }
 
   return (
-    <div className="w-full h-full p-6">
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { AuthResponse,  User } from "./auth.types";
-import { jwtDecode } from "jwt-decode"; // ✅ Correct import
+import type { AuthResponse, User } from "./auth.types";
+import { jwtDecode } from "jwt-decode";
 
 interface JwtPayload {
   userEmail: string;
@@ -13,13 +13,11 @@ interface JwtPayload {
 interface AuthState {
   user: User | null;
   token: string | null;
-  // <-- add this line
 }
 
 const initialState: AuthState = {
   user: null,
   token: null,
-    // <-- add initial value
 };
 
 const authSlice = createSlice({
@@ -28,48 +26,34 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (state, action: PayloadAction<AuthResponse>) => {
       const { accessToken } = action.payload;
-
-      const decoded = jwtDecode<JwtPayload>(accessToken);
-      console.log("🔍 Decoded JWT Payload:", decoded);
-      // ✅ Correct usage
-      const user: User = {
-        email: decoded.userEmail,
-        role: decoded.role,
-      };
-      console.log(user)
-
       state.token = accessToken;
-      state.user = user;
 
-      localStorage.setItem("token", accessToken);
-      localStorage.setItem("role", user.role);
-      localStorage.setItem("user", JSON.stringify(user));
+      try {
+        const decoded = jwtDecode<JwtPayload>(accessToken);
+        console.log("Decoded JWT:", decoded);
+        state.user = { email: decoded.userEmail, role: decoded.role };
+      } catch {
+        state.user = null;
+      }
     },
-
-    
-
     clearCredentials: (state) => {
       state.token = null;
       state.user = null;
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-   
-      localStorage.removeItem("resetToken");
     },
-
-    loadFromStorage: (state) => {
-      const token = localStorage.getItem("token");
-      const user = localStorage.getItem("user");
-       
-     
-
-      if (token && user) {
-        state.token = token;
-        state.user = JSON.parse(user);
+    rehydrateUserFromToken: (state) => {
+      if (state.token) {
+        try {
+          const decoded = jwtDecode<JwtPayload>(state.token);
+          state.user = { email: decoded.userEmail, role: decoded.role };
+        } catch {
+          state.user = null; // invalid/expired token in storage
+          state.token = null;
+        }
       }
     },
   },
 });
 
-export const { setCredentials, clearCredentials, loadFromStorage, } = authSlice.actions;
+export const { setCredentials, clearCredentials, rehydrateUserFromToken } =
+  authSlice.actions;
 export default authSlice.reducer;

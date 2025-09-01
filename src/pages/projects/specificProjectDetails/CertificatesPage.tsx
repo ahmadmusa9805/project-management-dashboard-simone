@@ -168,6 +168,8 @@
 
 // export default CertificatesPage;
 
+//TODO: Refactor and clean up the above code if needed
+
 import type React from "react";
 import { useState } from "react";
 import { Modal, Spin, message } from "antd";
@@ -289,6 +291,9 @@ const CertificatesPage: React.FC = () => {
     setUnshareModalOpen(true);
   };
 
+  const handleView = (id: any) => {
+    console.log(id);
+  };
   // ✅ Confirm Unshare
   const handleConfirmUnshare = async (selectedUsers: SharedUser[]) => {
     const data = selectedUsers.map((u) => u.userId);
@@ -307,107 +312,114 @@ const CertificatesPage: React.FC = () => {
 
   return (
     <>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Certificates</h1>
-        <CustomCreateButton
-          title="Add Certificate"
-          onClick={() => {
-            setEditingCert(null);
-            setDrawerOpen(true);
-          }}
-        />
-      </div>
-
-      {/* Loading spinner */}
-      {certificatesLoading ? (
-        <div className="flex justify-center items-center h-40">
-          <Spin size="large" />
+      <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+        {" "}
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-semibold">Certificates</h1>
+          <CustomCreateButton
+            title="Add Certificate"
+            onClick={() => {
+              setEditingCert(null);
+              setDrawerOpen(true);
+            }}
+          />
         </div>
-      ) : (
-        <div className="w-full p-5 flex flex-wrap gap-4 items-start justify-start">
-          {certificatesData?.data?.map((cert: any) => (
-            <div key={cert._id} className="relative">
-              <CertificateCard title={cert.title} size={``} />
-              <div className="absolute top-2 right-2">
-                <CustomViewMoreButton
-                  items={[
-                    { key: "edit", label: "✏️ Edit" },
-                    { key: "share", label: "🔗 Share" },
-                    { key: "unshare", label: "🚫 Unshare" },
-                    { key: "delete", label: "🗑️ Delete", danger: true },
-                  ]}
-                  onClick={(key) => {
-                    if (key === "edit") {
-                      setEditingCert(cert);
-                      setDrawerOpen(true);
-                    }
-                    if (key === "delete") handleDeleteCertificate(cert._id);
-                    if (key === "share") handleShareCertificate(cert);
-                    if (key === "unshare") handleUnShareCertificate(cert._id);
-                  }}
-                />
+        {/* Loading spinner */}
+        {certificatesLoading ? (
+          <div className="flex justify-center items-center h-40">
+            <Spin size="large" />
+          </div>
+        ) : (
+          <div className="w-full p-5 flex flex-wrap gap-4 items-start justify-start">
+            {certificatesData?.data?.map((cert: any) => (
+              <div className="">
+                <div key={cert._id} className="relative ">
+                  <CertificateCard title={cert.title} size={``} />
+                  <div className="absolute top-2 right-2">
+                    <CustomViewMoreButton
+                      items={[
+                        { key: "view", label: "👀 View Certificate" },
+                        { key: "edit", label: "✏️ Edit Certificate" },
+                        { key: "share", label: "🔗 Share Certificate" },
+                        { key: "unshare", label: "🚫 Unshare Certificate" },
+                        {
+                          key: "delete",
+                          label: "🗑️ Delete Certificate",
+                          danger: true,
+                        },
+                      ]}
+                      onClick={(key) => {
+                        if (key === "edit") {
+                          setEditingCert(cert);
+                          setDrawerOpen(true);
+                        }
+                        if (key === "delete") handleDeleteCertificate(cert._id);
+                        if (key === "share") handleShareCertificate(cert);
+                        if (key === "unshare")
+                          handleUnShareCertificate(cert._id);
+                        if (key === "view") handleView(cert._id);
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Drawer for Image Uploader */}
-      <Modal
-        title={editingCert ? "Update Certificate" : "Add New Certificate"}
-        open={drawerOpen}
-        onCancel={() => {
-          setDrawerOpen(false);
-          setEditingCert(null);
-        }}
-        footer={null}
-        width={500}
-      >
-        <ImageUploader onUploadSuccess={handleUploadSuccess} />
-      </Modal>
-
-      {/* Modal for Sharing */}
-      <Modal
-        title="Share Certificate"
-        open={shareModalOpen}
-        onCancel={() => {
-          setShareModalOpen(false);
-          setShareCert(null);
-        }}
-        footer={null}
-        width={500}
-      >
-        <CustomShareSelector
-          title="Share this certificate"
-          roles={["prime-admin", "basic-admin", "client"]}
-          onShare={handleConfirmShare}
-        />
-      </Modal>
-
-      {/* Modal for Unsharing */}
-      <Modal
-        title="Unshare Certificate"
-        open={unshareModalOpen}
-        onCancel={() => {
-          setUnshareModalOpen(false);
-          setSelectedCertId(null);
-        }}
-        footer={null}
-        width={500}
-      >
-        <CustomUnshareSelector
-          title="Remove access from users"
-          sharedUsers={(singleCertData?.sharedWith || []).map((u: any) => ({
-            userId: u.userId._id,
-            name: u.userId.name,
-            role: u.userId.role,
-            email: u.userId.email || "",
-            profileImg: u.userId.profileImg,
-          }))}
-          onUnshare={handleConfirmUnshare}
-        />
-      </Modal>
+            ))}
+          </div>
+        )}
+        {/* Drawer for Image Uploader */}
+        <Modal
+          title={editingCert ? "Update Certificate" : "Add New Certificate"}
+          open={drawerOpen}
+          onCancel={() => {
+            setDrawerOpen(false);
+            setEditingCert(null);
+          }}
+          footer={null}
+          width={500}
+        >
+          <ImageUploader onUploadSuccess={handleUploadSuccess} />
+        </Modal>
+        {/* Modal for Sharing */}
+        <Modal
+          title="Share Certificate"
+          open={shareModalOpen}
+          onCancel={() => {
+            setShareModalOpen(false);
+            setShareCert(null);
+          }}
+          footer={null}
+          width={500}
+        >
+          <CustomShareSelector
+            title="Share this certificate"
+            roles={["prime-admin", "basic-admin", "client"]}
+            onShare={handleConfirmShare}
+          />
+        </Modal>
+        {/* Modal for Unsharing */}
+        <Modal
+          title="Unshare Certificate"
+          open={unshareModalOpen}
+          onCancel={() => {
+            setUnshareModalOpen(false);
+            setSelectedCertId(null);
+          }}
+          footer={null}
+          width={500}
+        >
+          <CustomUnshareSelector
+            title="Remove access from users"
+            sharedUsers={(singleCertData?.sharedWith || []).map((u: any) => ({
+              userId: u.userId._id,
+              name: u.userId.name,
+              role: u.userId.role,
+              email: u.userId.email || "",
+              profileImg: u.userId.profileImg,
+            }))}
+            onUnshare={handleConfirmUnshare}
+          />
+        </Modal>
+      </div>
     </>
   );
 };

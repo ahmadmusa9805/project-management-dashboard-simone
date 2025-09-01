@@ -1,6 +1,4 @@
-// reportApi.ts
-// Adjust import path as needed
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "../../../../app/api/baseApi";
 
 export interface SiteReport {
@@ -14,6 +12,7 @@ export interface SiteReport {
   workingDays?: string[];
   LaborTeam?: string[];
   isShared: boolean;
+  sharedWith?: any[]; // Add this field to match the expected response
   createdAt: string;
   updatedAt: string;
 }
@@ -102,21 +101,27 @@ export const reportApi = baseApi.injectEndpoints({
       invalidatesTags: ["SiteReports"],
     }),
 
-    shareSiteReport: build.mutation<void, string>({
-      query: (id) => ({
+    // ✅ Fixed: Accept object with id and sharedWith array
+    shareSiteReport: build.mutation<void, { id: string; sharedWith: any[] }>({
+      query: ({ id, sharedWith }) => ({
         url: `/site-reports/${id}/share`,
         method: "POST",
+        body: { sharedWith },
       }),
       invalidatesTags: ["SiteReports"],
     }),
 
-    unshareSiteReport: build.mutation<void, string>({
-      query: (id) => ({
-        url: `/site-reports/${id}/unshare`,
-        method: "POST",
-      }),
-      invalidatesTags: ["SiteReports"],
-    }),
+    // ✅ Fixed: Accept object with id and unShareWith array
+    unshareSiteReport: build.mutation<void, { id: string; unShareWith: any[] }>(
+      {
+        query: ({ id, unShareWith }) => ({
+          url: `/site-reports/${id}/unshare`,
+          method: "POST",
+          body: { unShareWith },
+        }),
+        invalidatesTags: ["SiteReports"],
+      }
+    ),
   }),
 });
 

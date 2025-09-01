@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 
 interface TaskScheduleFormProps {
@@ -11,6 +11,7 @@ interface TaskScheduleFormProps {
     endDate?: string;
     description?: string;
     completed?: boolean;
+    file?: File | null;
   } | null;
   onCancel: () => void;
   onSubmit: (formData: any) => void;
@@ -23,10 +24,16 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
   onCancel,
   onSubmit,
 }) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(
+    initialData?.file || null
+  );
+  const [dragOver, setDragOver] = useState(false);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({
     defaultValues: {
       title: initialData?.title || "",
@@ -34,8 +41,33 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
       endDate: initialData?.endDate || "",
       description: initialData?.description || "",
       completed: initialData?.completed || false,
+      file: initialData?.file || null,
     },
   });
+
+  const handleFileChange = (file: File) => {
+    setSelectedFile(file);
+    setValue("file", file);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileChange(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+  };
 
   return (
     <form
@@ -69,16 +101,60 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
         )}
       </div>
 
-      {/* Upload Placeholder */}
-      <div className="w-full border-2 border-dashed border-gray-300 rounded px-4 py-6 flex flex-col justify-center items-center gap-4">
-        <div className="w-6 h-6 relative">
-          <div className="absolute w-[22px] h-[15px] left-[2px] top-[2px] bg-gray-500 rounded-sm"></div>
-          <div className="absolute w-[2px] h-[11px] left-[11px] top-[11px] bg-gray-500"></div>
-          <div className="absolute w-[10px] h-[6px] left-[7px] top-[11px] bg-gray-500"></div>
+      {/* File Upload */}
+      <div>
+        <label className="block text-xs font-semibold text-[#2B3738] mb-1 tracking-wide">
+          File Attachment
+        </label>
+        <div
+          className={`w-full border-2 border-dashed rounded px-4 py-6 flex flex-col justify-center items-center gap-4 cursor-pointer
+            ${dragOver ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={() => document.getElementById("file-input")?.click()}
+        >
+          <div className="w-6 h-6 relative">
+            <div className="absolute w-[22px] h-[15px] left-[2px] top-[2px] bg-gray-500 rounded-sm"></div>
+            <div className="absolute w-[2px] h-[11px] left-[11px] top-[11px] bg-gray-500"></div>
+            <div className="absolute w-[10px] h-[6px] left-[7px] top-[11px] bg-gray-500"></div>
+          </div>
+          <p className="text-[#2B3738] text-base font-medium">
+            {selectedFile
+              ? selectedFile.name
+              : "Upload file or drag & drop here"}
+          </p>
+          <p className="text-sm text-gray-500">
+            {selectedFile
+              ? `Size: ${Math.round(selectedFile.size / 1024)} KB`
+              : "Supports JPG, PNG, PDF up to 10MB"}
+          </p>
+
+          <input
+            id="file-input"
+            type="file"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                handleFileChange(e.target.files[0]);
+              }
+            }}
+          />
         </div>
-        <p className="text-[#2B3738] text-base font-medium">
-          Upload file or drag & drop here
-        </p>
+        {selectedFile && (
+          <div className="mt-2 flex items-center">
+            <button
+              type="button"
+              className="text-red-600 text-sm"
+              onClick={() => {
+                setSelectedFile(null);
+                setValue("file", null);
+              }}
+            >
+              Remove file
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Start & End Date – Always Visible */}

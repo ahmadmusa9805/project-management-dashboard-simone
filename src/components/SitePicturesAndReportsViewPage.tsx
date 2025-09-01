@@ -515,7 +515,7 @@
 
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Drawer, message } from "antd";
+import { Drawer, message, Spin } from "antd";
 import CustomCreateButton from "./CustomCreateButton";
 import ReportForm from "./ReportForm";
 import ImageUploader from "./ImageUploader";
@@ -539,6 +539,7 @@ import {
 
 import { showDeleteAlert } from "../utils/deleteAlert";
 import type { ReportFormData } from "./ReportForm";
+import { errorAlert, successAlert } from "../utils/alerts";
 
 const SitePicturesAndReportsViewPage: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -559,12 +560,14 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
     { skip: isReport }
   );
 
-  const [createSitePictureImage] = useCreateSitePictureImageMutation();
+  const [createSitePictureImage, { isLoading: isLoadingUpload }] =
+    useCreateSitePictureImageMutation();
   const [updateSitePictureImage] = useUpdateSitePictureImageMutation(); // Reports
 
   const { data: reportsData, isLoading: isLoadingReports } =
     useGetSiteReportsQuery(projectId as string, { skip: !isReport });
-  const [createSiteReport] = useCreateSiteReportMutation();
+  const [createSiteReport, { isLoading: isLoadingCreateReport }] =
+    useCreateSiteReportMutation();
   const [deleteSiteReport] = useDeleteSiteReportMutation(); // Pictures transform
 
   const pictures = (imagesData?.data || []).reduce((acc: any[], group: any) => {
@@ -595,10 +598,10 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
     });
     try {
       await createSitePictureImage(formData).unwrap();
-      message.success(`${fileList.length} image(s) uploaded successfully!`);
+      successAlert(`${fileList.length} image(s) uploaded successfully!`);
     } catch (err) {
       console.error("Failed to upload images:", err);
-      message.error("Image upload failed. Please try again.");
+      errorAlert("Image upload failed. Please try again.");
     }
   };
 
@@ -640,65 +643,8 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
     }
   };
 
-  // const handleUpdatePicture = (recordId: string, fileUrl: string) => {
-  //   console.log("Update called for recordId:", recordId, "fileUrl:", fileUrl);
-
-  //   // Add fileUrl parameter
-  //   showDeleteAlert({
-  //     title: "Are you sure you want to delete this image?",
-  //     text: "This will only delete the selected image, not the entire batch.",
-  //     onConfirm: async () => {
-  //       try {
-  //         const parentRecord = imagesData?.data.find(
-  //           (record: any) => record._id === recordId
-  //         );
-
-  //         console.log("Parent record found:", parentRecord);
-  //         if (parentRecord) {
-  //           // 1. Remove the deleted image
-  //           const updatedFiles = parentRecord.file.filter(
-  //             (file: string) => file !== fileUrl
-  //           );
-
-  //           if (updatedFiles.length === 0) {
-  //             // Case: all images removed
-  //             message.info(
-  //               "Last image in the batch. Please reload to see changes."
-  //             );
-  //           } else {
-  //             // 2. Send updated array to backend
-  //             const formData = new FormData();
-
-  //             console.log("Updated files:", updatedFiles);
-  //             // Append each file individually
-  //             updatedFiles.forEach((file: string) => {
-  //               formData.append("file", file);
-  //             });
-
-  //             // Or if your API expects a different format, you might need to stringify
-  //             // formData.append("files", JSON.stringify(updatedFiles));
-
-  //             await updateSitePictureImage({
-  //               id: recordId,
-  //               data: formData,
-  //             }).unwrap();
-
-  //             message.success("Image deleted successfully!");
-  //           }
-  //         } else {
-  //           message.error("Could not find the image record.");
-  //         }
-  //       } catch (err) {
-  //         console.error("Failed to delete image:", err);
-  //         message.error("Could not delete the image.");
-  //       }
-  //     },
-  //   });
-  // };
-
   const handleUpdatePicture = (recordId: string, fileUrl: string) => {
     showDeleteAlert({
-      // ...
       onConfirm: async () => {
         try {
           const parentRecord = imagesData?.data.find(
@@ -710,17 +656,15 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
               (file: string) => file !== fileUrl
             );
 
-            // 1. Prepare the JSON data
-            const dataToUpdate = { file: updatedFiles };
+            const formData = new FormData();
+            formData.append("data", JSON.stringify({ file: updatedFiles }));
 
-            // 2. Call the mutation with the new JSON payload
             await updateSitePictureImage({
               id: recordId,
-              data: dataToUpdate,
+              data: formData,
             }).unwrap();
 
             message.success("Image deleted successfully!");
-            // You might need to refetch data to update the UI
           } else {
             message.error("Could not find the image record.");
           }
@@ -752,7 +696,7 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
 
   console.log(reportsData); // Render
   return (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
            {" "}
       <div className="flex justify-between items-center mb-4">
                {" "}
@@ -775,9 +719,16 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
       >
                {" "}
         {isReport ? (
-          <ReportForm onSubmit={handleReportCreate} />
+          <ReportForm
+            creating={isLoadingCreateReport}
+            onSubmit={handleReportCreate}
+            onCancel={handleCloseDrawer}
+          />
         ) : (
-          <ImageUploader onUploadSuccess={handleImageUpload} />
+          <ImageUploader
+            uploading={isLoadingUpload}
+            onUploadSuccess={handleImageUpload}
+          />
         )}
              {" "}
       </Drawer>
@@ -786,7 +737,9 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow w-full">
                    {" "}
           {isLoadingReports ? (
-            <p>Loading reports...</p>
+            <p>
+              <Spin></Spin>
+            </p>
           ) : reportsData?.length ? (
             <SiteReportsList
               reports={reportsData}

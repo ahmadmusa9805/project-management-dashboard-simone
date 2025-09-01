@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { buildFormData } from "../../../../../utils/buildFormData";
 import { baseApi } from "../../../../app/api/baseApi";
 
 export const quoteApi = baseApi.injectEndpoints({
@@ -20,16 +21,22 @@ export const quoteApi = baseApi.injectEndpoints({
 
     createQuote: builder.mutation<any, any>({
       query: (data) => {
-        const formData = new FormData();
-        formData.append("file", data.file);
-        formData.append(
-          "data",
-          JSON.stringify({
-            title: data.title,
-            projectId: data.projectId,
-            value: data.amount,
-          })
-        );
+        const formData = buildFormData({
+          file: data.file,
+          title: data.title,
+          projectId: data.projectId,
+          value: data.amount,
+        });
+        // const formData = new FormData();
+        // formData.append("file", data.file);
+        // formData.append(
+        //   "data",
+        //   JSON.stringify({
+        //     title: data.title,
+        //     projectId: data.projectId,
+        //     value: data.amount,
+        //   })
+        // );
         return {
           url: "/quotes/create-quote",
           method: "POST",
@@ -41,16 +48,12 @@ export const quoteApi = baseApi.injectEndpoints({
 
     updateQuote: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => {
-        const formData = new FormData();
-        formData.append("file", data.file);
-        formData.append(
-          "data",
-          JSON.stringify({
-            title: data.title,
-            projectId: data.projectId,
-            value: data.amount,
-          })
-        );
+        const formData = buildFormData({
+          file: data.file,
+          title: data.title,
+          projectId: data.projectId,
+          value: data.amount,
+        });
         return {
           url: `/quotes/${id}`,
           method: "PATCH",

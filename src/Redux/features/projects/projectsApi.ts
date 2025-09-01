@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "../../app/api/baseApi";
 export type SharedUser = { userId: string; role: string };
 export const projectsApi = baseApi.injectEndpoints({
@@ -45,31 +46,29 @@ export const projectsApi = baseApi.injectEndpoints({
       invalidatesTags: ["Projects"],
     }),
 
- shareProject: builder.mutation<
-  any, // or the response type
-  { id: string; sharedWith: SharedUser[] }
->({
-  query: ({ id, sharedWith }) => ({
-    url: `/projects/${id}/share`,
-    method: "POST",
-    body: { sharedWith },
-  }),
-  invalidatesTags: ["Projects"],
-}),
+    shareProject: builder.mutation<
+      any, // or the response type
+      { id: string; sharedWith: SharedUser[] }
+    >({
+      query: ({ id, sharedWith }) => ({
+        url: `/projects/${id}/share`,
+        method: "POST",
+        body: { sharedWith },
+      }),
+      invalidatesTags: ["Projects"],
+    }),
 
-unShareProject: builder.mutation<
-  any, // Response type
-  { id: string; userId: string } // Argument type
->({
-  query: ({ id, userId }) => ({
-    url: `/projects/${id}/unshare`,
-    method: "POST",
-    body: { userId },
-  }),
-  invalidatesTags: ["Projects"],
-}),
-
-
+    unShareProject: builder.mutation<
+      any, // Response type
+      { id: string; userId: string } // Argument type
+    >({
+      query: ({ id, userId }) => ({
+        url: `/projects/${id}/unshare`,
+        method: "POST",
+        body: { userId },
+      }),
+      invalidatesTags: ["Projects"],
+    }),
   }),
 });
 
@@ -80,5 +79,5 @@ export const {
   useUpdateProjectMutation,
   useDeleteProjectMutation,
   useShareProjectMutation,
-  useUnShareProjectMutation
+  useUnShareProjectMutation,
 } = projectsApi;

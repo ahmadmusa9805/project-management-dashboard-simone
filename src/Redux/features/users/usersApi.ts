@@ -48,11 +48,9 @@ import type { SingleUserResponse, User, UserApiResponse } from "./users.types";
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUsers: builder.query<UserApiResponse, { status?: string }>({
-      query: ({ status }) => {
-        const params = new URLSearchParams();
-        params.append("sort", "-createdAt");
-        if (status) params.append("status", status);
-        return `/users?${params.toString()}`;
+      query: (params) => {
+        const queryString = params?.status ? `?status=${params.status}` : "";
+        return `/users${queryString}`;
       },
       transformResponse: (response: any) => response,
       providesTags: ["Users"],

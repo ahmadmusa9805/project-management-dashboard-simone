@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import type {
   ExpenseItem,
   ExpenseType,
@@ -10,6 +10,7 @@ import { useGetAllMaterialExpensesQuery } from "../../../Redux/features/projects
 import { useGetAllSubContractorsQuery } from "../../../Redux/features/projects/project/costManagenent/subContractorExpensesApi";
 
 const ExpenseDocumentsPage = () => {
+  const { projectId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -24,9 +25,9 @@ const ExpenseDocumentsPage = () => {
   const { quoteTitle, expenseType } = state;
 
   // Queries
-  const subcontractorRes = useGetAllSubContractorsQuery(undefined);
-  const labourRes = useGetAllLabourExpensesQuery(undefined);
-  const materialRes = useGetAllMaterialExpensesQuery(undefined);
+  const subcontractorRes = useGetAllSubContractorsQuery({ projectId });
+  const labourRes = useGetAllLabourExpensesQuery({ projectId });
+  const materialRes = useGetAllMaterialExpensesQuery({ projectId });
   // const subcontractorRes = useGetAllSubContractorsQuery({ projectId });
   // const labourRes = useGetAllLabourExpensesQuery({ projectId });
   // const materialRes = useGetAllMaterialExpensesQuery({ projectId });
@@ -35,6 +36,8 @@ const ExpenseDocumentsPage = () => {
   let isLoading = false;
   let isError = false;
   let refetchFn: (() => void) | undefined;
+
+  console.log("Expense Type:", subcontractorRes);
 
   switch (expenseType) {
     case "Labour":
@@ -63,7 +66,7 @@ const ExpenseDocumentsPage = () => {
   if (isError) return <div>Error loading expenses.</div>;
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">{quoteTitle}</h1>
         <button

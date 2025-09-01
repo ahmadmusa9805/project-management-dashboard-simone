@@ -207,14 +207,19 @@
 // };
 
 // export default InterimEvaluationPage;
-
+// TODO: review and clean up the code above if needed
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Modal, Spin } from "antd";
+
 import CustomCreateButton from "../../../components/CustomCreateButton";
 import CustomSearchInput from "../../../components/CustomSearchInput";
 import ResuableDocumentForm from "../../../components/ResuableDocumentForm";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
+import CustomShareSelector from "../../../components/CustomShareSelector";
+import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
 
 import {
   useGetAllInterimsQuery,
@@ -222,9 +227,12 @@ import {
   useUpdateInterimMutation,
   useDeleteInterimMutation,
   useShareInterimMutation,
+  useUnShareInterimMutation,
+  useGetSingleInterimQuery,
 } from "../../../Redux/features/projects/project/interim/interimApi";
+
+import type { SharedUser } from "../../../Redux/features/projects/projectsApi";
 import { errorAlert, successAlert } from "../../../utils/alerts";
-import { showDeleteAlert } from "../../../utils/deleteAlert";
 
 interface DocumentType {
   _id: string;
@@ -235,27 +243,39 @@ interface DocumentType {
   file?: any;
 }
 
-const InterimEvaluationPage = () => {
+const InterimEvaluationPage: React.FC = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
 
   // API hooks
-  const { data: documentsFromApi = [], refetch } = useGetAllInterimsQuery(
+  const { data: documentsFromApi = [], isLoading } = useGetAllInterimsQuery(
     projectId ? { projectId } : undefined
   );
-  const [createInterim] = useCreateInterimMutation();
-  const [updateInterim] = useUpdateInterimMutation();
+  const [createInterim, { isLoading: creating }] = useCreateInterimMutation();
+  const [updateInterim, { isLoading: updating }] = useUpdateInterimMutation();
   const [deleteInterim] = useDeleteInterimMutation();
   const [shareInterim] = useShareInterimMutation();
+  const [unShareInterim] = useUnShareInterimMutation();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [editDoc, setEditDoc] = useState<DocumentType | null>(null);
 
-  // Local documents state to show updated list immediately
+  // Local documents state
   const [documents, setDocuments] = useState<DocumentType[]>([]);
 
-  // Sync local state with API data when fetched or refetched
+  // Share modal state
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareDoc, setShareDoc] = useState<DocumentType | null>(null);
+
+  // Unshare modal state
+  const [unshareModalOpen, setUnshareModalOpen] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
+  const { data: singleInterimData } = useGetSingleInterimQuery(selectedDocId!, {
+    skip: !selectedDocId,
+  });
+
+  // Sync local state with API
   useEffect(() => {
     if (Array.isArray(documentsFromApi)) {
       setDocuments(documentsFromApi);
@@ -275,58 +295,76 @@ const InterimEvaluationPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    showDeleteAlert({
-      onConfirm: async () => {
-        try {
-          await deleteInterim(id).unwrap();
-          successAlert("Interim deleted successfully.");
-          refetch();
-        } catch (error) {
-          errorAlert("Failed to delete interim.");
-        }
-      },
-    });
+    try {
+      await deleteInterim(id).unwrap();
+      successAlert("Interim deleted successfully.");
+    } catch (error) {
+      errorAlert("Failed to delete interim.");
+    }
   };
 
-  const handleShare = async (doc: DocumentType) => {
+  // ✅ Open Share Modal
+  const handleShareInterim = (doc: DocumentType) => {
+    setShareDoc(doc);
+    setShareModalOpen(true);
+  };
+
+  // ✅ Confirm Share
+  const handleConfirmShare = async (selectedUsers: SharedUser[]) => {
     try {
-      // Example: share with dummy users, adjust as per your real sharedWith data
       await shareInterim({
-        id: doc._id,
-        sharedWith: ["user1", "user2"],
+        id: shareDoc!._id,
+        sharedWith: selectedUsers,
       }).unwrap();
-      successAlert(`Shared "${doc.title}" successfully.`);
-      refetch();
-    } catch {
-      errorAlert("Failed to share interim.");
+      successAlert("Interim shared successfully");
+      setShareModalOpen(false);
+      setShareDoc(null);
+    } catch (error) {
+      errorAlert("Failed to share interim");
+    }
+  };
+
+  // ✅ Open Unshare Modal
+  const handleUnshareInterim = (id: string) => {
+    setSelectedDocId(id);
+    setUnshareModalOpen(true);
+  };
+
+  // ✅ Confirm Unshare
+  const handleConfirmUnshare = async (selectedUsers: SharedUser[]) => {
+    try {
+      await unShareInterim({
+        id: selectedDocId!,
+        unShareWith: selectedUsers.map((u) => u.userId),
+      }).unwrap();
+      successAlert("Interim unshared successfully");
+      setUnshareModalOpen(false);
+      setSelectedDocId(null);
+    } catch (error) {
+      errorAlert("Failed to unshare interim");
     }
   };
 
   const handleViewMoreAction = (key: string, doc: DocumentType) => {
-    console.log(doc);
-    if (key === "view document") {
+    if (key === "view Interim") {
       navigate(`/projects/${projectId}/interim-documents`, {
         state: {
           interimTitle: doc.title,
           documents: [
             {
-              id: 1,
-              title: "Interim Report",
+              id: doc._id,
+              title: doc.title,
               amount: Number(doc.value),
-              fileUrl:
-                "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+              fileUrl: doc.file,
             },
           ],
         },
       });
-    } else if (key === "edit") {
-      handleEdit(doc);
-    } else if (key === "delete") {
-      console.log(doc._id);
-      handleDelete(doc._id);
-    } else if (key === "share") {
-      handleShare(doc);
     }
+    if (key === "edit") handleEdit(doc);
+    if (key === "delete") handleDelete(doc._id);
+    if (key === "share") handleShareInterim(doc);
+    if (key === "unshare") handleUnshareInterim(doc._id);
   };
 
   const handleSubmit = async (data: any) => {
@@ -339,14 +377,13 @@ const InterimEvaluationPage = () => {
         successAlert("Interim updated successfully.");
       }
       setIsDrawerOpen(false);
-      refetch();
     } catch (error) {
       errorAlert("Failed to save interim.");
     }
   };
 
   return (
-    <div className="w-full bg-white h-full p-6">
+    <div className="w-full bg-white h-full p-6 min-h-screen">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Manage Interim</h1>
         <CustomSearchInput onSearch={() => {}} />
@@ -356,49 +393,59 @@ const InterimEvaluationPage = () => {
         <CustomCreateButton title="Create New Interim" onClick={handleCreate} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {documents.map((doc) => (
-          <div
-            key={doc._id}
-            className="relative p-4 bg-[#F1F1F1] border rounded shadow transition group cursor-pointer"
-          >
+      {/* Loading spinner */}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {documents.map((doc) => (
             <div
-              className="absolute top-2 right-2 opacity-100 z-10"
-              onClick={(e) => e.stopPropagation()} // Prevent card click
+              key={doc._id}
+              className="relative p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
             >
-              <CustomViewMoreButton
-                items={[
-                  { key: "view document", label: "View Document" },
-                  { key: "edit", label: "Edit" },
-                  { key: "delete", label: "Delete" },
-                  { key: "share", label: "Share" },
-                ]}
-                onClick={(key) => handleViewMoreAction(key, doc)}
-              />
-            </div>
-
-            <h3 className="text-lg font-semibold text-gray-800 truncate mt-2">
-              📁 {doc.title}
-            </h3>
-            <p className="text-sm text-gray-600">Value: ${doc.value}</p>
-
-            {/* Show status only here — no editing on card */}
-            <div className="mt-3 flex items-center gap-2">
-              <span
-                className={`text-sm font-semibold ${
-                  doc.status === "pending"
-                    ? "text-yellow-700"
-                    : "text-green-700"
-                }`}
+              <div
+                className="absolute top-2 right-2 opacity-100 z-10"
+                onClick={(e) => e.stopPropagation()}
               >
-                {doc.status === "pending" ? "⏳ Pending" : "✅ Paid"}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+                <CustomViewMoreButton
+                  items={[
+                    { key: "view Interim", label: "👁️ View Interim" },
+                    { key: "edit", label: "✏️ Edit Interim" },
+                    { key: "share", label: "🔗 Share Interim" },
+                    { key: "unshare", label: "🚫 Unshare Interim" },
+                    { key: "delete", label: "🗑️ Delete Interim", danger: true },
+                  ]}
+                  onClick={(key) => handleViewMoreAction(key, doc)}
+                />
+              </div>
 
+              <h3 className="text-lg font-semibold text-gray-800 truncate mt-2">
+                📁 {doc.title}
+              </h3>
+              <p className="text-sm text-gray-600">Value: ${doc.value}</p>
+
+              <div className="mt-3 flex items-center gap-2">
+                <span
+                  className={`text-sm font-semibold ${
+                    doc.status === "pending"
+                      ? "text-yellow-700"
+                      : "text-green-700"
+                  }`}
+                >
+                  {doc.status === "pending" ? "⏳ Pending" : "✅ Paid"}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Drawer Form */}
       <ResuableDocumentForm
+        creating={creating}
+        updating={updating}
         mode={mode}
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
@@ -409,7 +456,7 @@ const InterimEvaluationPage = () => {
                 title: editDoc.title,
                 projectId: editDoc.projectId,
                 value: editDoc.value,
-                status: editDoc.status, // pass status to edit form
+                status: editDoc.status,
               }
             : { projectId: projectId || "" }
         }
@@ -436,6 +483,48 @@ const InterimEvaluationPage = () => {
           },
         ]}
       />
+
+      {/* Share Modal */}
+      <Modal
+        title="Share Interim"
+        open={shareModalOpen}
+        onCancel={() => {
+          setShareModalOpen(false);
+          setShareDoc(null);
+        }}
+        footer={null}
+        width={500}
+      >
+        <CustomShareSelector
+          title="Share this interim"
+          roles={["prime-admin", "basic-admin", "client"]}
+          onShare={handleConfirmShare}
+        />
+      </Modal>
+
+      {/* Unshare Modal */}
+      <Modal
+        title="Unshare Interim"
+        open={unshareModalOpen}
+        onCancel={() => {
+          setUnshareModalOpen(false);
+          setSelectedDocId(null);
+        }}
+        footer={null}
+        width={500}
+      >
+        <CustomUnshareSelector
+          title="Remove access from users"
+          sharedUsers={(singleInterimData?.sharedWith || []).map((u: any) => ({
+            userId: u.userId._id,
+            name: u.userId.name,
+            role: u.userId.role,
+            email: u.userId.email || "",
+            profileImg: u.userId.profileImg,
+          }))}
+          onUnshare={handleConfirmUnshare}
+        />
+      </Modal>
     </div>
   );
 };

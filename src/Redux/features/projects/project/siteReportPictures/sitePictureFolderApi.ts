@@ -66,21 +66,27 @@ export const sitePictureFolderApi = baseApi.injectEndpoints({
     }),
 
     // ✅ Share SitePictureFolder
-    shareSitePictureFolder: builder.mutation<any, { id: string; data: any }>({
-      query: ({ id, data }) => ({
+    shareSitePictureFolder: builder.mutation<
+      any,
+      { id: string; shareWith: any[] }
+    >({
+      query: ({ id, shareWith }) => ({
         url: `/site-pictures/${id}/share`,
         method: "POST",
-        body: data,
+        body: shareWith,
       }),
       invalidatesTags: ["SitePictureFolders"],
     }),
 
     // ✅ Unshare SitePictureFolder
-    unshareSitePictureFolder: builder.mutation<any, { id: string; data: any }>({
-      query: ({ id, data }) => ({
+    unshareSitePictureFolder: builder.mutation<
+      any,
+      { id: string; unShareWith: any[] }
+    >({
+      query: ({ id, unShareWith }) => ({
         url: `/site-pictures/${id}/unshare`,
         method: "POST",
-        body: data,
+        body: unShareWith,
       }),
       invalidatesTags: ["SitePictureFolders"],
     }),

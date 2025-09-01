@@ -172,11 +172,7 @@ const AppRoutes: React.FC = () => (
           path="interim-evaluation"
           element={
             <ProtectedRoute
-              allowedRoles={[
-                USER_ROLE.superAdmin,
-                USER_ROLE.primeAdmin,
-                USER_ROLE.basicAdmin,
-              ]}
+              allowedRoles={[USER_ROLE.superAdmin, USER_ROLE.primeAdmin]}
             >
               <InterimEvaluationPage />
             </ProtectedRoute>
@@ -186,7 +182,11 @@ const AppRoutes: React.FC = () => (
           path="live-project-costs"
           element={
             <ProtectedRoute
-              allowedRoles={[USER_ROLE.superAdmin, USER_ROLE.primeAdmin]}
+              allowedRoles={[
+                USER_ROLE.superAdmin,
+                USER_ROLE.primeAdmin,
+                USER_ROLE.basicAdmin,
+              ]}
             >
               <CostManagementPage></CostManagementPage>
             </ProtectedRoute>
@@ -240,6 +240,7 @@ const AppRoutes: React.FC = () => (
                 USER_ROLE.superAdmin,
                 USER_ROLE.primeAdmin,
                 USER_ROLE.basicAdmin,
+                USER_ROLE.client,
               ]}
             >
               <DocumentsPage />
@@ -269,6 +270,7 @@ const AppRoutes: React.FC = () => (
                 USER_ROLE.superAdmin,
                 USER_ROLE.primeAdmin,
                 USER_ROLE.basicAdmin,
+                USER_ROLE.client,
               ]}
             >
               <TimeSchedulePage />
@@ -296,7 +298,6 @@ const AppRoutes: React.FC = () => (
               allowedRoles={[
                 USER_ROLE.superAdmin,
                 USER_ROLE.primeAdmin,
-                USER_ROLE.basicAdmin,
                 USER_ROLE.client,
               ]}
             >

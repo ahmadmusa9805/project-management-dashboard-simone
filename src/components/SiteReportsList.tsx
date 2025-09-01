@@ -1,11 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { Table, Modal } from "antd";
+import { Table, Modal, message } from "antd";
+
 import CustomViewMoreButton from "./CustomViewMoreButton";
 import SiteReportDetail from "./SiteReportDetail";
+import CustomShareSelector from "./CustomShareSelector";
+import CustomUnshareSelector from "./CustomUnshareSelector";
+
+import {
+  useShareSiteReportMutation,
+  useUnshareSiteReportMutation,
+  useGetSingleSiteReportQuery,
+} from "../Redux/features/projects/project/siteReportPictures/reportApi"; // Adjust import path
 
 interface SiteReportsListProps {
-  reports: any[]; // receive the reports array from parent
+  reports: any[];
   onDelete?: (reportId: string) => void;
 }
 
@@ -16,6 +26,22 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
   const [selectedReportId, setSelectedReportId] = useState<string>("");
   const [detailMode, setDetailMode] = useState<"view" | "edit">("view");
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Share/Unshare states
+  const [shareModalVisible, setShareModalVisible] = useState(false);
+  const [unshareModalVisible, setUnshareModalVisible] = useState(false);
+  const [selectedReportForSharing, setSelectedReportForSharing] =
+    useState<any>(null);
+
+  // API hooks
+  const [shareSiteReport] = useShareSiteReportMutation();
+  const [unshareSiteReport] = useUnshareSiteReportMutation();
+  const { data: singleReportData } = useGetSingleSiteReportQuery(
+    selectedReportId,
+    {
+      skip: !selectedReportId,
+    }
+  );
 
   const handleAction = (key: string, record: any) => {
     switch (key) {
@@ -32,6 +58,16 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
       case "delete":
         if (onDelete) onDelete(record._id);
         break;
+      case "share":
+        setSelectedReportForSharing(record);
+        setSelectedReportId(record._id);
+        setShareModalVisible(true);
+        break;
+      case "unshare":
+        setSelectedReportForSharing(record);
+        setSelectedReportId(record._id);
+        setUnshareModalVisible(true);
+        break;
       default:
         break;
     }
@@ -44,6 +80,34 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
 
   const handleModeChange = (mode: "view" | "edit") => {
     setDetailMode(mode);
+  };
+
+  const handleShare = async (selectedUsers: any[]) => {
+    try {
+      await shareSiteReport({
+        id: selectedReportForSharing._id,
+        sharedWith: selectedUsers,
+      }).unwrap();
+      message.success("Report shared successfully");
+      setShareModalVisible(false);
+      setSelectedReportForSharing(null);
+    } catch (error) {
+      message.error("Failed to share report");
+    }
+  };
+
+  const handleUnshare = async (selectedUsers: any[]) => {
+    try {
+      await unshareSiteReport({
+        id: selectedReportForSharing._id,
+        unShareWith: selectedUsers.map((u) => u.userId),
+      }).unwrap();
+      message.success("Report unshared successfully");
+      setUnshareModalVisible(false);
+      setSelectedReportForSharing(null);
+    } catch (error) {
+      message.error("Failed to unshare report");
+    }
   };
 
   const columns = [
@@ -59,6 +123,12 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
+      title: "Shared",
+      dataIndex: "isShared",
+      key: "isShared",
+      render: (isShared: boolean) => (isShared ? "Yes" : "No"),
+    },
+    {
       title: "Actions",
       key: "actions",
       render: (_: any, record: any) => (
@@ -66,7 +136,9 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
           items={[
             { key: "view", label: "View" },
             { key: "edit", label: "Edit" },
-            { key: "delete", label: "Delete" },
+            { key: "share", label: "Share" },
+            { key: "unshare", label: "Unshare" },
+            { key: "delete", label: "Delete", danger: true },
           ]}
           onClick={(key) => handleAction(key, record)}
         />
@@ -83,6 +155,7 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
         pagination={false}
       />
 
+      {/* Report Detail Modal */}
       <Modal
         open={modalVisible}
         onCancel={handleBack}
@@ -96,6 +169,44 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
             mode={detailMode}
             onBack={handleBack}
             onModeChange={handleModeChange}
+          />
+        )}
+      </Modal>
+
+      {/* Share Modal */}
+      <Modal
+        title="Share Report"
+        open={shareModalVisible}
+        onCancel={() => setShareModalVisible(false)}
+        footer={null}
+        width={500}
+      >
+        <CustomShareSelector
+          title="Share this report"
+          roles={["prime-admin", "basic-admin", "client"]}
+          onShare={handleShare}
+        />
+      </Modal>
+
+      {/* Unshare Modal */}
+      <Modal
+        title="Unshare Report"
+        open={unshareModalVisible}
+        onCancel={() => setUnshareModalVisible(false)}
+        footer={null}
+        width={500}
+      >
+        {singleReportData && (
+          <CustomUnshareSelector
+            title="Remove access from users"
+            sharedUsers={(singleReportData.sharedWith || []).map((u: any) => ({
+              userId: u.userId._id,
+              name: u.userId.name,
+              role: u.userId.role,
+              email: u.userId.email || "",
+              profileImg: u.userId.profileImg,
+            }))}
+            onUnshare={handleUnshare}
           />
         )}
       </Modal>

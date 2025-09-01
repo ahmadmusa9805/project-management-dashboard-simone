@@ -11,7 +11,7 @@ export const secondFixFileApi = baseApi.injectEndpoints({
               params as Record<string, string>
             ).toString()}`
           : "";
-        return `/second-fix-file${queryString}`;
+        return `/second-fix-files${queryString}`;
       },
       providesTags: ["SecondFixFiles"],
       transformResponse: (response: {
@@ -26,7 +26,7 @@ export const secondFixFileApi = baseApi.injectEndpoints({
 
     // ✅ Get Single SecondFixFile
     getSingleSecondFixFile: builder.query<any, string>({
-      query: (id) => `/second-fix-file/${id}`,
+      query: (id) => `/second-fix-files/${id}`,
       providesTags: ["SecondFixFiles"],
       transformResponse: (response: { status: string; data: any }) =>
         response.data,
@@ -53,7 +53,7 @@ export const secondFixFileApi = baseApi.injectEndpoints({
         formData.append("data", JSON.stringify(requestData));
 
         return {
-          url: "/second-fix-file/create-second-fix-file",
+          url: "/second-fix-files/create-second-fix-file",
           method: "POST",
           body: formData,
         };
@@ -83,7 +83,7 @@ export const secondFixFileApi = baseApi.injectEndpoints({
         );
 
         return {
-          url: `/second-fix-file/${id}`,
+          url: `/second-fix-files/${id}`,
           method: "PATCH",
           body: formData,
         };
@@ -94,7 +94,7 @@ export const secondFixFileApi = baseApi.injectEndpoints({
     // ✅ Delete SecondFixFile
     deleteSecondFixFile: builder.mutation<any, string>({
       query: (id) => ({
-        url: `/second-fix-file/${id}`,
+        url: `/second-fix-files/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["SecondFixFiles"],
@@ -106,7 +106,7 @@ export const secondFixFileApi = baseApi.injectEndpoints({
       { id: string; sharedWith: any[] }
     >({
       query: ({ id, sharedWith }) => ({
-        url: `/second-fix-file/${id}/share`,
+        url: `/second-fix-files/${id}/share`,
         method: "POST",
         body: { sharedWith },
       }),
@@ -119,7 +119,7 @@ export const secondFixFileApi = baseApi.injectEndpoints({
       { id: string; unShareWith: any[] }
     >({
       query: ({ id, unShareWith }) => ({
-        url: `/second-fix-file/${id}/unshare`,
+        url: `/second-fix-files/${id}/unshare`,
         method: "POST",
         body: { unShareWith },
       }),

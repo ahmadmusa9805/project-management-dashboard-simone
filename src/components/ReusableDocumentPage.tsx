@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-
 import { Modal } from "antd";
 import { setCurrentFile } from "../Redux/features/projects/project/shared/documentSlice";
 import ReusableDocumentViewer from "./ReusableDocumentViewer";
@@ -11,7 +10,7 @@ interface DocumentItem {
   title: string;
   iconColor?: string;
   amount?: number;
-  fileUrl?: string; // 📌 Add file URL if needed
+  fileUrl?: string;
 }
 
 interface LocationState {
@@ -48,13 +47,13 @@ const ReusableDocumentPage: React.FC = () => {
   }
 
   return (
-    <div className=" flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4">
       <h1 className="text-2xl font-bold mb-2">Documents for {quoteTitle}</h1>
 
       {documents.map((doc) => (
         <div key={doc.id} className="flex flex-col gap-4">
           <div
-            className="w-full p-4 bg-[#F1F1F1] border border-[#E6E7E7] rounded flex items-center gap-4 cursor-pointer"
+            className="w-full p-4 bg-[#F1F1F1] border border-[#E6E7E7] rounded flex items-center gap-4 cursor-pointer hover:bg-gray-100 transition-colors"
             onClick={() => handleDocumentClick(doc.fileUrl)}
           >
             {/* Icon */}
@@ -88,15 +87,27 @@ const ReusableDocumentPage: React.FC = () => {
         </div>
       ))}
 
-      {/* 🔍 Modal for Viewer */}
       <Modal
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
-        width=""
-        style={{ top: 20 }}
+        width="50vw"
+        height={"80vh"}
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+        styles={{
+          content: {
+            borderRadius: "12px",
+            border: "none",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+          },
+        }}
+        destroyOnClose
+        centered
       >
-        <ReusableDocumentViewer />
+        <ReusableDocumentViewer quoteTitle={quoteTitle} />
       </Modal>
     </div>
   );

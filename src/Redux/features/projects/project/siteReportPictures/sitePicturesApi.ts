@@ -62,7 +62,7 @@ export const sitePictureImageApi = baseApi.injectEndpoints({
 
     updateSitePictureImage: builder.mutation<
       any,
-      { id: string; data: { file: string[] } } // Define the data type
+      { id: string; data: FormData } // Define the data type
     >({
       query: ({ id, data }) => ({
         url: `/site-picture-images/${id}`,

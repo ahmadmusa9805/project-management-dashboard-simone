@@ -124,6 +124,7 @@
 // export default ResuableDocumentForm;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// TODO: clean above code after review
 import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Input, Button, Drawer, Upload, Select } from "antd";
@@ -139,10 +140,13 @@ type DocumentField = {
   type?: "text" | "select";
   options?: { label: string; value: any }[];
   disabled?: boolean;
+  rules?: Record<string, any>;
 };
 
 type DocumentFormProps = {
   mode: "create" | "edit";
+  creating?: boolean;
+  updating?: boolean;
   fields: DocumentField[];
   defaultValues?: Record<string, any>;
   onSubmit: (data: any) => void;
@@ -153,12 +157,15 @@ type DocumentFormProps = {
 const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
   mode,
   fields,
+  creating,
+  updating,
   defaultValues = {},
   onSubmit,
   open,
   onClose,
 }) => {
-  const { control, handleSubmit, reset } = useForm();
+  // validation trigger on blur
+  const { control, handleSubmit, reset } = useForm({ mode: "onBlur" });
 
   useEffect(() => {
     reset(defaultValues);
@@ -191,34 +198,45 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
             <Controller
               name={field.name}
               control={control}
-              render={({ field: controllerField }) =>
-                field.type === "select" && field.options ? (
-                  <Select
-                    {...controllerField}
-                    id={field.name}
-                    placeholder={field.placeholder}
-                    disabled={field.disabled}
-                    className="w-full"
-                    size="middle"
-                    onChange={(value) => controllerField.onChange(value)}
-                    value={controllerField.value}
-                  >
-                    {field.options.map((opt) => (
-                      <Option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </Option>
-                    ))}
-                  </Select>
-                ) : (
-                  <Input
-                    {...controllerField}
-                    id={field.name}
-                    placeholder={field.placeholder}
-                    className="w-full px-2 py-3 border border-[#000E0F1A] rounded outline-none"
-                    disabled={field.disabled}
-                  />
-                )
-              }
+              // ✅ default required validation if no rules provided
+              rules={field.rules ?? { required: `${field.label} is required` }}
+              render={({ field: controllerField, fieldState }) => (
+                <>
+                  {field.type === "select" && field.options ? (
+                    <Select
+                      {...controllerField}
+                      id={field.name}
+                      placeholder={field.placeholder}
+                      disabled={field.disabled}
+                      className="w-full"
+                      size="middle"
+                      onChange={(value) => controllerField.onChange(value)}
+                      value={controllerField.value}
+                      status={fieldState.error ? "error" : ""}
+                    >
+                      {field.options.map((opt) => (
+                        <Option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </Option>
+                      ))}
+                    </Select>
+                  ) : (
+                    <Input
+                      {...controllerField}
+                      id={field.name}
+                      placeholder={field.placeholder}
+                      className="w-full px-2 py-3 border rounded outline-none"
+                      disabled={field.disabled}
+                      status={fieldState.error ? "error" : ""}
+                    />
+                  )}
+                  {fieldState.error && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {fieldState.error.message}
+                    </p>
+                  )}
+                </>
+              )}
             />
           </div>
         ))}
@@ -230,20 +248,44 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
           <Controller
             control={control}
             name="file"
-            render={({ field }) => (
-              <Dragger
-                accept=".pdf"
-                beforeUpload={() => false}
-                multiple={false}
-                onChange={(info) => field.onChange(info.file)}
-                fileList={field.value ? [field.value] : []}
-                onRemove={() => field.onChange(undefined)}
-              >
-                <p className="text-center flex flex-col items-center">
-                  <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
-                </p>
-                <p className="text-[10px]">Click or drag PDF to upload</p>
-              </Dragger>
+            rules={
+              mode === "create"
+                ? { required: "File is required" } // ✅ Required only when creating
+                : {} // ✅ Optional when editing
+            }
+            render={({ field, fieldState }) => (
+              <>
+                <Dragger
+                  accept=".pdf"
+                  beforeUpload={() => false}
+                  multiple={false}
+                  // ✅ keep existing file if in edit mode
+                  onChange={(info) => field.onChange(info.file)}
+                  fileList={
+                    field.value
+                      ? [field.value]
+                      : defaultValues.file
+                      ? [defaultValues.file]
+                      : []
+                  }
+                  onRemove={() => field.onChange(undefined)}
+                  style={{
+                    border: fieldState.error
+                      ? "1px dashed #ff4d4f"
+                      : "1px dashed #d9d9d9",
+                  }}
+                >
+                  <p className="text-center flex flex-col items-center">
+                    <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+                  </p>
+                  <p className="text-[10px]">Click or drag PDF to upload</p>
+                </Dragger>
+                {fieldState.error && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {fieldState.error.message}
+                  </p>
+                )}
+              </>
             )}
           />
         </div>
@@ -261,7 +303,7 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
             htmlType="submit"
             type="primary"
             className="flex-1 h-12 px-6 bg-[#001D01] rounded text-white text-base font-medium leading-6 tracking-wide"
-            loading={false}
+            loading={creating || updating}
           >
             {mode === "create" ? "Create" : "Update"}
           </Button>

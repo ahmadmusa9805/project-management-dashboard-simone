@@ -196,9 +196,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onUpdate }) => {
               }}
               aria-label={`Delete image record ${img._id}`}
             >
-                            <Trash2Icon size={16} />           {" "}
+              <Trash2Icon size={16} />{" "}
             </button>
-                     {" "}
           </div>
         ))}
              {" "}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { Input, Drawer, Spin } from "antd";
 import type { GetProps } from "antd";
@@ -63,8 +64,6 @@ const LaborTable: React.FC = () => {
       setLaborData(mapped);
     }
   }, [data]);
-
-
 
   const filteredData = laborData.filter((item) =>
     item.name.toLowerCase().includes(searchText.toLowerCase())

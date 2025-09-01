@@ -14,6 +14,106 @@ export const costManagementApi = baseApi.injectEndpoints({
       transformResponse: (response: { success: boolean; data: any[] }) =>
         Array.isArray(response.data) ? response.data : [],
     }),
+
+    // ===== Labour Expenses =====
+    // ✅ Share All Labor Expenses
+    shareAllLaborExpenses: builder.mutation<
+      any,
+      { id: string; sharedWith: any[] }
+    >({
+      query: ({ id, sharedWith }) => ({
+        url: `/certificates/${id}/share`,
+        method: "POST",
+        body: { sharedWith },
+      }),
+      invalidatesTags: ["ProjectCosts"],
+    }),
+
+    // ✅ Unshare All Labor Expenses
+    unSharAllLaborExpenses: builder.mutation<
+      any,
+      { id: string; unShareWith: any[] }
+    >({
+      query: ({ id, unShareWith }) => ({
+        url: `/certificates/${id}/unshare`,
+        method: "POST",
+        body: { unShareWith },
+      }),
+      invalidatesTags: ["ProjectCosts"],
+    }),
+
+    // ===== Material Expenses =====
+    shareAllMaterialExpenses: builder.mutation<
+      any,
+      { id: string; sharedWith: any[] }
+    >({
+      query: ({ id, sharedWith }) => ({
+        url: `/certificates/${id}/share`,
+        method: "POST",
+        body: { sharedWith },
+      }),
+      invalidatesTags: ["ProjectCosts"],
+    }),
+
+    // ✅ Unshare All Material Expenses
+    unShareAllMaterialExpenses: builder.mutation<
+      any,
+      { id: string; unShareWith: any[] }
+    >({
+      query: ({ id, unShareWith }) => ({
+        url: `/certificates/${id}/unshare`,
+        method: "POST",
+        body: { unShareWith },
+      }),
+      invalidatesTags: ["ProjectCosts"],
+    }),
+
+    // ===== Subcontractor Expenses =====
+    shareAllSubContractExpenses: builder.mutation<
+      any,
+      { id: string; sharedWith: any[] }
+    >({
+      query: ({ id, sharedWith }) => ({
+        url: `/certificates/${id}/share`,
+        method: "POST",
+        body: { sharedWith },
+      }),
+      invalidatesTags: ["ProjectCosts"],
+    }),
+
+    // ✅ Unshare All Subcontractor Expenses
+    unShareAllSubContractExpenses: builder.mutation<
+      any,
+      { id: string; unShareWith: any[] }
+    >({
+      query: ({ id, unShareWith }) => ({
+        url: `/certificates/${id}/unshare`,
+        method: "POST",
+        body: { unShareWith },
+      }),
+      invalidatesTags: ["ProjectCosts"],
+    }),
+    shareAllExpenses: builder.mutation<any, { id: string; sharedWith: any[] }>({
+      query: ({ id, sharedWith }) => ({
+        url: `/certificates/${id}/share`,
+        method: "POST",
+        body: { sharedWith },
+      }),
+      invalidatesTags: ["ProjectCosts"],
+    }),
+
+    // ✅ Unshare All Expenses
+    unShareAllExpenses: builder.mutation<
+      any,
+      { id: string; unShareWith: any[] }
+    >({
+      query: ({ id, unShareWith }) => ({
+        url: `/certificates/${id}/unshare`,
+        method: "POST",
+        body: { unShareWith },
+      }),
+      invalidatesTags: ["ProjectCosts"],
+    }),
   }),
 });
 

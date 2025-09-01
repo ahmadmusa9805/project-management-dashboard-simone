@@ -1,31 +1,47 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams } from "react-router-dom";
-
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
-import type { RootState } from "../../../Redux/app/store";
-import { setPaymentsForProject } from "../../../Redux/features/payments/paymentSlice";
-import { mockPaymentData } from "../../../data/mockPaymentData"; // ✅ Make sure this file exists
+import { useGetAllPaymentTrackerElementsQuery } from "../../../Redux/features/projects/project/paymentTracker/paymentTrackerApi";
 
 const PaymentTrackerPage = () => {
-  const dispatch = useDispatch();
-
-  const navigate = useNavigate();
   const { projectId } = useParams();
-
-  const payments = useSelector(
-    (state: RootState) => state.payment.payments[projectId!] || []
+  const { data: paymentData, isLoading } = useGetAllPaymentTrackerElementsQuery(
+    { projectId: projectId!, status: "paid" }
   );
+  const navigate = useNavigate();
 
-  // ✅ Auto load payment data when component mounts
-  useEffect(() => {
-    if (projectId && payments.length === 0) {
-      dispatch(setPaymentsForProject({ projectId, payments: mockPaymentData }));
-    }
-  }, [dispatch, projectId, payments.length]);
+  if (isLoading) return <div>Loading...</div>;
+
+  console.log("Payments:", paymentData);
+
+  // ✅ Convert object -> array for UI mapping
+  const payments = [
+    paymentData?.quote && {
+      id: paymentData.quote._id,
+      title: paymentData.quote.title,
+      value: paymentData.quote.value,
+      documents: [paymentData.quote],
+    },
+    ...(paymentData?.interims?.map((i: any) => ({
+      id: i._id,
+      title: i.title,
+      value: i.value,
+      documents: [i],
+    })) || []),
+    {
+      id: "outStanding",
+      title: "Total outstanding from contract",
+      value: paymentData?.outStanding,
+    },
+    {
+      id: "profit",
+      title: "Total Profit",
+      value: paymentData?.profit,
+    },
+  ].filter(Boolean); // remove null/undefined entries
 
   return (
-    <div className="p-6">
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       <h1 className="text-xl font-bold mb-6">Payment Tracker Page</h1>
 
       {payments.length === 0 ? (
@@ -41,34 +57,27 @@ const PaymentTrackerPage = () => {
             >
               <div className="flex justify-between">
                 <h3 className="text-lg font-semibold">{item.title}</h3>
-                {item.title !== "Total Profit" && (
-                  <CustomViewMoreButton
-                    items={
-                      item.title === "Total outstanding from contract"
-                        ? [{ key: "shared", label: "Shared" }]
-                        : [
-                            { key: "view", label: "View Details" },
-                            { key: "shared", label: "Shared" },
-                            { key: "delete", label: "Delete" },
-                          ]
-                    }
-                    onClick={(key) => {
-                      if (key === "view" && item.documents) {
-                        navigate(
-                          `/projects/${projectId}/paymentrucker-documents`,
-                          {
-                            state: {
-                              quoteTitle: item.title,
-                              documents: item.documents,
-                            },
-                          }
-                        );
-                      } else {
-                        console.log(`Clicked '${key}' on ${item.title}`);
-                      }
-                    }}
-                  />
-                )}
+                {item.title !== "Total Profit" &&
+                  item.title !== "Total outstanding from contract" && (
+                    <CustomViewMoreButton
+                      items={[{ key: "view", label: "View Details" }]}
+                      onClick={(key) => {
+                        if (key === "view" && item.documents) {
+                          navigate(
+                            `/projects/${projectId}/paymentrucker-documents`,
+                            {
+                              state: {
+                                quoteTitle: item.title,
+                                documents: item.documents,
+                              },
+                            }
+                          );
+                        } else {
+                          console.log(`Clicked '${key}' on ${item.title}`);
+                        }
+                      }}
+                    />
+                  )}
               </div>
               <p className="mt-2 text-lg text-gray-900">{item.value}</p>
             </div>

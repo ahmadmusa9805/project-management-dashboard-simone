@@ -55,6 +55,8 @@ export const baseApi = createApi({
     "Handover",
     "HandoverCombine",
     "Snagging",
+    "TimeSchedule",
+    "PaymentTrackers",
   ],
   endpoints: () => ({}),
 });

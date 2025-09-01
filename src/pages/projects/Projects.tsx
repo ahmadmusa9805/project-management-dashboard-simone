@@ -53,6 +53,8 @@ const Projects = () => {
   } = useGetProjectsWithstatusQuery({
     status: statusFilter,
   });
+
+  console.log(projects, "projects with status");
   const [shareProject] = useShareProjectMutation();
 
   // const [unShareProject] = useUnShareProjectMutation();
@@ -60,6 +62,7 @@ const Projects = () => {
   const [createProject] = useCreateProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
   const [deleteProject] = useDeleteProjectMutation();
+  if (isLoading) return <Spin />;
 
   const handleViewDetails = (id: string) => {
     setSelectedProjectId(id);
@@ -137,7 +140,7 @@ const Projects = () => {
             />
           </div>
         )}
-        {projects.map((project) => (
+        {projects?.map((project) => (
           <div key={project._id} className="hover:bg-[#e6f4ea] bg-[#f1f1f1]">
             <div className="w-full px-4 py-2.5 flex items-center gap-2.5">
               <div className="w-6 h-6">
