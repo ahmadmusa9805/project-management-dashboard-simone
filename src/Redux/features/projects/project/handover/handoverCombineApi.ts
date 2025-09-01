@@ -1,47 +1,49 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "../../../../app/api/baseApi";
-
 
 const handoverCombineApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Create handover combine
     createHandoverCombine: builder.mutation({
       query: (handoverCombineData) => ({
-        url: '/handover-combines/create-handover-combine',
-        method: 'POST',
+        url: "/handover-combines/create-handover-combine",
+        method: "POST",
         body: handoverCombineData,
       }),
-      invalidatesTags: ['HandoverCombine'],
+      invalidatesTags: ["HandoverCombine"],
     }),
 
     // Get all handover combines
     getAllHandoverCombines: builder.query({
       query: (params) => ({
-        url: '/handover-combines',
-        method: 'GET',
+        url: "/handover-combines",
+        method: "GET",
         params,
       }),
-      providesTags: ['HandoverCombine'],
+      providesTags: ["HandoverCombine"],
     }),
 
     // Get single handover combine
     getSingleHandoverCombine: builder.query({
       query: (id) => ({
         url: `/handover-combines/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'HandoverCombine', id }],
+      transformResponse: (response: { status: string; data: any }) =>
+        response.data,
+      providesTags: (_result, _error, id) => [{ type: "HandoverCombine", id }],
     }),
 
     // Update handover combine
     updateHandoverCombine: builder.mutation({
       query: ({ id, ...handoverCombineData }) => ({
         url: `/handover-combines/${id}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: handoverCombineData,
       }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'HandoverCombine', id },
-        'HandoverCombine',
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "HandoverCombine", id },
+        "HandoverCombine",
       ],
     }),
 
@@ -49,45 +51,47 @@ const handoverCombineApi = baseApi.injectEndpoints({
     deleteHandoverCombine: builder.mutation({
       query: (id) => ({
         url: `/handover-combines/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['HandoverCombine'],
+      invalidatesTags: ["HandoverCombine"],
     }),
 
-    // Share handover combine
-    shareHandoverCombine: builder.mutation({
+    // ✅ Share Certificate
+    shareHandoverCombine: builder.mutation<
+      any,
+      { id: string; sharedWith: any[] }
+    >({
       query: ({ id, sharedWith }) => ({
         url: `/handover-combines/${id}/share`,
-        method: 'POST',
+        method: "POST",
         body: { sharedWith },
       }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'HandoverCombine', id },
-        'HandoverCombine',
-      ],
+      invalidatesTags: ["HandoverCombine"],
     }),
 
-    // Unshare handover combine
-    unShareHandoverCombine: builder.mutation({
+    // ✅ Unshare Certificate
+    unShareHandoverCombine: builder.mutation<
+      any,
+      { id: string; unShareWith: any[] }
+    >({
       query: ({ id, unShareWith }) => ({
         url: `/handover-combines/${id}/unshare`,
-        method: 'POST',
+        method: "POST",
         body: { unShareWith },
       }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'HandoverCombine', id },
-        'HandoverCombine',
-      ],
+      invalidatesTags: ["HandoverCombine"],
     }),
 
     // Get all handover combines data
     getAllHandoverCombinesData: builder.query({
       query: ({ id, ...params }) => ({
         url: `/handover-combines/${id}/combine-data`,
-        method: 'GET',
+        method: "GET",
         params,
       }),
-      providesTags: (result, error, { id }) => [{ type: 'HandoverCombine', id }],
+      providesTags: (_result, _error, { id }) => [
+        { type: "HandoverCombine", id },
+      ],
     }),
   }),
 });

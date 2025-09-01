@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // TODO: importtant ---------------------------------------------------------------------------------------------------------------------------------------------------------
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import DocumentsPage from "./DocumentsPage";
@@ -13,7 +14,8 @@
 // export default HandoverToolPage;
 
 // TODO: reviewing ---------------------------------------------------------------------------------------------------------------------------------------------------------
-import React, { useRef, useState } from "react";
+import type React from "react";
+import { useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   useGetAllHandoversQuery,
@@ -21,6 +23,7 @@ import {
   useDeleteHandoverMutation,
   useShareHandoverFileMutation,
   useUnShareHandoverFileMutation,
+  useGetSingleHandoverQuery,
 } from "../../../Redux/features/projects/project/handover/handoverApi";
 
 import {
@@ -30,12 +33,16 @@ import {
   useUpdateHandoverCombineMutation,
   useShareHandoverCombineMutation,
   useUnShareHandoverCombineMutation,
+  useGetSingleHandoverCombineQuery,
 } from "../../../Redux/features/projects/project/handover/handoverCombineApi";
 
+import type { SharedUser } from "../../../Redux/features/projects/projectsApi";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import CustomCreateButton from "../../../components/CustomCreateButton";
-import { Modal, Checkbox, Button, Input } from "antd";
+import { Modal, Checkbox, Button, Input, message } from "antd";
 import CreateFolder from "../../../components/CreateFolder";
+import CustomShareSelector from "../../../components/CustomShareSelector";
+import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
 
 interface FileItem {
   id: string;
@@ -50,19 +57,24 @@ interface Folder {
   files: any[];
 }
 
-const HandoverToolPage = () => {
-  const { projectId } = useParams();
+const HandoverToolPage: React.FC = () => {
+  const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ✅ Local state
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [renameFolderId, setRenameFolderId] = useState<string | null>(null);
   const [newFolderTitle, setNewFolderTitle] = useState("");
 
-  // ✅ API hooks
+  // Share/unshare modal state
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [unshareModalOpen, setUnshareModalOpen] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [isFolder, setIsFolder] = useState(false);
+
+  // API hooks
   const {
     data: handoverData,
     isLoading,
@@ -76,6 +88,16 @@ const HandoverToolPage = () => {
       skip: !projectId,
     });
 
+  const { data: singleHandoverData, refetch: refetchSingleFolder } =
+    useGetSingleHandoverQuery(selectedItemId!, {
+      skip: !selectedItemId || isFolder,
+    });
+
+  const { data: singleFolderData } = useGetSingleHandoverCombineQuery(
+    selectedItemId!,
+    { skip: !selectedItemId || !isFolder }
+  );
+
   const [createHandover, { isLoading: creating }] = useCreateHandoverMutation();
   const [deleteHandover] = useDeleteHandoverMutation();
   const [shareHandover] = useShareHandoverFileMutation();
@@ -88,7 +110,6 @@ const HandoverToolPage = () => {
   const [shareHandoverCombine] = useShareHandoverCombineMutation();
   const [unShareHandoverCombine] = useUnShareHandoverCombineMutation();
 
-  // ✅ Map handovers into display format
   const files: FileItem[] =
     handoverData?.data?.map((file: any) => ({
       id: file._id,
@@ -104,69 +125,63 @@ const HandoverToolPage = () => {
       files: folder.files,
     })) || [];
 
-  // ✅ File Upload Click
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  // ✅ File Input Change
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || !projectId) return;
-
     try {
       for (const file of Array.from(files)) {
-        await createHandover({
-          projectId,
-          title: file.name,
-          file,
-        }).unwrap();
+        await createHandover({ projectId, title: file.name, file }).unwrap();
       }
       refetchHandovers();
     } catch (err) {
-      console.error("Failed to upload files:", err);
+      message.error("Failed to upload files");
     }
   };
 
-  // ✅ Toggle file selection for folder creation
   const toggleFileSelection = (fileId: string) => {
-    if (selectedFileIds.includes(fileId)) {
-      setSelectedFileIds(selectedFileIds.filter((id) => id !== fileId));
-    } else {
-      setSelectedFileIds([...selectedFileIds, fileId]);
-    }
+    setSelectedFileIds((prev) =>
+      prev.includes(fileId)
+        ? prev.filter((id) => id !== fileId)
+        : [...prev, fileId]
+    );
   };
 
-  // ✅ Create Folder with selected files
   const handleCreateFolder = async (folderName: string) => {
     if (!projectId || selectedFileIds.length === 0) return;
-
     try {
       await createHandoverCombine({
         projectId,
         title: folderName,
         files: selectedFileIds,
       }).unwrap();
-
       setIsCreateFolderModalOpen(false);
       setSelectedFileIds([]);
       refetchFolders();
-    } catch (err) {
-      console.error("Failed to create folder:", err);
+    } catch {
+      message.error("Failed to create folder");
     }
   };
 
-  // ✅ File Actions
+  // File actions
   const handleFileAction = async (action: string, file: FileItem) => {
     switch (action) {
       case "view":
         window.open(file.url, "_blank");
         break;
       case "share":
-        await shareHandover(file.id);
+        setSelectedItemId(file.id);
+        setIsFolder(false);
+        setShareModalOpen(true);
         break;
       case "unshare":
-        await unShareHandover(file.id);
+        setSelectedItemId(file.id);
+        setIsFolder(false);
+        setUnshareModalOpen(true);
+        refetchSingleFolder();
         break;
       case "delete":
         if (window.confirm(`Delete ${file.name}?`)) {
@@ -177,11 +192,11 @@ const HandoverToolPage = () => {
     }
   };
 
-  // ✅ Folder Actions
+  // Folder actions
   const handleFolderAction = async (action: string, folder: Folder) => {
     switch (action) {
       case "view":
-        navigate(`/handover/folder/${folder._id}`); // navigate to folder details page
+        navigate(`/handover/folder/${folder._id}`);
         break;
       case "update":
         setRenameFolderId(folder._id);
@@ -195,168 +210,213 @@ const HandoverToolPage = () => {
         }
         break;
       case "share":
-        await shareHandoverCombine({ id: folder._id, sharedWith: [] }); // update as per your payload
+        setSelectedItemId(folder._id);
+        setIsFolder(true);
+        setShareModalOpen(true);
         break;
       case "unshare":
-        await unShareHandoverCombine({ id: folder._id, unShareWith: [] }); // update as per your payload
+        setSelectedItemId(folder._id);
+        setIsFolder(true);
+        setUnshareModalOpen(true);
+
         break;
     }
   };
 
-  // ✅ Update Folder
   const handleUpdateFolder = async () => {
     if (!renameFolderId || !newFolderTitle) return;
-
     try {
       await updateHandoverCombine({
         id: renameFolderId,
         title: newFolderTitle,
       }).unwrap();
-
       setIsRenameModalOpen(false);
       setRenameFolderId(null);
       setNewFolderTitle("");
       refetchFolders();
-    } catch (err) {
-      console.error("Failed to update folder:", err);
+    } catch {
+      message.error("Failed to update folder");
     }
   };
 
+  // Confirm Share
+  const handleConfirmShare = async (selectedUsers: SharedUser[]) => {
+    console.log(selectedUsers);
+    try {
+      if (isFolder) {
+        await shareHandoverCombine({
+          id: selectedItemId!,
+          sharedWith: selectedUsers,
+        }).unwrap();
+      } else {
+        await shareHandover({
+          id: selectedItemId!,
+          sharedWith: selectedUsers,
+        }).unwrap();
+      }
+      message.success("Shared successfully");
+      setShareModalOpen(false);
+      setSelectedItemId(null);
+    } catch {
+      message.error("Failed to share");
+    }
+  };
+
+  // Confirm Unshare
+  const handleConfirmUnshare = async (selectedUsers: SharedUser[]) => {
+    try {
+      if (isFolder) {
+        await unShareHandoverCombine({
+          id: selectedItemId!,
+          unShareWith: selectedUsers.map((u) => u.userId),
+        }).unwrap();
+      } else {
+        await unShareHandover({
+          id: selectedItemId!,
+          unShareWith: selectedUsers.map((u) => u.userId),
+        }).unwrap();
+        refetchSingleFolder();
+      }
+      message.success("Unshared successfully");
+      setUnshareModalOpen(false);
+      setSelectedItemId(null);
+    } catch {
+      message.error("Failed to unshare");
+    }
+  };
+
+  console.log(singleFolderData, "singleFolderData");
+  console.log(singleHandoverData, "singleHandoverData");
+
   return (
-    <div>
-      <div className="w-full h-full p-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-semibold">
-            📁Handover — Uploaded Files
-          </h1>
-          <div className="flex gap-2">
-            <CustomCreateButton
-              title="Upload Handover Documents"
-              onClick={handleUploadClick}
-            />
-            <Button
-              type="primary"
-              onClick={() => setIsCreateFolderModalOpen(true)}
-              disabled={selectedFileIds.length === 0}
-            >
-              Create Folder from Selected
-            </Button>
-          </div>
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">📁 Handover — Uploaded Files</h1>
+        <div className="flex gap-2">
+          <CustomCreateButton
+            title="Upload Handover Documents"
+            onClick={handleUploadClick}
+          />
+          <Button
+            type="primary"
+            onClick={() => setIsCreateFolderModalOpen(true)}
+            disabled={selectedFileIds.length === 0}
+          >
+            Create Folder from Selected
+          </Button>
         </div>
+      </div>
 
-        {/* Selection info */}
-        {selectedFileIds.length > 0 && (
-          <div className="mb-4 p-2 bg-blue-50 rounded-md">
-            <p className="text-blue-700">
-              {selectedFileIds.length} file
-              {selectedFileIds.length !== 1 ? "s" : ""} selected
-            </p>
-            <Button
-              type="link"
-              size="small"
-              onClick={() => setSelectedFileIds([])}
-              className="p-0 text-blue-500"
-            >
-              Clear selection
-            </Button>
-          </div>
-        )}
+      {selectedFileIds.length > 0 && (
+        <div className="mb-4 p-2 bg-blue-50 rounded-md">
+          <p className="text-blue-700">
+            {selectedFileIds.length} file
+            {selectedFileIds.length !== 1 ? "s" : ""} selected
+          </p>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => setSelectedFileIds([])}
+            className="p-0 text-blue-500"
+          >
+            Clear selection
+          </Button>
+        </div>
+      )}
 
-        {/* Hidden File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          onChange={handleFileUpload}
-          className="hidden"
-        />
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        onChange={handleFileUpload}
+        className="hidden"
+      />
 
-        {/* Folder Section */}
-        {folders.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-3">📂 Folders</h2>
-            <div className="flex flex-wrap gap-4">
-              {folders.map((folder: Folder) => (
-                <div
-                  key={folder._id}
-                  className="p-4 bg-[#E8F5E9] rounded outline outline-[#C8E6C9] flex flex-col gap-2 w-64"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="text-lg font-medium">{folder.title}</div>
-                    <CustomViewMoreButton
-                      items={[
-                        { label: "View", key: "view" },
-                        { label: "Update", key: "update" },
-                        { label: "Delete", key: "delete" },
-                        { label: "Share", key: "share" },
-                        { label: "Unshare", key: "unshare" },
-                      ]}
-                      onClick={(action: string) =>
-                        handleFolderAction(action, folder)
-                      }
-                    />
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {folder.files.length} file
-                    {folder.files.length !== 1 ? "s" : ""}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* File List */}
-        {isLoading ? (
-          <p>Loading files...</p>
-        ) : files.length > 0 ? (
-          <div className="w-full h-full flex flex-wrap gap-4">
-            {files.map((file: FileItem) => (
+      {/* Folders */}
+      {folders.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-3">📂 Folders</h2>
+          <div className="flex flex-wrap gap-4">
+            {folders.map((folder) => (
               <div
-                key={file.id}
-                className={`p-4 rounded outline flex flex-col gap-4 w-64 ${
-                  selectedFileIds.includes(file.id)
-                    ? "bg-blue-50 outline-blue-200"
-                    : "bg-[#F1F1F1] outline-[#E6E7E7]"
-                }`}
+                key={folder._id}
+                className="p-4 bg-[#E8F5E9] rounded outline outline-[#C8E6C9] flex flex-col gap-2 w-64"
               >
-                <div className="flex items-center justify-between">
-                  <Checkbox
-                    checked={selectedFileIds.includes(file.id)}
-                    onChange={() => toggleFileSelection(file.id)}
-                  >
-                    Select
-                  </Checkbox>
+                <div className="flex justify-between items-center">
+                  <div className="text-lg font-medium">{folder.title}</div>
                   <CustomViewMoreButton
                     items={[
                       { label: "View", key: "view" },
+                      { label: "Update", key: "update" },
+                      { label: "Delete", key: "delete" },
                       { label: "Share", key: "share" },
                       { label: "Unshare", key: "unshare" },
-                      { label: "Delete", key: "delete" },
                     ]}
-                    onClick={(action: string) => handleFileAction(action, file)}
+                    onClick={(action: string) =>
+                      handleFolderAction(action, folder)
+                    }
                   />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <div className="text-lg font-medium break-words">
-                    {file.name}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {(file.size / 1024).toFixed(2)} KB
-                  </div>
+                <div className="text-sm text-gray-600">
+                  {folder.files.length} file
+                  {folder.files.length !== 1 ? "s" : ""}
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-12 border-2 border-dashed rounded-lg">
-            <p className="text-gray-500">No handover documents yet.</p>
-          </div>
-        )}
+        </div>
+      )}
 
-        {creating && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
-      </div>
+      {/* Files */}
+      {isLoading ? (
+        <p>Loading files...</p>
+      ) : files.length > 0 ? (
+        <div className="w-full h-full flex flex-wrap gap-4">
+          {files.map((file) => (
+            <div
+              key={file.id}
+              className={`p-4 rounded outline flex flex-col gap-4 w-64 ${
+                selectedFileIds.includes(file.id)
+                  ? "bg-blue-50 outline-blue-200"
+                  : "bg-[#F1F1F1] outline-[#E6E7E7]"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <Checkbox
+                  checked={selectedFileIds.includes(file.id)}
+                  onChange={() => toggleFileSelection(file.id)}
+                >
+                  Select
+                </Checkbox>
+                <CustomViewMoreButton
+                  items={[
+                    { label: "View", key: "view" },
+                    { label: "Share", key: "share" },
+                    { label: "Unshare", key: "unshare" },
+                    { label: "Delete", key: "delete" },
+                  ]}
+                  onClick={(action: string) => handleFileAction(action, file)}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="text-lg font-medium break-words">
+                  {file.name}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {(file.size / 1024).toFixed(2)} KB
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center flex items-center justify-center w-full min-h-screen">
+          <p className="text-gray-500">No handover documents yet.</p>
+        </div>
+      )}
+
+      {creating && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
 
       {/* Create Folder Modal */}
       <Modal
@@ -387,6 +447,47 @@ const HandoverToolPage = () => {
           value={newFolderTitle}
           onChange={(e) => setNewFolderTitle(e.target.value)}
           placeholder="Enter new folder name"
+        />
+      </Modal>
+
+      {/* Share Modal */}
+      <Modal
+        title="Share"
+        open={shareModalOpen}
+        onCancel={() => setShareModalOpen(false)}
+        footer={null}
+        width={500}
+      >
+        <CustomShareSelector
+          roles={["prime-admin", "basic-admin", "client"]}
+          onShare={handleConfirmShare}
+        />
+      </Modal>
+
+      {/* Unshare Modal */}
+      <Modal
+        title="Unshare"
+        open={unshareModalOpen}
+        onCancel={() => {
+          setUnshareModalOpen(false);
+          setSelectedItemId(null);
+        }}
+        footer={null}
+        width={500}
+      >
+        <CustomUnshareSelector
+          sharedUsers={(
+            (isFolder
+              ? singleFolderData?.sharedWith
+              : singleHandoverData?.sharedWith) || []
+          ).map((u: any) => ({
+            userId: u.userId._id,
+            name: u.userId.name,
+            role: u.userId.role,
+            email: u.userId.email || "",
+            profileImg: u.userId.profileImg,
+          }))}
+          onUnshare={handleConfirmUnshare}
         />
       </Modal>
     </div>

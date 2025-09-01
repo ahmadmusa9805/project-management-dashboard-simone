@@ -2,14 +2,14 @@
 
 import { Tabs } from "antd";
 import { useState } from "react";
-import AdminTable from "./UserManagement"; // This is your main table component
+import AdminTable, { type DataItem } from "./UserManagement"; // This is your main table component
 import CustomSearchInput from "../../components/CustomSearchInput";
 import CustomCreateButton from "../../components/CustomCreateButton";
 
 const UserPageWithTabs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<DataItem | null>(null);
   const [mode, setMode] = useState<"create" | "edit">("create");
 
   const handleSearch = (value: string) => {

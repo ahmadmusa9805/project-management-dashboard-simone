@@ -934,6 +934,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
       surface: file.surface,
       productCode: file.productCode,
       suplierName: file.supplierName,
+
       text: file.text,
     })) || [];
 
@@ -1014,7 +1015,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
     try {
       await shareFile({
         id: selectedFile.id,
-        sharedWith: selectedUsers.map((u) => u.userId),
+        sharedWith: selectedUsers,
       }).unwrap();
       message.success("File shared successfully");
       setShareModalOpen(false);
@@ -1050,7 +1051,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
         room: formData.room,
         surface: formData.surface,
         productCode: formData.productCode,
-        supplierName: formData.supplierName,
+        suplierName: formData.supplierName,
         text: formData.text,
         file: formData.file ?? undefined,
         projectId,
@@ -1097,6 +1098,9 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
     baseRoute === "second-fixed-list-material"
       ? "Create Second Fix File"
       : "Upload Files";
+
+  console.log(singleSecondFixData, "singleSecondFixData");
+  console.log(singleDocData, "singleDocData");
 
   return (
     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
@@ -1207,10 +1211,10 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
           title="Remove access"
           sharedUsers={
             (baseRoute === "documents"
-              ? singleDocData?.data?.sharedWith
-              : singleSecondFixData?.data?.sharedWith
+              ? singleDocData?.sharedWith
+              : singleSecondFixData?.sharedWith
             )?.map((u: any) => ({
-              userId: u.userId._id,
+              userId: u.userId?._id,
               name: u.userId.name,
               role: u.userId.role,
               email: u.userId.email || "",

@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "../store";
 
 // const musaVaiApi = "http://192.168.0.100:5001";
-const myApi = "http://localhost:5001";
+const myApi = "http://18.116.251.160";
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({

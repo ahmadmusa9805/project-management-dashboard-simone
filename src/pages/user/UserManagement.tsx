@@ -19,7 +19,7 @@ import TabPane from "antd/es/tabs/TabPane";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Redux/app/store";
 
-interface DataItem {
+export interface DataItem {
   id: string;
   name: string;
   email: string;
@@ -35,7 +35,19 @@ interface DataItem {
 type StatusType = "active" | "blocked";
 const ITEMS_PER_PAGE = 10;
 
-const AdminTable = () => {
+interface AdminTableProps {
+  title?: string;
+  statusFilter?: StatusType; // undefined = all users
+  searchTerm?: string;
+  openDrawer?: boolean;
+  setOpenDrawer?: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedUser?: DataItem | null;
+  setSelectedUser?: React.Dispatch<React.SetStateAction<DataItem | null>>;
+  mode?: "create" | "edit";
+  setMode?: React.Dispatch<React.SetStateAction<"create" | "edit">>;
+}
+
+const AdminTable: React.FC<AdminTableProps> = () => {
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [openDrawer, setOpenDrawer] = useState(false);

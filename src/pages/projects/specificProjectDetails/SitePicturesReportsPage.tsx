@@ -131,18 +131,6 @@ const SitePicturesReportsPage = () => {
                     { key: "share", label: "🔗 Share Quote" },
                     { key: "unshare", label: "🚫 Unshare Quote" },
                     { key: "delete", label: "🗑️ Delete Quote", danger: true },
-
-                    { label: "View", key: "view" },
-                    { label: "Share", key: "share" },
-                    { label: "Unshare", key: "unshare" },
-
-                    // Only show Edit and Delete for non-static folders
-                    ...(isStatic
-                      ? []
-                      : [
-                          { label: "Edit", key: "edit" },
-                          { label: "Delete", key: "delete" },
-                        ]),
                   ]}
                   onClick={(key) => handleFolderAction(folder, key)}
                 />

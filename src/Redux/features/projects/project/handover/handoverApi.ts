@@ -91,20 +91,26 @@ export const handoverApi = baseApi.injectEndpoints({
       invalidatesTags: ["Handover"],
     }),
 
-    // ✅ Share Handover File
-    shareHandoverFile: builder.mutation<any, string>({
-      query: (id) => ({
-        url: `/handovers/${id}/share`,
-        method: "POST",
-      }),
-      invalidatesTags: ["Handover"],
-    }),
+    shareHandoverFile: builder.mutation<any, { id: string; sharedWith: any[] }>(
+      {
+        query: ({ id, sharedWith }) => ({
+          url: `/handovers/${id}/share`,
+          method: "POST",
+          body: { sharedWith },
+        }),
+        invalidatesTags: ["Handover"],
+      }
+    ),
 
-    // ✅ Unshare Handover File
-    unShareHandoverFile: builder.mutation<any, string>({
-      query: (id) => ({
+    // ✅ Unshare Certificate
+    unShareHandoverFile: builder.mutation<
+      any,
+      { id: string; unShareWith: any[] }
+    >({
+      query: ({ id, unShareWith }) => ({
         url: `/handovers/${id}/unshare`,
         method: "POST",
+        body: { unShareWith },
       }),
       invalidatesTags: ["Handover"],
     }),
