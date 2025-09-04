@@ -21,6 +21,9 @@ import {
 } from "../../../Redux/features/projects/project/timeSchedule/timeScheduleApi";
 
 import type { SharedUser } from "../../../Redux/features/projects/projectsApi";
+import { errorAlert, successAlert } from "../../../utils/alerts";
+import { showDeleteAlert } from "../../../utils/deleteAlert";
+import { Unlink } from "lucide-react";
 
 const TimeSchedulePage: React.FC = () => {
   const navigate = useNavigate();
@@ -38,8 +41,10 @@ const TimeSchedulePage: React.FC = () => {
     }
   );
 
-  const [createTimeSchedule] = useCreateTimeScheduleMutation();
-  const [updateTimeSchedule] = useUpdateTimeScheduleMutation();
+  const [createTimeSchedule, { isLoading: createLoading }] =
+    useCreateTimeScheduleMutation();
+  const [updateTimeSchedule, { isLoading: updateLoading }] =
+    useUpdateTimeScheduleMutation();
   const [deleteTimeSchedule] = useDeleteTimeScheduleMutation();
   const [shareTimeSchedule] = useShareTimeScheduleMutation();
   const [unShareTimeSchedule] = useUnShareTimeScheduleMutation();
@@ -120,7 +125,7 @@ const TimeSchedulePage: React.FC = () => {
         );
 
         await createTimeSchedule(submitData);
-        message.success("Schedule created successfully");
+        successAlert("Schedule created successfully");
       } else {
         // For update, use the correct parameter structure
         const submitData = new FormData();
@@ -146,23 +151,29 @@ const TimeSchedulePage: React.FC = () => {
           id: editingSchedule._id,
           data: { formData: submitData }, // Fixed parameter structure
         });
-        message.success("Schedule updated successfully");
+        successAlert("Schedule updated successfully");
       }
 
       setIsFormOpen(false);
       setEditingSchedule(null);
     } catch (error) {
-      message.error("Failed to save schedule");
+      errorAlert("Failed to save schedule");
     }
   };
 
   const handleDeleteSchedule = async (id: string) => {
-    try {
-      await deleteTimeSchedule(id);
-      message.success("Schedule deleted successfully");
-    } catch (error) {
-      message.error("Failed to delete schedule");
-    }
+    showDeleteAlert({
+      onConfirm: async () => {
+        try {
+          await deleteTimeSchedule(id);
+        } catch (err: any) {
+          errorAlert(
+            "Delete Error",
+            err?.data?.message || "Failed to delete schedule"
+          );
+        }
+      },
+    });
   };
 
   const handleConfirmShare = async (selectedUsers: SharedUser[]) => {
@@ -195,17 +206,9 @@ const TimeSchedulePage: React.FC = () => {
 
   const schedules = schedulesData?.data || [];
 
-  if (schedulesLoading) {
-    return (
-      <div className="p-6 flex justify-center items-center h-64">
-        <Spin size="large" />
-      </div>
-    );
-  }
-
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-6">Time Schedule Page</h1>
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3 ">
+      <h1 className="text-xl font-bold mb-6 pt-8">Time Schedule </h1>
 
       <div className="flex justify-end mb-4">
         <CustomCreateButton
@@ -213,36 +216,52 @@ const TimeSchedulePage: React.FC = () => {
           onClick={handleCreateClick}
         />
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {schedules.map((item: any) => (
-          <div
-            key={item._id}
-            className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
-          >
-            <div className="flex justify-between">
-              <h3 className="text-lg font-semibold">{item.title}</h3>
-              <CustomViewMoreButton
-                items={[
-                  { key: "view", label: "View Documents" },
-                  { key: "edit", label: "Edit" },
-                  { key: "share", label: "Share" },
-                  { key: "unshare", label: "Unshare" },
-                  { key: "delete", label: "Delete", danger: true },
-                ]}
-                onClick={(key) => handleMenuClick(key, item)}
-              />
-            </div>
-            <p className="mt-2 text-gray-700">{item.description}</p>
-            <div className="mt-2 text-sm text-gray-500">
-              {new Date(item.startDate).toLocaleDateString()} -{" "}
-              {new Date(item.endDate).toLocaleDateString()}
-            </div>
+        {schedulesLoading ? (
+          <div className="col-span-3 flex justify-center items-center h-40">
+            <Spin size="large" />
           </div>
-        ))}
-
-        {schedules.length === 0 && (
-          <div className="col-span-3 text-center py-10 text-gray-500">
+        ) : schedules.length > 0 ? (
+          schedules.map((item: any) => (
+            <div
+              key={item._id}
+              className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
+            >
+              <div className="flex justify-between">
+                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <CustomViewMoreButton
+                  items={[
+                    //TODO: add view schedule later
+                    //  { key: "view", label: "👁️ View Schedule" },
+                    { key: "edit", label: "✏️ Edit Schedule" },
+                    { key: "share", label: "🔗 Share Schedule" },
+                    {
+                      key: "unshare",
+                      label: (
+                        <div className="flex items-center gap-1">
+                          <Unlink className="text-green-500" size={14} />
+                          Unshare Schedule
+                        </div>
+                      ),
+                    },
+                    {
+                      key: "delete",
+                      label: "🗑️ Delete Schedule",
+                      danger: true,
+                    },
+                  ]}
+                  onClick={(key) => handleMenuClick(key, item)}
+                />
+              </div>
+              <p className="mt-2 text-gray-700">{item.description}</p>
+              <div className="mt-2 text-sm text-gray-500">
+                {new Date(item.startDate).toLocaleDateString()} -{" "}
+                {new Date(item.endDate).toLocaleDateString()}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-3 text-center py-20 text-gray-500">
             No schedules found. Create your first schedule.
           </div>
         )}
@@ -261,6 +280,8 @@ const TimeSchedulePage: React.FC = () => {
         destroyOnClose
       >
         <TaskScheduleForm
+          creating={createLoading}
+          updating={updateLoading}
           entityName="Schedule"
           mode={formMode}
           initialData={editingSchedule}

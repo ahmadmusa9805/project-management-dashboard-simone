@@ -137,7 +137,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { Drawer, Tag, Modal, message } from "antd";
+import { Drawer, Tag, Modal } from "antd";
 import {
   useGetAllNotesQuery,
   useCreateNoteMutation,
@@ -154,6 +154,7 @@ import CustomCreateButton from "../../../components/CustomCreateButton";
 import CustomShareSelector from "../../../components/CustomShareSelector";
 import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
 import { useParams } from "react-router-dom";
+import { errorAlert, successAlert } from "../../../utils/alerts";
 
 const NotesPage = () => {
   const projectId = useParams().projectId;
@@ -165,8 +166,8 @@ const NotesPage = () => {
   } = useGetAllNotesQuery({
     projectId,
   });
-  const [createNote] = useCreateNoteMutation();
-  const [updateNote] = useUpdateNoteMutation();
+  const [createNote, { isLoading: creating }] = useCreateNoteMutation();
+  const [updateNote, { isLoading: updating }] = useUpdateNoteMutation();
   const [deleteNote] = useDeleteNoteMutation();
   const [shareNote] = useShareNoteMutation();
   const [unShareNote] = useUnShareNoteMutation();
@@ -203,12 +204,15 @@ const NotesPage = () => {
     try {
       if (editingNote) {
         await updateNote({ id: editingNote._id, data }).unwrap();
+        successAlert("Note updated successfully");
       } else {
         await createNote(data).unwrap();
+        successAlert("Note created successfully");
       }
       closeDrawer();
     } catch (error) {
       console.error("Failed to save note:", error);
+      errorAlert("Failed to save note");
     }
   };
 
@@ -233,11 +237,11 @@ const NotesPage = () => {
         id: shareNoteItem._id,
         sharedWith: selectedUsers,
       }).unwrap();
-      message.success("Note shared successfully");
+      successAlert("Note shared successfully");
       setShareModalOpen(false);
       setShareNoteItem(null);
     } catch (error) {
-      message.error("Failed to share note");
+      errorAlert("Failed to share note");
     }
   };
 
@@ -253,11 +257,11 @@ const NotesPage = () => {
         id: selectedNoteId!,
         unShareWith: selectedUsers.map((u) => u.userId),
       }).unwrap();
-      message.success("Note unshared successfully");
+      successAlert("Note unshared successfully");
       setUnshareModalOpen(false);
       setSelectedNoteId(null);
     } catch (error) {
-      message.error("Failed to unshare note");
+      errorAlert("Failed to unshare note");
     }
   };
 
@@ -265,9 +269,9 @@ const NotesPage = () => {
   if (error) return <div className="p-8 text-red-500">Error loading notes</div>;
 
   return (
-    <div className="w-full h-full p-8 bg-white flex flex-col items-end gap-8">
-      <div className="w-full flex justify-between items-end gap-8">
-        <h1 className="text-2xl font-medium text-[#000E0F]">My notes</h1>
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+      <div className="w-full flex justify-between items-end gap-8 my-10">
+        <h1 className="text-2xl font-medium text-[#000E0F] ">My notes</h1>
         <CustomCreateButton onClick={openCreateDrawer} title="New Note" />
       </div>
 
@@ -275,7 +279,7 @@ const NotesPage = () => {
         {notes.map((note: any) => (
           <div
             key={note.id}
-            className="w-full bg-white border rounded-2xl shadow-sm p-6 relative"
+            className="bg-gray-100 rounded shadow flex flex-col justify-between p-5 relative"
           >
             <div className="flex justify-between items-start">
               <div className="flex flex-col">
@@ -300,7 +304,10 @@ const NotesPage = () => {
               />
             </div>
 
-            <p className="mt-3 text-gray-700">{note.description}</p>
+            <div
+              className="prose max-w-none text-gray-800 mt-3"
+              dangerouslySetInnerHTML={{ __html: note.description }}
+            />
 
             <div className="flex items-center gap-2 mt-4 text-gray-600 text-sm">
               <Calendar size={16} />
@@ -336,6 +343,9 @@ const NotesPage = () => {
       >
         <NoteForm
           mode={editingNote ? "edit" : "create"}
+          closeDrawer={closeDrawer}
+          creating={creating}
+          updating={updating}
           initialData={editingNote}
           onSave={handleFormSubmit}
           onDelete={

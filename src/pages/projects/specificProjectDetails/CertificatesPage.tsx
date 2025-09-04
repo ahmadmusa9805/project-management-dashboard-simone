@@ -193,6 +193,11 @@ import {
 import type { SharedUser } from "../../../Redux/features/projects/projectsApi";
 import CustomShareSelector from "../../../components/CustomShareSelector";
 import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
+import { errorAlert, successAlert } from "../../../utils/alerts";
+import { showDeleteAlert } from "../../../utils/deleteAlert";
+import { Unlink } from "lucide-react";
+
+import CertificateDocumentSceoundFixViewer from "../../../components/CertificateDocumentSceoundFixViewer";
 // ✅ new reusable unshare component
 
 const CertificatesPage: React.FC = () => {
@@ -207,9 +212,11 @@ const CertificatesPage: React.FC = () => {
     }
   );
 
-  const [createCertificate] = useCreateCertificateMutation();
+  const [createCertificate, { isLoading: createLoading }] =
+    useCreateCertificateMutation();
   const [deleteCertificate] = useDeleteCertificateMutation();
-  const [updateCertificate] = useUpdateCertificateMutation();
+  const [updateCertificate, { isLoading: updateLoading }] =
+    useUpdateCertificateMutation();
   const [shareCertificate] = useShareCertificateMutation();
   const [unShareCertificate] = useUnShareCertificateMutation();
 
@@ -219,6 +226,8 @@ const CertificatesPage: React.FC = () => {
   // Share modal state
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareCert, setShareCert] = useState<any>(null);
+  const [selectedCert, setSelectedCert] = useState<{ file?: string }>({});
+  const [openViewModel, setOpenViewModel] = useState(false);
 
   // Unshare modal state
   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
@@ -236,14 +245,14 @@ const CertificatesPage: React.FC = () => {
               projectId,
             },
           });
-          message.success(`Certificate "${file.name}" updated successfully`);
+          successAlert(`Certificate "${file.name}" updated successfully`);
         } else {
           await createCertificate({
             file: file.originFileObj,
             title: file.name,
             projectId,
           });
-          message.success(`Certificate "${file.name}" uploaded successfully`);
+          successAlert(`Certificate "${file.name}" uploaded successfully`);
         }
       }
       setDrawerOpen(false);
@@ -254,13 +263,21 @@ const CertificatesPage: React.FC = () => {
   };
 
   // ✅ Delete certificate
-  const handleDeleteCertificate = async (id: string) => {
-    try {
-      await deleteCertificate(id);
-      message.success("Certificate deleted");
-    } catch (error) {
-      message.error("Failed to delete certificate");
-    }
+  const handleDeleteCertificate = async (cert: any) => {
+    showDeleteAlert({
+      title: "Are you sure?",
+      text: `Delete certificate "${cert.title}"? This action cannot be undone.`,
+      onConfirm: async () => {
+        try {
+          await deleteCertificate(cert._id);
+          // successAlert("Certificate deleted successfully!");
+        } catch (error) {
+          errorAlert("Failed to delete certificate");
+        }
+      },
+    });
+    // await deleteCertificate(id);
+    // message.success("Certificate deleted");
   };
 
   // ✅ Open Share Modal
@@ -276,11 +293,11 @@ const CertificatesPage: React.FC = () => {
         id: shareCert._id,
         sharedWith: selectedUsers,
       });
-      message.success("Certificate shared successfully");
+      successAlert("Certificate shared successfully");
       setShareModalOpen(false);
       setShareCert(null);
     } catch (error) {
-      message.error("Failed to share certificate");
+      errorAlert("Failed to share certificate");
     }
   };
 
@@ -291,8 +308,10 @@ const CertificatesPage: React.FC = () => {
     setUnshareModalOpen(true);
   };
 
-  const handleView = (id: any) => {
-    console.log(id);
+  const handleView = (certificate: any) => {
+    setSelectedCert(certificate);
+    setOpenViewModel(true);
+    console.log(certificate);
   };
   // ✅ Confirm Unshare
   const handleConfirmUnshare = async (selectedUsers: SharedUser[]) => {
@@ -303,10 +322,10 @@ const CertificatesPage: React.FC = () => {
         id: selectedCertId!,
         unShareWith: selectedUsers.map((u) => u.userId), // ✅ now this will be string IDs
       });
-      message.success("Certificate unshared successfully");
+      successAlert("Certificate unshared successfully");
       setUnshareModalOpen(false);
     } catch (error) {
-      message.error("Failed to unshare certificate");
+      errorAlert("Failed to unshare certificate");
     }
   };
 
@@ -314,7 +333,7 @@ const CertificatesPage: React.FC = () => {
     <>
       <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
         {" "}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 mt-10">
           <h1 className="text-2xl font-semibold">Certificates</h1>
           <CustomCreateButton
             title="Add Certificate"
@@ -333,15 +352,27 @@ const CertificatesPage: React.FC = () => {
           <div className="w-full p-5 flex flex-wrap gap-4 items-start justify-start">
             {certificatesData?.data?.map((cert: any) => (
               <div className="">
-                <div key={cert._id} className="relative ">
+                <div
+                  key={cert._id}
+                  className="relative hover:bg-[#e6f4ea] bg-[#f1f1f1] cursor-pointer"
+                  onClick={() => handleView(cert)}
+                >
                   <CertificateCard title={cert.title} size={``} />
                   <div className="absolute top-2 right-2">
                     <CustomViewMoreButton
                       items={[
-                        { key: "view", label: "👀 View Certificate" },
+                        { key: "view", label: "👁️ View Certificate" },
                         { key: "edit", label: "✏️ Edit Certificate" },
                         { key: "share", label: "🔗 Share Certificate" },
-                        { key: "unshare", label: "🚫 Unshare Certificate" },
+                        {
+                          key: "unshare",
+                          label: (
+                            <div className="flex items-center gap-1">
+                              <Unlink className="text-green-500" size={14} />
+                              Unshare Certificate
+                            </div>
+                          ),
+                        },
                         {
                           key: "delete",
                           label: "🗑️ Delete Certificate",
@@ -353,11 +384,11 @@ const CertificatesPage: React.FC = () => {
                           setEditingCert(cert);
                           setDrawerOpen(true);
                         }
-                        if (key === "delete") handleDeleteCertificate(cert._id);
+                        if (key === "delete") handleDeleteCertificate(cert);
                         if (key === "share") handleShareCertificate(cert);
                         if (key === "unshare")
                           handleUnShareCertificate(cert._id);
-                        if (key === "view") handleView(cert._id);
+                        if (key === "view") handleView(cert);
                       }}
                     />
                   </div>
@@ -377,7 +408,23 @@ const CertificatesPage: React.FC = () => {
           footer={null}
           width={500}
         >
-          <ImageUploader onUploadSuccess={handleUploadSuccess} />
+          <ImageUploader
+            uploading={createLoading || updateLoading}
+            onUploadSuccess={handleUploadSuccess}
+          />
+        </Modal>
+        <Modal
+          title={""}
+          open={openViewModel}
+          onCancel={() => {
+            setOpenViewModel(false);
+          }}
+          footer={null}
+          width={900}
+        >
+          <CertificateDocumentSceoundFixViewer
+            propfileUrl={selectedCert?.file as string}
+          ></CertificateDocumentSceoundFixViewer>
         </Modal>
         {/* Modal for Sharing */}
         <Modal

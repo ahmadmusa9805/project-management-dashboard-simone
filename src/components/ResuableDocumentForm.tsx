@@ -145,6 +145,7 @@ type DocumentField = {
 
 type DocumentFormProps = {
   mode: "create" | "edit";
+  title?: string;
   creating?: boolean;
   updating?: boolean;
   fields: DocumentField[];
@@ -155,6 +156,7 @@ type DocumentFormProps = {
 };
 
 const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
+  title,
   mode,
   fields,
   creating,
@@ -177,7 +179,7 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
 
   return (
     <Drawer
-      title={mode === "create" ? "New Interim" : "Edit Interim"}
+      title={`${title} ${mode === "create" ? "Create" : "Update"}`}
       placement="right"
       width={480}
       onClose={onClose}
@@ -295,7 +297,8 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
         <div className="w-full flex justify-start gap-3 mt-4">
           <Button
             onClick={onClose}
-            className="flex-1 h-12 px-6 bg-[#172B4D0F] rounded text-[#001D01] text-base font-medium leading-6 tracking-wide"
+            type="text"
+            className="flex-1 h-12 px-6  rounded text-base font-medium cancel leading-6 tracking-wide"
           >
             Cancel
           </Button>

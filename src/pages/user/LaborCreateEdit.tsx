@@ -1,11 +1,9 @@
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { Form, Input, InputNumber, Button, Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
 
 import { successAlert, errorAlert } from "../../utils/alerts";
+import { CloudUpload } from "lucide-react";
 
 interface Props {
   mode: "create" | "edit";
@@ -117,28 +115,45 @@ const LaborCreateEdit: React.FC<Props> = ({
       </Form.Item>
 
       <Form.Item label="Upload File" required={mode === "create"}>
-        <Upload
-          beforeUpload={(file) => {
-            setPhotoFile(file);
-            return false; // prevent auto upload
-          }}
-          maxCount={1}
-          fileList={photoFile ? [photoFile as any] : []} // To show selected file
-          onRemove={() => setPhotoFile(null)}
-        >
-          <Button icon={<UploadOutlined />}>Click to Upload</Button>
-        </Upload>
+        <div className="flex flex-col gap-1">
+          <label className="font-medium">Contract PDF</label>
+          <Upload.Dragger
+            name="file"
+            accept=".pdf"
+            beforeUpload={(file) => {
+              setPhotoFile(file); // save file to state
+              return false; // prevent auto upload
+            }}
+            multiple={false}
+            fileList={photoFile ? [photoFile as any] : []} // show selected file
+            onRemove={() => setPhotoFile(null)}
+            style={{ padding: "8px" }}
+          >
+            <p className="text-center flex flex-col items-center">
+              <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+            </p>
+            <p className="text-[10px]">Click or drag PDF to upload</p>
+          </Upload.Dragger>
+
+          {/* Optional: render validation error */}
+          {mode === "create" && !photoFile && (
+            <div className="text-red-500 text-xs mt-1">File is required</div>
+          )}
+        </div>
       </Form.Item>
 
-      <Form.Item>
-        <Button onClick={onCancel}>Cancel</Button>
+      <Form.Item className="flex justify-end gap-2">
+        <Button type="text" className="cancel" onClick={onCancel}>
+          Cancel
+        </Button>
+
         <Button
-          style={{ marginLeft: 8 }}
           type="primary"
+          style={{ marginLeft: 8 }}
           htmlType="submit"
           loading={creating || updating}
         >
-          {mode === "create" ? "Add" : "Save"}
+          {mode === "create" ? "Create" : "Update"}
         </Button>
       </Form.Item>
     </Form>
@@ -146,5 +161,3 @@ const LaborCreateEdit: React.FC<Props> = ({
 };
 
 export default LaborCreateEdit;
-
-

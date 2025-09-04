@@ -89,7 +89,7 @@
 // export default PasswordUpdateModal;
 
 import React, { useState, useEffect } from "react";
-import { Modal, Spin } from "antd";
+import { Button, Modal, Spin } from "antd";
 
 interface PasswordUpdateModalProps {
   isOpen: boolean;
@@ -172,17 +172,17 @@ const PasswordUpdateModal: React.FC<PasswordUpdateModalProps> = ({
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <button
-            type="button"
+          <Button
+            type="text"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 hover:opacity-80 rounded"
+            className="px-4 py-2 cancel rounded"
             disabled={isSaving}
           >
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-[#0d542b] text-white hover:opacity-80 font-semibold rounded flex items-center gap-2"
+          </Button>
+          <Button
+            type="primary"
+            className="px-4 py-2 b  font-semibold rounded flex items-center gap-2"
             disabled={isSaving}
           >
             {isSaving ? (
@@ -192,7 +192,7 @@ const PasswordUpdateModal: React.FC<PasswordUpdateModalProps> = ({
             ) : (
               "Save"
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

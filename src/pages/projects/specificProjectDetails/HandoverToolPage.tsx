@@ -15,8 +15,8 @@
 
 // TODO: reviewing ---------------------------------------------------------------------------------------------------------------------------------------------------------
 import type React from "react";
-import { useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   useGetAllHandoversQuery,
   useCreateHandoverMutation,
@@ -39,9 +39,15 @@ import {
 import type { SharedUser } from "../../../Redux/features/projects/projectsApi";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import CustomCreateButton from "../../../components/CustomCreateButton";
-import { Modal, Checkbox, Button, Input, message } from "antd";
+import { Modal, Checkbox, Button, Input, message, Spin } from "antd";
 import CreateFolder from "../../../components/CreateFolder";
 import CustomShareSelector from "../../../components/CustomShareSelector";
+// import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
+import { Unlink } from "lucide-react";
+import ImageUploader from "../../../components/ImageUploader";
+import CertificateDocumentSceoundFixViewer from "../../../components/CertificateDocumentSceoundFixViewer";
+import { showDeleteAlert } from "../../../utils/deleteAlert";
+import { errorAlert, successAlert } from "../../../utils/alerts";
 import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
 
 interface FileItem {
@@ -59,8 +65,6 @@ interface Folder {
 
 const HandoverToolPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
@@ -73,7 +77,9 @@ const HandoverToolPage: React.FC = () => {
   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [isFolder, setIsFolder] = useState(false);
-
+  const [uploaderOpen, setUploaderOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedFile] = useState<any>(null);
   // API hooks
   const {
     data: handoverData,
@@ -88,10 +94,12 @@ const HandoverToolPage: React.FC = () => {
       skip: !projectId,
     });
 
-  const { data: singleHandoverData, refetch: refetchSingleFolder } =
-    useGetSingleHandoverQuery(selectedItemId!, {
+  const { data: singleHandoverData } = useGetSingleHandoverQuery(
+    selectedItemId!,
+    {
       skip: !selectedItemId || isFolder,
-    });
+    }
+  );
 
   const { data: singleFolderData } = useGetSingleHandoverCombineQuery(
     selectedItemId!,
@@ -125,19 +133,21 @@ const HandoverToolPage: React.FC = () => {
       files: folder.files,
     })) || [];
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || !projectId) return;
+  const handleUploadSuccess = async (fileList: any[]) => {
+    console.log(fileList);
+    if (!projectId) return;
     try {
-      for (const file of Array.from(files)) {
-        await createHandover({ projectId, title: file.name, file }).unwrap();
+      for (const file of fileList) {
+        await createHandover({
+          projectId,
+          title: file.name,
+          file: file, // 👈 actual File object
+        }).unwrap();
       }
+      message.success("Files uploaded successfully");
       refetchHandovers();
-    } catch (err) {
+      setUploaderOpen(false);
+    } catch {
       message.error("Failed to upload files");
     }
   };
@@ -170,7 +180,10 @@ const HandoverToolPage: React.FC = () => {
   const handleFileAction = async (action: string, file: FileItem) => {
     switch (action) {
       case "view":
-        window.open(file.url, "_blank");
+        setSelectedItemId(file.id); // set ID for fetching
+        setIsFolder(false); // it's a single file
+        setViewModalOpen(true);
+        // window.open(file.url, "_blank");
         break;
       case "share":
         setSelectedItemId(file.id);
@@ -178,16 +191,31 @@ const HandoverToolPage: React.FC = () => {
         setShareModalOpen(true);
         break;
       case "unshare":
+        console.log(file.id, "unshare");
         setSelectedItemId(file.id);
         setIsFolder(false);
         setUnshareModalOpen(true);
-        refetchSingleFolder();
+
         break;
       case "delete":
-        if (window.confirm(`Delete ${file.name}?`)) {
-          await deleteHandover(file.id);
-          refetchHandovers();
-        }
+        showDeleteAlert({
+          title: "Are you sure?",
+          text: `Delete ${file.name}? This action cannot be undone.`,
+          onConfirm: async () => {
+            try {
+              await deleteHandover(file.id).unwrap();
+              // successAlert("File deleted successfully");
+              refetchHandovers();
+            } catch (error) {
+              errorAlert("Failed to delete file");
+            }
+          },
+        });
+
+        // if (window.confirm(`Delete ${file.name}?`)) {
+        //   await deleteHandover(file.id);
+
+        // }
         break;
     }
   };
@@ -195,19 +223,30 @@ const HandoverToolPage: React.FC = () => {
   // Folder actions
   const handleFolderAction = async (action: string, folder: Folder) => {
     switch (action) {
-      case "view":
-        navigate(`/handover/folder/${folder._id}`);
-        break;
       case "update":
         setRenameFolderId(folder._id);
         setNewFolderTitle(folder.title);
         setIsRenameModalOpen(true);
         break;
       case "delete":
-        if (window.confirm(`Delete folder ${folder.title}?`)) {
-          await deleteHandoverCombine(folder._id);
-          refetchFolders();
-        }
+        showDeleteAlert({
+          title: "Are you sure?",
+          text: `Delete ${folder.title}? This action cannot be undone.`,
+          onConfirm: async () => {
+            try {
+              await deleteHandoverCombine(folder._id).unwrap();
+              // successAlert("File deleted successfully");
+              refetchFolders();
+            } catch (error) {
+              errorAlert("Failed to delete file");
+            }
+          },
+        });
+
+        // if (window.confirm(`Delete folder ${folder.title}?`)) {
+        //   await deleteHandoverCombine(folder._id);
+
+        // }
         break;
       case "share":
         setSelectedItemId(folder._id);
@@ -248,13 +287,14 @@ const HandoverToolPage: React.FC = () => {
           id: selectedItemId!,
           sharedWith: selectedUsers,
         }).unwrap();
+        successAlert("Shared successfully");
       } else {
         await shareHandover({
           id: selectedItemId!,
           sharedWith: selectedUsers,
         }).unwrap();
       }
-      message.success("Shared successfully");
+      successAlert("Shared successfully");
       setShareModalOpen(false);
       setSelectedItemId(null);
     } catch {
@@ -270,12 +310,13 @@ const HandoverToolPage: React.FC = () => {
           id: selectedItemId!,
           unShareWith: selectedUsers.map((u) => u.userId),
         }).unwrap();
+        successAlert("Unshared successfully");
       } else {
         await unShareHandover({
           id: selectedItemId!,
           unShareWith: selectedUsers.map((u) => u.userId),
         }).unwrap();
-        refetchSingleFolder();
+        successAlert("Unshared successfully");
       }
       message.success("Unshared successfully");
       setUnshareModalOpen(false);
@@ -285,18 +326,19 @@ const HandoverToolPage: React.FC = () => {
     }
   };
 
-  console.log(singleFolderData, "singleFolderData");
-  console.log(singleHandoverData, "singleHandoverData");
+  console.log(selectedFile, "selectedFile");
+  // console.log(singleFolderData, "singleFolderData");
+  // console.log(singleHandoverData, "singleHandoverData");
 
   return (
     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">📁 Handover — Uploaded Files</h1>
+      <div className="flex justify-between items-center mb-4 mt-10">
+        <h1 className="text-2xl font-semibold">Handover</h1>
         <div className="flex gap-2">
           <CustomCreateButton
             title="Upload Handover Documents"
-            onClick={handleUploadClick}
+            onClick={() => setUploaderOpen(true)}
           />
           <Button
             type="primary"
@@ -309,8 +351,8 @@ const HandoverToolPage: React.FC = () => {
       </div>
 
       {selectedFileIds.length > 0 && (
-        <div className="mb-4 p-2 bg-blue-50 rounded-md">
-          <p className="text-blue-700">
+        <div className="mb-4 p-2 bg-[#e6f4ea] rounded-md">
+          <p className="text-[#0d542b]">
             {selectedFileIds.length} file
             {selectedFileIds.length !== 1 ? "s" : ""} selected
           </p>
@@ -318,59 +360,26 @@ const HandoverToolPage: React.FC = () => {
             type="link"
             size="small"
             onClick={() => setSelectedFileIds([])}
-            className="p-0 text-blue-500"
+            style={{ color: "#0d542b" }} // <-- use inline style to override AntD
+            className="p-0"
           >
             Clear selection
           </Button>
         </div>
       )}
 
-      <input
+      {/* <input
         ref={fileInputRef}
         type="file"
         multiple
         onChange={handleFileUpload}
         className="hidden"
-      />
-
-      {/* Folders */}
-      {folders.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-3">📂 Folders</h2>
-          <div className="flex flex-wrap gap-4">
-            {folders.map((folder) => (
-              <div
-                key={folder._id}
-                className="p-4 bg-[#E8F5E9] rounded outline outline-[#C8E6C9] flex flex-col gap-2 w-64"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="text-lg font-medium">{folder.title}</div>
-                  <CustomViewMoreButton
-                    items={[
-                      { label: "View", key: "view" },
-                      { label: "Update", key: "update" },
-                      { label: "Delete", key: "delete" },
-                      { label: "Share", key: "share" },
-                      { label: "Unshare", key: "unshare" },
-                    ]}
-                    onClick={(action: string) =>
-                      handleFolderAction(action, folder)
-                    }
-                  />
-                </div>
-                <div className="text-sm text-gray-600">
-                  {folder.files.length} file
-                  {folder.files.length !== 1 ? "s" : ""}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
+      /> */}
       {/* Files */}
       {isLoading ? (
-        <p>Loading files...</p>
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
+        </div>
       ) : files.length > 0 ? (
         <div className="w-full h-full flex flex-wrap gap-4">
           {files.map((file) => (
@@ -378,7 +387,7 @@ const HandoverToolPage: React.FC = () => {
               key={file.id}
               className={`p-4 rounded outline flex flex-col gap-4 w-64 ${
                 selectedFileIds.includes(file.id)
-                  ? "bg-blue-50 outline-blue-200"
+                  ? "bg-[#e6f4ea] outline-[#0d542b]"
                   : "bg-[#F1F1F1] outline-[#E6E7E7]"
               }`}
             >
@@ -391,21 +400,34 @@ const HandoverToolPage: React.FC = () => {
                 </Checkbox>
                 <CustomViewMoreButton
                   items={[
-                    { label: "View", key: "view" },
-                    { label: "Share", key: "share" },
-                    { label: "Unshare", key: "unshare" },
-                    { label: "Delete", key: "delete" },
+                    { key: "view", label: "👁️ View " },
+                    // { key: "edit", label: "✏️ Edit " },
+                    { key: "share", label: "🔗 Share " },
+                    {
+                      key: "unshare",
+                      label: (
+                        <div className="flex items-center gap-1">
+                          <Unlink className="text-green-500" size={14} />
+                          Unshare
+                        </div>
+                      ),
+                    },
+                    {
+                      key: "delete",
+                      label: "🗑️ Delete ",
+                      danger: true,
+                    },
                   ]}
                   onClick={(action: string) => handleFileAction(action, file)}
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <div className="text-lg font-medium break-words">
+                <div className="text-lg font-medium w-[90%] truncate">
                   {file.name}
                 </div>
-                <div className="text-sm text-gray-500">
+                {/* <div className="text-sm text-gray-500">
                   {(file.size / 1024).toFixed(2)} KB
-                </div>
+                </div> */}
               </div>
             </div>
           ))}
@@ -416,7 +438,70 @@ const HandoverToolPage: React.FC = () => {
         </div>
       )}
 
-      {creating && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
+      {/* Folders */}
+      {folders.length > 0 && (
+        <div className="my-16">
+          <h2 className="text-xl font-semibold ">📂Created Folders</h2>
+          <div className="flex flex-wrap gap-4 mt-8">
+            {folders.map((folder) => (
+              <div
+                key={folder._id}
+                className="p-4 bg-[#E8F5E9] rounded outline outline-[#C8E6C9] flex flex-col gap-2 w-64"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="text-lg font-medium truncate w-[90%]">
+                    {folder.title}
+                  </div>
+                  <CustomViewMoreButton
+                    items={[
+                      // { key: "view", label: "👀 View Certificate" },
+                      // { key: "edit", label: "✏️ Edit " },
+                      { key: "share", label: "🔗 Share " },
+                      {
+                        key: "unshare",
+                        label: (
+                          <div className="flex items-center gap-1">
+                            <Unlink className="text-green-500" size={14} />
+                            Unshare
+                          </div>
+                        ),
+                      },
+                      {
+                        key: "delete",
+                        label: "🗑️ Delete ",
+                        danger: true,
+                      },
+                    ]}
+                    onClick={(action: string) =>
+                      handleFolderAction(action, folder)
+                    }
+                  />
+                </div>
+                <div className="text-sm ">
+                  {folder.files.length} file
+                  {folder.files.length !== 1 ? "s" : ""}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* {creating && <p className="text-sm text-gray-500 mt-2">Uploading...</p>} */}
+
+      <Modal
+        title="Upload Handover Documents"
+        open={uploaderOpen}
+        onCancel={() => setUploaderOpen(false)}
+        footer={null}
+        width={500}
+      >
+        <ImageUploader
+          uploading={creating}
+          fileType="pdf" // 👈 or "image", depending on what handovers should be
+          onUploadSuccess={handleUploadSuccess}
+        />
+      </Modal>
 
       {/* Create Folder Modal */}
       <Modal
@@ -450,6 +535,23 @@ const HandoverToolPage: React.FC = () => {
         />
       </Modal>
 
+      {/* View modal */}
+      <Modal
+        title={"File Viewer"}
+        open={viewModalOpen}
+        onCancel={() => {
+          setViewModalOpen(false);
+          setSelectedItemId(null);
+        }}
+        footer={null}
+        width={900}
+        destroyOnClose
+      >
+        <CertificateDocumentSceoundFixViewer
+          propfileUrl={singleHandoverData?.file}
+        />
+      </Modal>
+
       {/* Share Modal */}
       <Modal
         title="Share"
@@ -475,20 +577,23 @@ const HandoverToolPage: React.FC = () => {
         footer={null}
         width={500}
       >
-        <CustomUnshareSelector
-          sharedUsers={(
-            (isFolder
-              ? singleFolderData?.sharedWith
-              : singleHandoverData?.sharedWith) || []
-          ).map((u: any) => ({
-            userId: u.userId._id,
-            name: u.userId.name,
-            role: u.userId.role,
-            email: u.userId.email || "",
-            profileImg: u.userId.profileImg,
-          }))}
-          onUnshare={handleConfirmUnshare}
-        />
+        {((isFolder && singleFolderData) ||
+          (!isFolder && singleHandoverData)) && (
+          <CustomUnshareSelector
+            sharedUsers={(
+              (isFolder
+                ? singleFolderData?.sharedWith
+                : singleHandoverData?.sharedWith) || []
+            ).map((u: any) => ({
+              userId: u.userId._id,
+              name: u.userId.name,
+              role: u.userId.role || "unknown",
+              email: u.userId.email || "",
+              profileImg: u.userId.profileImg,
+            }))}
+            onUnshare={handleConfirmUnshare}
+          />
+        )}
       </Modal>
     </div>
   );

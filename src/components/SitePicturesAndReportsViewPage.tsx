@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-irregular-whitespace */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -514,7 +515,7 @@
 // SitePicturesAndReportsViewPage.tsx
 
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Drawer, message, Spin } from "antd";
 import CustomCreateButton from "./CustomCreateButton";
 import ReportForm from "./ReportForm";
@@ -540,8 +541,10 @@ import {
 import { showDeleteAlert } from "../utils/deleteAlert";
 import type { ReportFormData } from "./ReportForm";
 import { errorAlert, successAlert } from "../utils/alerts";
+import { ChevronLeft } from "lucide-react";
 
 const SitePicturesAndReportsViewPage: React.FC = () => {
+  const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { projectId, folderId } = useParams<{
     projectId: string;
@@ -555,17 +558,24 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
       skip: isReport,
     }
   );
-  const { data: imagesData } = useGetAllSitePictureImagesQuery(
-    { projectId: projectId as string, sitePictureFolderId: folderId as string },
-    { skip: isReport }
-  );
+  const { data: imagesData, refetch: refetchImages } =
+    useGetAllSitePictureImagesQuery(
+      {
+        projectId: projectId as string,
+        sitePictureFolderId: folderId as string,
+      },
+      { skip: isReport }
+    );
 
   const [createSitePictureImage, { isLoading: isLoadingUpload }] =
     useCreateSitePictureImageMutation();
   const [updateSitePictureImage] = useUpdateSitePictureImageMutation(); // Reports
 
-  const { data: reportsData, isLoading: isLoadingReports } =
-    useGetSiteReportsQuery(projectId as string, { skip: !isReport });
+  const {
+    data: reportsData,
+    isLoading: isLoadingReports,
+    refetch: refetchReports,
+  } = useGetSiteReportsQuery(projectId as string, { skip: !isReport });
   const [createSiteReport, { isLoading: isLoadingCreateReport }] =
     useCreateSiteReportMutation();
   const [deleteSiteReport] = useDeleteSiteReportMutation(); // Pictures transform
@@ -598,6 +608,8 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
     });
     try {
       await createSitePictureImage(formData).unwrap();
+      handleCloseDrawer();
+      refetchImages();
       successAlert(`${fileList.length} image(s) uploaded successfully!`);
     } catch (err) {
       console.error("Failed to upload images:", err);
@@ -605,6 +617,7 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
     }
   };
 
+  console.log(reportsData, "reportsData");
   const handleReportCreate = async (reportData: ReportFormData) => {
     if (!projectId) {
       message.error("Project ID is missing");
@@ -637,9 +650,12 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
         formData.append("LaborTeam", file)
       );
       await createSiteReport(formData).unwrap();
-      message.success("Report created successfully!");
+      refetchReports();
+
+      successAlert("Report created successfully!");
+      setIsDrawerOpen(false);
     } catch (err) {
-      console.error("Failed to upload images:", err);
+      errorAlert("Failed to upload images:");
     }
   };
 
@@ -664,13 +680,13 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
               data: formData,
             }).unwrap();
 
-            message.success("Image deleted successfully!");
+            // successAlert("Image deleted successfully!");
           } else {
-            message.error("Could not find the image record.");
+            errorAlert("Could not find the image record.");
           }
         } catch (err) {
           console.error("Failed to delete image:", err);
-          message.error("Could not delete the image.");
+          errorAlert("Could not delete the image.");
         }
       },
     });
@@ -683,9 +699,8 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
       onConfirm: async () => {
         try {
           await deleteSiteReport(reportId).unwrap();
-          message.success("Report deleted successfully!");
         } catch {
-          message.error("Could not delete the report.");
+          errorAlert("Could not delete the report.");
         }
       },
     });
@@ -697,22 +712,24 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
   console.log(reportsData); // Render
   return (
     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
-           {" "}
-      <div className="flex justify-between items-center mb-4">
-               {" "}
-        <h1 className="text-2xl font-bold capitalize">
-                    {isReport ? "Report" : folderTitle}       {" "}
-        </h1>
-               {" "}
+      <div className="flex justify-between items-center py-8">
+        <div className="flex items-center gap-1 pt-10 mb-3">
+          <ChevronLeft
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 cursor-pointer -translate-y-[4px]" // Adjust -translate-y value as needed
+          />
+          <h1 className="text-2xl font-bold capitalize">
+            {isReport ? "Report" : folderTitle}
+          </h1>
+        </div>
+
         <CustomCreateButton
           title={isReport ? "Create Report" : "Upload Image"}
           onClick={handleCreate}
         />
-             {" "}
       </div>
-           {" "}
       <Drawer
-        title={isReport ? "Create Daily Report" : "Upload Image"}
+        title={isReport ? "Create Report" : "Upload Image"}
         width={640}
         onClose={handleCloseDrawer}
         open={isDrawerOpen}
@@ -726,6 +743,7 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
           />
         ) : (
           <ImageUploader
+            // onClose={() => setIsDrawerOpen(false)}
             uploading={isLoadingUpload}
             onUploadSuccess={handleImageUpload}
           />
@@ -737,21 +755,25 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow w-full">
                    {" "}
           {isLoadingReports ? (
-            <p>
-              <Spin></Spin>
-            </p>
+            <div className="flex justify-center items-center h-40">
+              <Spin size="large" />
+            </div>
           ) : reportsData?.length ? (
             <SiteReportsList
               reports={reportsData}
               onDelete={handleDeleteReport}
             />
           ) : (
-            <p>No reports have been created yet.</p>
+            <div className="flex justify-center items-center h-40">
+              <p>No reports have been created yet.</p>
+            </div>
           )}
                  {" "}
         </div>
       ) : pictures.length === 0 ? (
-        <p>No pictures have been uploaded to this folder yet.</p>
+        <div className="flex justify-center items-center h-40">
+          <p>No pictures have been uploaded to this folder yet.</p>
+        </div>
       ) : (
         <ImageGallery images={pictures} onUpdate={handleUpdatePicture} />
       )}

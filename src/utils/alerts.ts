@@ -1,20 +1,20 @@
 // utils/alerts.ts
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 export const successAlert = (title: string, text?: string) => {
   return Swal.fire({
-    icon: 'success',
+    icon: "success",
     title,
     text,
-    confirmButtonColor: '#001D01',
+    confirmButtonColor: "#0d542b",
   });
 };
 
 export const errorAlert = (title: string, text?: string) => {
   return Swal.fire({
-    icon: 'error',
+    icon: "error",
     title,
     text,
-    confirmButtonColor: '#d33',
+    confirmButtonColor: "#0d542b",
   });
 };

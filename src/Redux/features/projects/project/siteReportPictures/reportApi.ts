@@ -17,17 +17,17 @@ export interface SiteReport {
   updatedAt: string;
 }
 
-interface SiteReportsApiResponse {
-  data: SiteReport[];
-  message: string;
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPage: number;
-  };
-  success: boolean;
-}
+// interface SiteReportsApiResponse {
+//   data: SiteReport[];
+//   message: string;
+//   meta: {
+//     page: number;
+//     limit: number;
+//     total: number;
+//     totalPage: number;
+//   };
+//   success: boolean;
+// }
 
 export interface CreateSiteReportRequest {
   projectId: string;
@@ -67,8 +67,8 @@ export const reportApi = baseApi.injectEndpoints({
         url: `/site-reports?projectId=${projectId}`,
         method: "GET",
       }),
-      transformResponse: (response: SiteReportsApiResponse) => response.data,
-      providesTags: ["SiteReports"],
+      transformResponse: (response: { status: string; data: any }) =>
+        response.data,
     }),
 
     getSingleSiteReport: build.query<SiteReport, string>({

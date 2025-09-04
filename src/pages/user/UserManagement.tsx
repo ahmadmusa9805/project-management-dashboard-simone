@@ -6,7 +6,6 @@ import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 import { Drawer } from "antd";
 import UserCreateEditPage from "./UserCreateEditPage";
-import getStatusClasses from "../../utils/getStatusClasses";
 import { USER_ROLE, type TRole } from "../../types/userAllTypes/user";
 import { useLocation } from "react-router-dom";
 import UserDetailsModal from "./UserDetailModal";
@@ -249,11 +248,14 @@ const AdminTable: React.FC<AdminTableProps> = () => {
 
                           <td className="px-4 py-3">
                             <div
-                              className={`inline-block px-3 py-1 rounded text-sm font-medium ${getStatusClasses(
-                                status
-                              )}`}
+                              className={`inline-block px-3 py-1  rounded text-sm font-medium ${
+                                status === "active"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
                             >
                               <Select
+                                className="w-[100px] "
                                 size="small"
                                 value={status}
                                 onChange={async (newStatus: StatusType) => {
@@ -404,9 +406,7 @@ const AdminTable: React.FC<AdminTableProps> = () => {
 
                           <td className="px-4 py-3">
                             <div
-                              className={`inline-block px-3 py-1 rounded text-sm font-medium ${getStatusClasses(
-                                status
-                              )}`}
+                              className={`inline-block px-3 py-1 rounded text-sm font-medium w-[100px] text-center`}
                             >
                               <Select
                                 size="small"
@@ -512,6 +512,7 @@ const AdminTable: React.FC<AdminTableProps> = () => {
         destroyOnClose
       >
         <UserCreateEditPage
+          onClose={() => setOpenDrawer(false)}
           mode={mode}
           defaultValues={selectedUser ?? undefined}
           onSubmitSuccess={() => {

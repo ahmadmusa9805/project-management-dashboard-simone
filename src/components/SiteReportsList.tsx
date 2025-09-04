@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { Table, Modal, message } from "antd";
+import { Table, Modal } from "antd";
 
 import CustomViewMoreButton from "./CustomViewMoreButton";
 import SiteReportDetail from "./SiteReportDetail";
@@ -13,6 +13,7 @@ import {
   useUnshareSiteReportMutation,
   useGetSingleSiteReportQuery,
 } from "../Redux/features/projects/project/siteReportPictures/reportApi"; // Adjust import path
+import { errorAlert, successAlert } from "../utils/alerts";
 
 interface SiteReportsListProps {
   reports: any[];
@@ -88,11 +89,11 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
         id: selectedReportForSharing._id,
         sharedWith: selectedUsers,
       }).unwrap();
-      message.success("Report shared successfully");
+      successAlert("Report shared successfully");
       setShareModalVisible(false);
       setSelectedReportForSharing(null);
     } catch (error) {
-      message.error("Failed to share report");
+      errorAlert("Failed to share report");
     }
   };
 
@@ -102,11 +103,11 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
         id: selectedReportForSharing._id,
         unShareWith: selectedUsers.map((u) => u.userId),
       }).unwrap();
-      message.success("Report unshared successfully");
+      successAlert("Report unshared successfully");
       setUnshareModalVisible(false);
       setSelectedReportForSharing(null);
     } catch (error) {
-      message.error("Failed to unshare report");
+      errorAlert("Failed to unshare report");
     }
   };
 
@@ -134,17 +135,28 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
       render: (_: any, record: any) => (
         <CustomViewMoreButton
           items={[
-            { key: "view", label: "View" },
-            { key: "edit", label: "Edit" },
-            { key: "share", label: "Share" },
-            { key: "unshare", label: "Unshare" },
-            { key: "delete", label: "Delete", danger: true },
+            { key: "view", label: "👀 View Report" },
+            { key: "edit", label: "✏️ Edit Report" },
+            { key: "share", label: "🔗 Share Report" },
+            { key: "unshare", label: "🚫 Unshare Report" },
+            {
+              key: "delete",
+              label: "🗑️ Delete Report",
+              danger: true,
+            },
+
+            // { key: "view", label: "View" },
+            // { key: "edit", label: "Edit" },
+            // { key: "share", label: "Share" },
+            // { key: "unshare", label: "Unshare" },
+            // { key: "delete", label: "Delete", danger: true },
           ]}
           onClick={(key) => handleAction(key, record)}
         />
       ),
     },
   ];
+  console.log(reports);
 
   return (
     <>

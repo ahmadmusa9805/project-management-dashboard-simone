@@ -1,370 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+// TODO: FIX
 // import React, { useRef, useState } from "react";
 // import { useLocation, useNavigate, useParams } from "react-router-dom";
-// import { Modal, message } from "antd";
-// import CustomCreateButton from "../../components/CustomCreateButton";
-// import CustomViewMoreButton from "../../components/CustomViewMoreButton";
-// import CustomShareSelector from "../../components/CustomShareSelector";
-// import CustomUnshareSelector from "../../components/CustomUnshareSelector";
-// import { errorAlert, successAlert } from "../../utils/alerts";
-
-// // Import all API hooks
-// import {
-//   useGetAllDocumentFilesQuery,
-//   useCreateDocumentFileMutation,
-//   useDeleteDocumentFileMutation,
-//   useShareDocumentFileMutation,
-//   useUnShareDocumentFileMutation,
-// } from "../../Redux/features/projects/project/document/documentSubFolderFileApi";
-// import {
-//   useGetAllSecondFixFilesQuery,
-//   useCreateSecondFixFileMutation,
-//   useDeleteSecondFixFileMutation,
-//   useShareSecondFixFileMutation,
-//   useUnShareSecondFixFileMutation,
-// } from "../../Redux/features/projects/project/SecondFixedList/SecondFixFileApi";
-
-// // You will need to import the handover tool hooks if they exist,
-// // as the original code snippet mentioned them.
-// // import {
-// //   useGetAllHandoverFilesQuery,
-// //   useCreateHandoverFileMutation,
-// //   // ...etc
-// // } from "...";
-
-// interface SubfolderFilesPageProps {
-//   baseRoute?: "documents" | "second-fixed-list-material" | "handover-tool";
-// }
-
-// const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
-//   const location = useLocation();
-//   const navigate = useNavigate();
-//   const { projectId, subFolderId } = useParams();
-
-//   const fileInputRef = useRef<HTMLInputElement>(null);
-
-//   const folder = location.state as {
-//     name: string;
-//     id?: string;
-//     from?: string;
-//   } | null;
-
-//   const [shareModalOpen, setShareModalOpen] = useState(false);
-//   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
-//   const [selectedFile, setSelectedFile] = useState<any>(null);
-
-//   // Determine the base route from the URL pathname
-//   const baseRoute = location.pathname.split("/")[3];
-
-//   // 🚀 Solution: Call all hooks unconditionally at the top level
-//   const {
-//     data: docData,
-//     isLoading: docLoading,
-//     refetch: refetchDoc,
-//   } = useGetAllDocumentFilesQuery(
-//     { projectId, documentSubFolderId: subFolderId },
-//     { skip: baseRoute !== "documents" }
-//   );
-
-//   const [createDocFile] = useCreateDocumentFileMutation();
-//   const [deleteDocFile] = useDeleteDocumentFileMutation();
-//   const [shareDocFile] = useShareDocumentFileMutation();
-//   const [unShareDocFile] = useUnShareDocumentFileMutation();
-
-//   const {
-//     data: secondFixData,
-//     isLoading: secondFixLoading,
-//     refetch: refetchSecondFix,
-//   } = useGetAllSecondFixFilesQuery(
-//     { projectId, secondFixSubFolder: subFolderId },
-//     { skip: baseRoute !== "second-fixed-list-material" }
-//   );
-
-//   const [createSecondFixFile] = useCreateSecondFixFileMutation();
-//   const [deleteSecondFixFile] = useDeleteSecondFixFileMutation();
-//   const [shareSecondFixFile] = useShareSecondFixFileMutation();
-//   const [unShareSecondFixFile] = useUnShareSecondFixFileMutation();
-
-//   // You would do the same for the handover tool hooks here
-
-//   // Now, conditionally use the data and mutations based on the route
-//   let data, isLoading, refetch, createFile, deleteFile, shareFile, unShareFile;
-//   let subFolderKey;
-
-//   switch (baseRoute) {
-//     case "documents":
-//       data = docData;
-//       isLoading = docLoading;
-//       refetch = refetchDoc;
-//       createFile = createDocFile;
-//       deleteFile = deleteDocFile;
-//       shareFile = shareDocFile;
-//       unShareFile = unShareDocFile;
-//       subFolderKey = "documentSubFolderId";
-//       break;
-//     case "second-fixed-list-material":
-//       data = secondFixData;
-//       isLoading = secondFixLoading;
-//       refetch = refetchSecondFix;
-//       createFile = createSecondFixFile;
-//       deleteFile = deleteSecondFixFile;
-//       shareFile = shareSecondFixFile;
-//       unShareFile = unShareSecondFixFile;
-//       subFolderKey = "secondFixSubFolder";
-//       break;
-//     // ... add cases for other routes
-//     default:
-//       // Handle the invalid route case gracefully
-//       return (
-//         <div className="p-6">
-//           <p className="text-red-600">Invalid page route.</p>
-//           <button
-//             onClick={() => navigate(-1)}
-//             className="text-blue-600 underline mt-2"
-//           >
-//             Go Back
-//           </button>
-//         </div>
-//       );
-//   }
-
-//   const files =
-//     data?.data?.map((file: any) => ({
-//       id: file._id,
-//       name: file.title || file.originalName,
-//       size: file.size,
-//       url: file.url,
-//       sharedWith: file.sharedWith || [],
-//     })) || [];
-
-//   const handleUploadClick = () => {
-//     fileInputRef.current?.click();
-//   };
-
-//   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const uploadedFiles = e.target.files;
-
-//     if (!uploadedFiles || !subFolderId || !projectId) return;
-
-//     try {
-//       for (const file of uploadedFiles) {
-//         await createFile({
-//           file: file,
-//           title: file.name,
-//           projectId,
-//           [subFolderKey]: subFolderId,
-//         }).unwrap();
-//       }
-//       successAlert("Files uploaded successfully");
-//       refetch();
-//     } catch (err) {
-//       console.error("Failed to upload file:", err);
-//       errorAlert("Failed to upload files");
-//     }
-//   };
-
-//   const handleFileAction = async (action: string, file: any) => {
-//     // Logic remains the same, using the correctly assigned mutation functions
-//     switch (action) {
-//       case "view":
-//         window.open(file.url, "_blank");
-//         break;
-//       case "share":
-//         setSelectedFile(file);
-//         setShareModalOpen(true);
-//         break;
-//       case "unshare":
-//         setSelectedFile(file);
-//         setUnshareModalOpen(true);
-//         break;
-//       case "delete":
-//         if (window.confirm(`Delete ${file.name}?`)) {
-//           try {
-//             await deleteFile(file.id).unwrap();
-//             successAlert("File deleted successfully");
-//             refetch();
-//           } catch (error) {
-//             errorAlert("Failed to delete file");
-//           }
-//         }
-//         break;
-//       default:
-//         break;
-//     }
-//   };
-
-//   const handleConfirmShare = async (selectedUsers: any[]) => {
-//     if (!selectedFile) return;
-
-//     try {
-//       await shareFile({
-//         id: selectedFile.id,
-//         sharedWith: selectedUsers.map((user) => user.userId),
-//       }).unwrap();
-//       message.success("File shared successfully");
-//       setShareModalOpen(false);
-//       setSelectedFile(null);
-//       refetch();
-//     } catch (error) {
-//       message.error("Failed to share file");
-//     }
-//   };
-
-//   const handleConfirmUnshare = async (selectedUsers: any[]) => {
-//     if (!selectedFile) return;
-
-//     try {
-//       await unShareFile({
-//         id: selectedFile.id,
-//         unShareWith: selectedUsers.map((user) => user.userId),
-//       }).unwrap();
-//       message.success("File access removed successfully");
-//       setUnshareModalOpen(false);
-//       setSelectedFile(null);
-//       refetch();
-//     } catch (error) {
-//       message.error("Failed to remove access");
-//     }
-//   };
-
-//   if (!folder?.name) {
-//     return (
-//       <div className="p-6">
-//         <p className="text-red-600">Subfolder not found or missing data.</p>
-//         <button
-//           onClick={() => navigate(-1)}
-//           className="text-blue-600 underline mt-2"
-//         >
-//           Go Back
-//         </button>
-//       </div>
-//     );
-//   }
-
-//   let uploadTitle = "Upload Files";
-//   switch (baseRoute) {
-//     case "second-fixed-list-material":
-//       uploadTitle = "Upload Fixed List Files";
-//       break;
-//     default:
-//       uploadTitle = "Upload Files";
-//   }
-
-//   return (
-//     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
-//       {/* ... (rest of the component JSX) */}
-//       {/* Header */}
-//       <div className="flex justify-between items-center mb-4">
-//         {" "}
-//         <h1 className="text-2xl font-semibold">
-//           📁 {folder.name} — Uploaded Files
-//         </h1>
-//         <CustomCreateButton title={uploadTitle} onClick={handleUploadClick} />
-//       </div>
-//       {/* Hidden File Input */}{" "}
-//       <input
-//         ref={fileInputRef}
-//         type="file"
-//         multiple
-//         onChange={handleFileUpload}
-//         className="hidden"
-//       />
-//       {/* File List */}
-//       {isLoading ? (
-//         <p>Loading files...</p>
-//       ) : files.length > 0 ? (
-//         <div className="w-full h-full flex flex-wrap gap-4 justify-start items-start content-start">
-//           {files.map((file: any) => (
-//             <div
-//               key={file.id}
-//               className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
-//             >
-//               {/* Top Icons */}
-//               <div className="w-full flex justify-end">
-//                 <CustomViewMoreButton
-//                   items={[
-//                     { label: "View", key: "view" },
-//                     { label: "Share", key: "share" },
-//                     { label: "Unshare", key: "unshare" },
-//                     { label: "Delete", key: "delete", danger: true },
-//                   ]}
-//                   onClick={(action: string) => handleFileAction(action, file)}
-//                 />
-//               </div>
-
-//               {/* File Info */}
-//               <div className="flex flex-col items-start gap-2 w-full">
-//                 <div className="text-[#2B3738] text-lg font-medium break-words">
-//                   {file.name}
-//                 </div>
-
-//                 {/* Shared status indicator */}
-//                 {file.sharedWith && file.sharedWith.length > 0 && (
-//                   <div className="text-xs text-blue-500 mt-1">
-//                     Shared with {file.sharedWith.length} user(s)
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       ) : (
-//         <p className="text-gray-500">No files uploaded yet.</p>
-//       )}
-//       {/* {creating && <p className="text-sm text-gray-500 mt-2">Uploading...</p>} */}
-//       {/* Share Modal */}
-//       <Modal
-//         title="Share File"
-//         open={shareModalOpen}
-//         onCancel={() => {
-//           setShareModalOpen(false);
-//           setSelectedFile(null);
-//         }}
-//         footer={null}
-//         width={500}
-//         destroyOnClose
-//       >
-//         <CustomShareSelector
-//           title={`Share "${selectedFile?.name}"`}
-//           roles={["prime-admin", "basic-admin", "client"]}
-//           onShare={handleConfirmShare}
-//         />
-//       </Modal>
-//       {/* Unshare Modal */}
-//       <Modal
-//         title="Remove Access"
-//         open={unshareModalOpen}
-//         onCancel={() => {
-//           setUnshareModalOpen(false);
-//           setSelectedFile(null);
-//         }}
-//         footer={null}
-//         width={500}
-//         destroyOnClose
-//       >
-//         <CustomUnshareSelector
-//           title={`Remove access from "${selectedFile?.name}"`}
-//           sharedUsers={(selectedFile?.sharedWith || []).map((user: any) => ({
-//             userId: user.userId?._id || user.userId,
-//             name: user.userId?.name || "Unknown User",
-//             role: user.userId?.role || "Unknown Role",
-//             email: user.userId?.email || "",
-//             profileImg: user.userId?.profileImg,
-//           }))}
-//           onUnshare={handleConfirmUnshare}
-//         />
-//       </Modal>
-//     </div>
-//   );
-// };
-
-// export default SubfolderFilesPage;
-
-// import React, { useRef, useState } from "react";
-// import { useLocation, useNavigate, useParams } from "react-router-dom";
-// import { Modal, message, Drawer } from "antd";
+// import { Modal, message, Drawer, Spin } from "antd";
 // import CustomCreateButton from "../../components/CustomCreateButton";
 // import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 // import CustomShareSelector from "../../components/CustomShareSelector";
@@ -378,6 +17,7 @@
 //   useDeleteDocumentFileMutation,
 //   useShareDocumentFileMutation,
 //   useUnShareDocumentFileMutation,
+//   useGetSingleDocumentFileQuery, // Added single file query
 // } from "../../Redux/features/projects/project/document/documentSubFolderFileApi";
 
 // // Second Fix APIs
@@ -387,8 +27,14 @@
 //   useDeleteSecondFixFileMutation,
 //   useShareSecondFixFileMutation,
 //   useUnShareSecondFixFileMutation,
+//   useUpdateSecondFixFileMutation,
+//   useGetSingleSecondFixFileQuery, // Added single file query
 // } from "../../Redux/features/projects/project/SecondFixedList/SecondFixFileApi";
 // import SecondFixForm from "../../components/SecondFixform";
+// import { showDeleteAlert } from "../../utils/deleteAlert";
+// import { ChevronLeft, Unlink } from "lucide-react";
+// import CertificateCard from "../../components/CertificateCard";
+// import CertificateDocumentSceoundFixViewer from "../../components/CertificateDocumentSceoundFixViewer";
 
 // interface SubfolderFilesPageProps {
 //   baseRoute?: "documents" | "second-fixed-list-material" | "handover-tool";
@@ -409,9 +55,26 @@
 //   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
 //   const [drawerOpen, setDrawerOpen] = useState(false);
 //   const [selectedFile, setSelectedFile] = useState<any>(null);
+//   const [editingFile, setEditingFile] = useState<any>(null);
+//   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+//   const [viewModalOpen, setViewModalOpen] = useState(false);
+//   const [, setViewFile] = useState<any>(null);
 
-//   // infer route segment: /projects/:projectId/:baseRoute/:subFolderId
 //   const baseRoute = location.pathname.split("/")[3];
+
+//   // ===== Single file queries for accurate sharing data =====
+//   const { data: singleDocData } = useGetSingleDocumentFileQuery(
+//     selectedFileId!,
+//     {
+//       skip: !selectedFileId || baseRoute !== "documents",
+//     }
+//   );
+//   const { data: singleSecondFixData } = useGetSingleSecondFixFileQuery(
+//     selectedFileId!,
+//     {
+//       skip: !selectedFileId || baseRoute !== "second-fixed-list-material",
+//     }
+//   );
 
 //   // ===== Documents hooks =====
 //   const {
@@ -436,11 +99,14 @@
 //     { projectId, secondFixSubFolder: subFolderId },
 //     { skip: baseRoute !== "second-fixed-list-material" }
 //   );
+
 //   const [createSecondFixFile, { isLoading: creatingSecondFix }] =
 //     useCreateSecondFixFileMutation();
 //   const [deleteSecondFixFile] = useDeleteSecondFixFileMutation();
 //   const [shareSecondFixFile] = useShareSecondFixFileMutation();
 //   const [unShareSecondFixFile] = useUnShareSecondFixFileMutation();
+//   const [updateSecondFixFile, { isLoading: updatingSecondFix }] =
+//     useUpdateSecondFixFileMutation();
 
 //   // ===== Generic mapping for current route =====
 //   let data, isLoading, refetch, createFile, deleteFile, shareFile, unShareFile;
@@ -490,9 +156,14 @@
 //       size: file.size,
 //       url: file.url,
 //       sharedWith: file.sharedWith || [],
+//       room: file.room,
+//       surface: file.surface,
+//       productCode: file.productCode,
+//       suplierName: file.suplierName,
+
+//       text: file.text,
 //     })) || [];
 
-//   // ===== Document upload (multiple) =====
 //   const handleUploadClick = () => fileInputRef.current?.click();
 
 //   const handleDocumentFilesSelected = async (
@@ -503,9 +174,8 @@
 
 //     try {
 //       for (const file of uploadedFiles) {
-//         // Keep the same shape your API expects (object, not necessarily FormData)
 //         await createFile({
-//           file, // RTK endpoint should transform to FormData if needed
+//           file,
 //           title: file.name,
 //           projectId,
 //           [secondFixSubFolder]: subFolderId,
@@ -517,16 +187,16 @@
 //       console.error("Failed to upload file:", err);
 //       errorAlert("Failed to upload files");
 //     } finally {
-//       // reset input value so selecting the same file again triggers onChange
 //       e.currentTarget.value = "";
 //     }
 //   };
 
-//   // ===== Actions (view/share/unshare/delete) for both routes =====
 //   const handleFileAction = async (action: string, file: any) => {
 //     switch (action) {
 //       case "view":
-//         if (file.url) window.open(file.url, "_blank");
+//         setSelectedFileId(file.id);
+//         setViewModalOpen(true);
+//         // if (file.url) window.open(file.url, "_blank");
 //         break;
 
 //       case "share":
@@ -535,25 +205,31 @@
 //         break;
 
 //       case "unshare":
-//         setSelectedFile(file);
+//         setSelectedFileId(file.id);
 //         setUnshareModalOpen(true);
 //         break;
 
+//       case "edit":
+//         if (baseRoute === "second-fixed-list-material") {
+//           setEditingFile(file);
+//           setDrawerOpen(true);
+//         }
+//         break;
+
 //       case "delete":
-//         Modal.confirm({
-//           title: `Delete "${file.name}"?`,
-//           okText: "Delete",
-//           okButtonProps: { danger: true },
-//           onOk: async () => {
+//         showDeleteAlert({
+//           title: "Are you sure?",
+//           text: `Delete second-fixed-list file  This action cannot be undone.`,
+//           onConfirm: async () => {
 //             try {
-//               await deleteFile(file.id).unwrap();
-//               successAlert("File deleted successfully");
-//               refetch();
+//               await deleteFile(file.id);
+//               // successAlert("Certificate deleted successfully!");
 //             } catch (error) {
-//               errorAlert("Failed to delete file");
+//               errorAlert("Failed to delete second-fixed-list file ");
 //             }
 //           },
 //         });
+
 //         break;
 
 //       default:
@@ -566,9 +242,9 @@
 //     try {
 //       await shareFile({
 //         id: selectedFile.id,
-//         sharedWith: selectedUsers.map((u) => u.userId),
+//         sharedWith: selectedUsers,
 //       }).unwrap();
-//       message.success("File shared successfully");
+//       successAlert("File shared successfully");
 //       setShareModalOpen(false);
 //       setSelectedFile(null);
 //       refetch();
@@ -578,46 +254,56 @@
 //   };
 
 //   const handleConfirmUnshare = async (selectedUsers: any[]) => {
-//     if (!selectedFile) return;
+//     if (!selectedFileId) return;
 //     try {
 //       await unShareFile({
-//         id: selectedFile.id,
+//         id: selectedFileId,
 //         unShareWith: selectedUsers.map((u) => u.userId),
 //       }).unwrap();
-//       message.success("File access removed successfully");
+//       successAlert("File access removed successfully");
 //       setUnshareModalOpen(false);
-//       setSelectedFile(null);
+//       setSelectedFileId(null);
 //       refetch();
 //     } catch {
 //       message.error("Failed to remove access");
 //     }
 //   };
 
-//   // ===== Second Fix create via Drawer + Form =====
 //   const handleSecondFixSubmit = async (formData: any) => {
 //     if (!subFolderId || !projectId) return;
 
 //     try {
-//       // Keep API contract similar to your existing mutations
 //       const payload: any = {
 //         title: formData.title,
 //         room: formData.room,
 //         surface: formData.surface,
 //         productCode: formData.productCode,
-//         suplierName: formData.supplierName,
+//         suplierName: formData.suplierName,
 //         text: formData.text,
 //         file: formData.file ?? undefined,
 //         projectId,
-//         [secondFixSubFolder]: subFolderId, // "secondFixSubFolder"
+//         [secondFixSubFolder]: subFolderId,
 //       };
 
-//       await createSecondFixFile(payload).unwrap();
-//       successAlert("Second Fix File created successfully");
+//       if (editingFile) {
+//         await updateSecondFixFile({
+//           id: editingFile.id,
+//           data: payload,
+//         }).unwrap();
+//         successAlert("Second Fix File updated successfully");
+//       } else {
+//         await createSecondFixFile(payload).unwrap();
+//         successAlert("Second Fix File created successfully");
+//       }
+
 //       setDrawerOpen(false);
+//       setEditingFile(null);
 //       refetch();
 //     } catch (err) {
 //       console.error(err);
-//       errorAlert("Failed to create Second Fix File");
+//       errorAlert(
+//         `Failed to ${editingFile ? "update" : "create"} Second Fix File`
+//       );
 //     }
 //   };
 
@@ -640,18 +326,28 @@
 //       ? "Create Second Fix File"
 //       : "Upload Files";
 
+//   console.log(singleSecondFixData, "singleSecondFixData");
+//   console.log(singleDocData, "singleDocData");
+
 //   return (
-//     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+//     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3 ">
 //       {/* Header */}
-//       <div className="flex justify-between items-center mb-4">
-//         <h1 className="text-2xl font-semibold">
-//           📁 {folder.name} — Uploaded Files
-//         </h1>
+//       <div className="flex justify-between items-center mb-4 mt-10">
+//         <div className="flex items-center gap-1 pt-10 mb-3">
+//           <ChevronLeft
+//             onClick={() => navigate(-1)}
+//             className="w-10 h-10 cursor-pointer -translate-y-[4px]" // Adjust -translate-y value as needed
+//           />
+//           <h1 className="text-2xl font-semibold">{folder.name}</h1>
+//         </div>
 
 //         {baseRoute === "second-fixed-list-material" ? (
 //           <CustomCreateButton
 //             title={uploadTitle}
-//             onClick={() => setDrawerOpen(true)}
+//             onClick={() => {
+//               setEditingFile(null);
+//               setDrawerOpen(true);
+//             }}
 //           />
 //         ) : (
 //           <CustomCreateButton title={uploadTitle} onClick={handleUploadClick} />
@@ -671,43 +367,127 @@
 
 //       {/* File list */}
 //       {isLoading ? (
-//         <p>Loading files...</p>
+//         <div className="flex justify-center items-center h-40">
+//           <Spin size="large" />
+//         </div>
 //       ) : files.length > 0 ? (
-//         <div className="w-full h-full flex flex-wrap gap-4 justify-start items-start content-start">
+//         <div className="w-full h-full flex flex-wrap gap-4 justify-start items-start content-start mt-10">
 //           {files.map((file: any) => (
 //             <div
 //               key={file.id}
-//               className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
+//               className="relative hover:bg-[#e6f4ea] bg-[#f1f1f1] cursor-pointer"
+//               onClick={() => handleFileAction("view", file)}
 //             >
-//               <div className="w-full flex justify-end">
-//                 <CustomViewMoreButton
-//                   items={[
-//                     { label: "View", key: "view" },
-//                     { label: "Share", key: "share" },
-//                     { label: "Unshare", key: "unshare" },
-//                     { label: "Delete", key: "delete", danger: true },
-//                   ]}
-//                   onClick={(action: string) => handleFileAction(action, file)}
-//                 />
-//               </div>
-
-//               <div className="flex flex-col items-start gap-2 w-full">
-//                 <div className="text-[#2B3738] text-lg font-medium break-words">
+//               {/* Replace CertificateCard with your file display */}
+//               <CertificateCard title={file.name} size={``} />
+//               {/* <div className="p-6 flex flex-col items-start gap-2">
+//                 <div className="text-[#2B3738] text-lg font-medium w-[150px] truncate">
 //                   {file.name}
 //                 </div>
-//                 {file.sharedWith && file.sharedWith.length > 0 && (
-//                   <div className="text-xs text-blue-500 mt-1">
-//                     Shared with {file.sharedWith.length} user(s)
-//                   </div>
-//                 )}
+//               </div> */}
+
+//               {/* Menu Button */}
+//               <div className="absolute top-2 right-2">
+//                 <CustomViewMoreButton
+//                   items={[
+//                     { key: "view", label: "👁️ View File" },
+//                     ...(baseRoute === "second-fixed-list-material"
+//                       ? [{ key: "edit", label: "✏️ Edit File" }]
+//                       : []),
+//                     { key: "share", label: "🔗 Share File" },
+//                     {
+//                       key: "unshare",
+//                       label: (
+//                         <div className="flex items-center gap-1">
+//                           <Unlink className="text-green-500" size={14} />
+//                           Unshare File
+//                         </div>
+//                       ),
+//                     },
+//                     { key: "delete", label: "🗑️ Delete File", danger: true },
+//                   ]}
+//                   onClick={(key: string) => handleFileAction(key, file)}
+//                 />
 //               </div>
 //             </div>
+
+//             // <div
+//             //   key={file.id}
+//             //   className="p-6 hover:shadow-md cursor-pointer hover:bg-[#e6f4ea] bg-[#f1f1f1] transition flex flex-col justify-between"
+//             // >
+//             //   <div className="w-full flex justify-end">
+//             //     <CustomViewMoreButton
+//             //       items={[
+//             //         // { key: "view", label: "👀 View Certificate" },
+//             //         // { key: "edit", label: "✏️ Edit " },
+//             //         // { key: "share", label: "🔗 Share " },
+//             //         // { key: "unshare", label: "🚫 Unshare " },
+//             //         // {
+//             //         //   key: "delete",
+//             //         //   label: "🗑️ Delete ",
+//             //         //   danger: true,
+//             //         // },
+
+//             //         { label: "👀 View", key: "view" },
+//             //         ...(baseRoute === "second-fixed-list-material"
+//             //           ? [{ key: "edit", label: "✏️ Edit " }]
+//             //           : []),
+//             //         { key: "share", label: "🔗 Share " },
+//             //         {
+//             //           key: "unshare",
+//             //           label: (
+//             //             <div className="flex items-center gap-1">
+//             //               <Unlink className="text-green-500" size={14} />
+//             //               Unshare Folder
+//             //             </div>
+//             //           ),
+//             //         },
+//             //         {
+//             //           key: "delete",
+//             //           label: "🗑️ Delete ",
+//             //           danger: true,
+//             //         },
+//             //       ]}
+//             //       onClick={(action: string) => handleFileAction(action, file)}
+//             //     />
+//             //   </div>
+
+//             //   <div className="flex flex-col items-start gap-2 w-full">
+//             //     <div className="text-[#2B3738] text-lg font-medium w-[150px] truncate">
+//             //       {file.name}
+//             //     </div>
+//             //     {/* {file.sharedWith && file.sharedWith.length > 0 && (
+//             //       <div className="text-xs text-blue-500 mt-1">
+//             //         Shared with {file.sharedWith.length} user(s)
+//             //       </div>
+//             //     )} */}
+//             //   </div>
+//             // </div>
 //           ))}
 //         </div>
 //       ) : (
-//         <p className="text-gray-500">No files uploaded yet.</p>
+//         <div className="flex justify-center items-center h-60 mt-20">
+//           <p>No reports have been created yet.</p>
+//         </div>
 //       )}
 
+//       {/* View modal */}
+//       <Modal
+//         title=""
+//         open={viewModalOpen}
+//         onCancel={() => {
+//           setViewModalOpen(false);
+//           setViewFile(null);
+//         }}
+//         footer={null}
+//         width={900}
+//         destroyOnClose
+//       >
+//         <CertificateDocumentSceoundFixViewer
+//           title=""
+//           propfileUrl={singleDocData?.file || singleSecondFixData?.file}
+//         ></CertificateDocumentSceoundFixViewer>
+//       </Modal>
 //       {/* Share modal */}
 //       <Modal
 //         title="Share File"
@@ -733,47 +513,77 @@
 //         open={unshareModalOpen}
 //         onCancel={() => {
 //           setUnshareModalOpen(false);
-//           setSelectedFile(null);
+//           setSelectedFileId(null);
 //         }}
 //         footer={null}
 //         width={500}
 //         destroyOnClose
 //       >
 //         <CustomUnshareSelector
-//           title={`Remove access from "${selectedFile?.name || ""}"`}
-//           sharedUsers={(selectedFile?.sharedWith || []).map((user: any) => ({
-//             userId: user.userId?._id || user.userId,
-//             name: user.userId?.name || "Unknown User",
-//             role: user.userId?.role || "Unknown Role",
-//             email: user.userId?.email || "",
-//             profileImg: user.userId?.profileImg,
-//           }))}
+//           title="Remove access"
+//           sharedUsers={
+//             (baseRoute === "documents"
+//               ? singleDocData?.sharedWith
+//               : singleSecondFixData?.sharedWith
+//             )?.map((u: any) => ({
+//               userId: u.userId?._id,
+//               name: u.userId.name,
+//               role: u.userId.role,
+//               email: u.userId.email || "",
+//               profileImg: u.userId.profileImg,
+//             })) || []
+//           }
 //           onUnshare={handleConfirmUnshare}
 //         />
 //       </Modal>
 
 //       {/* Second Fix Drawer + Form */}
 //       <Drawer
-//         title="Create Second Fix File"
+//         title={editingFile ? "Update File" : "Upload File"}
 //         open={drawerOpen}
-//         onClose={() => setDrawerOpen(false)}
+//         onClose={() => {
+//           setDrawerOpen(false);
+//           setEditingFile(null);
+//         }}
+//         width={600}
+//         destroyOnClose
+//       ></Drawer>
+//       <Drawer
+//         title={editingFile ? "Update File" : "Create File"}
+//         open={drawerOpen}
+//         onClose={() => {
+//           setDrawerOpen(false);
+//           setEditingFile(null);
+//         }}
 //         width={600}
 //         destroyOnClose
 //       >
 //         <SecondFixForm
-//           mode="create"
+//           mode={editingFile ? "edit" : "create"}
 //           onSubmit={handleSecondFixSubmit}
 //           onCancel={() => setDrawerOpen(false)}
-//           creating={creatingSecondFix}
-//           defaultValues={{
-//             title: "",
-//             room: "",
-//             surface: "",
-//             productCode: "",
-//             supplierName: "",
-//             text: "",
-//             file: null,
-//           }}
+//           creating={creatingSecondFix || updatingSecondFix}
+//           defaultValues={
+//             editingFile
+//               ? {
+//                   title: editingFile.name,
+//                   room: editingFile.room || "",
+//                   surface: editingFile.surface || "",
+//                   productCode: editingFile.productCode || "",
+//                   suplierName: editingFile.suplierName || "",
+//                   text: editingFile.text || "",
+//                   file: null,
+//                 }
+//               : {
+//                   title: "",
+//                   room: "",
+//                   surface: "",
+//                   productCode: "",
+//                   suplierName: "",
+//                   text: "",
+//                   file: null,
+//                 }
+//           }
 //         />
 //       </Drawer>
 //     </div>
@@ -782,14 +592,17 @@
 
 // export default SubfolderFilesPage;
 
+// TODO: text
+
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Modal, message, Drawer } from "antd";
+import { Modal, message, Drawer, Spin } from "antd";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 import CustomShareSelector from "../../components/CustomShareSelector";
 import CustomUnshareSelector from "../../components/CustomUnshareSelector";
 import { errorAlert, successAlert } from "../../utils/alerts";
+import { ChevronLeft, Unlink } from "lucide-react";
 
 // Document APIs
 import {
@@ -798,7 +611,7 @@ import {
   useDeleteDocumentFileMutation,
   useShareDocumentFileMutation,
   useUnShareDocumentFileMutation,
-  useGetSingleDocumentFileQuery, // Added single file query
+  useGetSingleDocumentFileQuery,
 } from "../../Redux/features/projects/project/document/documentSubFolderFileApi";
 
 // Second Fix APIs
@@ -809,19 +622,35 @@ import {
   useShareSecondFixFileMutation,
   useUnShareSecondFixFileMutation,
   useUpdateSecondFixFileMutation,
-  useGetSingleSecondFixFileQuery, // Added single file query
+  useGetSingleSecondFixFileQuery,
 } from "../../Redux/features/projects/project/SecondFixedList/SecondFixFileApi";
 import SecondFixForm from "../../components/SecondFixform";
+import { showDeleteAlert } from "../../utils/deleteAlert";
+import CertificateCard from "../../components/CertificateCard";
+import CertificateDocumentSceoundFixViewer from "../../components/CertificateDocumentSceoundFixViewer";
+import ImageUploader from "../../components/ImageUploader";
 
 interface SubfolderFilesPageProps {
   baseRoute?: "documents" | "second-fixed-list-material" | "handover-tool";
+}
+
+interface FileItem {
+  id: string;
+  name: string;
+  size?: string;
+  url?: string;
+  sharedWith?: any[];
+  room?: string;
+  surface?: string;
+  productCode?: string;
+  suplierName?: string;
+  text?: string;
 }
 
 const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { projectId, subFolderId } = useParams();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const folder =
@@ -831,9 +660,11 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<any>(null);
-  const [editingFile, setEditingFile] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [editingFile, setEditingFile] = useState<FileItem | null>(null);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [uploaderOpen, setUploaderOpen] = useState(false);
 
   const baseRoute = location.pathname.split("/")[3];
 
@@ -844,6 +675,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
       skip: !selectedFileId || baseRoute !== "documents",
     }
   );
+
   const { data: singleSecondFixData } = useGetSingleSecondFixFileQuery(
     selectedFileId!,
     {
@@ -860,7 +692,9 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
     { projectId, documentSubFolderId: subFolderId },
     { skip: baseRoute !== "documents" }
   );
-  const [createDocFile] = useCreateDocumentFileMutation();
+
+  const [createDocFile, { isLoading: creatingDoc }] =
+    useCreateDocumentFileMutation();
   const [deleteDocFile] = useDeleteDocumentFileMutation();
   const [shareDocFile] = useShareDocumentFileMutation();
   const [unShareDocFile] = useUnShareDocumentFileMutation();
@@ -874,6 +708,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
     { projectId, secondFixSubFolder: subFolderId },
     { skip: baseRoute !== "second-fixed-list-material" }
   );
+
   const [createSecondFixFile, { isLoading: creatingSecondFix }] =
     useCreateSecondFixFileMutation();
   const [deleteSecondFixFile] = useDeleteSecondFixFileMutation();
@@ -883,8 +718,9 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
     useUpdateSecondFixFileMutation();
 
   // ===== Generic mapping for current route =====
-  let data, isLoading, refetch, createFile, deleteFile, shareFile, unShareFile;
-  let secondFixSubFolder: "documentSubFolderId" | "secondFixSubFolder";
+  let data: any, isLoading: boolean, refetch: () => void;
+  let createFile: any, deleteFile: any, shareFile: any, unShareFile: any;
+  let subFolderKey: string;
 
   switch (baseRoute) {
     case "documents":
@@ -895,7 +731,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
       deleteFile = deleteDocFile;
       shareFile = shareDocFile;
       unShareFile = unShareDocFile;
-      secondFixSubFolder = "documentSubFolderId";
+      subFolderKey = "documentSubFolderId";
       break;
 
     case "second-fixed-list-material":
@@ -906,7 +742,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
       deleteFile = deleteSecondFixFile;
       shareFile = shareSecondFixFile;
       unShareFile = unShareSecondFixFile;
-      secondFixSubFolder = "secondFixSubFolder";
+      subFolderKey = "secondFixSubFolder";
       break;
 
     default:
@@ -923,7 +759,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
       );
   }
 
-  const files =
+  const files: FileItem[] =
     data?.data?.map((file: any) => ({
       id: file._id,
       name: file.title || file.originalName,
@@ -933,12 +769,9 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
       room: file.room,
       surface: file.surface,
       productCode: file.productCode,
-      suplierName: file.supplierName,
-
+      suplierName: file.suplierName,
       text: file.text,
     })) || [];
-
-  const handleUploadClick = () => fileInputRef.current?.click();
 
   const handleDocumentFilesSelected = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -952,7 +785,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
           file,
           title: file.name,
           projectId,
-          [secondFixSubFolder]: subFolderId,
+          [subFolderKey]: subFolderId,
         }).unwrap();
       }
       successAlert("Files uploaded successfully");
@@ -961,14 +794,17 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
       console.error("Failed to upload file:", err);
       errorAlert("Failed to upload files");
     } finally {
-      e.currentTarget.value = "";
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
-  const handleFileAction = async (action: string, file: any) => {
+  const handleFileAction = async (action: string, file: FileItem) => {
     switch (action) {
       case "view":
-        if (file.url) window.open(file.url, "_blank");
+        setSelectedFileId(file.id);
+        setViewModalOpen(true);
         break;
 
       case "share":
@@ -989,14 +825,13 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
         break;
 
       case "delete":
-        Modal.confirm({
-          title: `Delete "${file.name}"?`,
-          okText: "Delete",
-          okButtonProps: { danger: true },
-          onOk: async () => {
+        showDeleteAlert({
+          title: "Are you sure?",
+          text: `Delete ${file.name}? This action cannot be undone.`,
+          onConfirm: async () => {
             try {
               await deleteFile(file.id).unwrap();
-              successAlert("File deleted successfully");
+              // successAlert("File deleted successfully");
               refetch();
             } catch (error) {
               errorAlert("Failed to delete file");
@@ -1017,7 +852,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
         id: selectedFile.id,
         sharedWith: selectedUsers,
       }).unwrap();
-      message.success("File shared successfully");
+      successAlert("File shared successfully");
       setShareModalOpen(false);
       setSelectedFile(null);
       refetch();
@@ -1033,7 +868,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
         id: selectedFileId,
         unShareWith: selectedUsers.map((u) => u.userId),
       }).unwrap();
-      message.success("File access removed successfully");
+      successAlert("File access removed successfully");
       setUnshareModalOpen(false);
       setSelectedFileId(null);
       refetch();
@@ -1051,11 +886,11 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
         room: formData.room,
         surface: formData.surface,
         productCode: formData.productCode,
-        suplierName: formData.supplierName,
+        suplierName: formData.suplierName,
         text: formData.text,
         file: formData.file ?? undefined,
         projectId,
-        [secondFixSubFolder]: subFolderId,
+        [subFolderKey]: subFolderId,
       };
 
       if (editingFile) {
@@ -1080,6 +915,27 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
     }
   };
 
+  const handleImageUploaderSuccess = async (fileList: any[]) => {
+    if (!projectId || !subFolderId) return;
+
+    try {
+      for (const file of fileList) {
+        await createFile({
+          file: file.originFileObj,
+          title: file.name,
+          projectId,
+          [subFolderKey]: subFolderId,
+        }).unwrap();
+      }
+      successAlert("Files uploaded successfully");
+      refetch();
+      setUploaderOpen(false);
+    } catch (err) {
+      console.error("Upload failed:", err);
+      errorAlert("Failed to upload files");
+    }
+  };
+
   if (!folder?.name) {
     return (
       <div className="p-6">
@@ -1095,20 +951,20 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
   }
 
   const uploadTitle =
-    baseRoute === "second-fixed-list-material"
-      ? "Create Second Fix File"
-      : "Upload Files";
+    baseRoute === "second-fixed-list-material" ? "Create File" : "Upload Files";
 
-  console.log(singleSecondFixData, "singleSecondFixData");
   console.log(singleDocData, "singleDocData");
-
   return (
     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">
-          📁 {folder.name} — Uploaded Files
-        </h1>
+      <div className="flex justify-between items-center mb-4 mt-10">
+        <div className="flex items-center gap-1 pt-10 mb-3">
+          <ChevronLeft
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 cursor-pointer -translate-y-[4px]"
+          />
+          <h1 className="text-2xl font-semibold">{folder.name}</h1>
+        </div>
 
         {baseRoute === "second-fixed-list-material" ? (
           <CustomCreateButton
@@ -1119,62 +975,100 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
             }}
           />
         ) : (
-          <CustomCreateButton title={uploadTitle} onClick={handleUploadClick} />
+          <CustomCreateButton
+            title={uploadTitle}
+            onClick={() => setUploaderOpen(true)}
+          />
         )}
       </div>
 
-      {/* Hidden file input for Document uploads */}
-      {baseRoute === "documents" && (
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          onChange={handleDocumentFilesSelected}
-          className="hidden"
-        />
-      )}
+      {/* Hidden file input for direct document uploads */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        onChange={handleDocumentFilesSelected}
+        className="hidden"
+      />
 
       {/* File list */}
       {isLoading ? (
-        <p>Loading files...</p>
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
+        </div>
       ) : files.length > 0 ? (
-        <div className="w-full h-full flex flex-wrap gap-4 justify-start items-start content-start">
-          {files.map((file: any) => (
+        <div className="w-full h-full flex flex-wrap gap-4 justify-start items-start content-start mt-10">
+          {files.map((file: FileItem) => (
             <div
               key={file.id}
-              className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
+              className="relative hover:bg-[#e6f4ea] bg-[#f1f1f1] cursor-pointer p-4 rounded-lg"
+              onClick={() => handleFileAction("view", file)}
             >
-              <div className="w-full flex justify-end">
+              <CertificateCard title={file.name} size={file.size || ""} />
+
+              {/* Menu Button */}
+              <div className="absolute top-2 right-2">
                 <CustomViewMoreButton
                   items={[
-                    { label: "View", key: "view" },
+                    { key: "view", label: "👁️ View File" },
                     ...(baseRoute === "second-fixed-list-material"
-                      ? [{ label: "Edit", key: "edit" }]
+                      ? [{ key: "edit", label: "✏️ Edit File" }]
                       : []),
-                    { label: "Share", key: "share" },
-                    { label: "Unshare", key: "unshare" },
-                    { label: "Delete", key: "delete", danger: true },
+                    { key: "share", label: "🔗 Share File" },
+                    {
+                      key: "unshare",
+                      label: (
+                        <div className="flex items-center gap-1">
+                          <Unlink className="text-green-500" size={14} />
+                          Unshare File
+                        </div>
+                      ),
+                    },
+                    { key: "delete", label: "🗑️ Delete File", danger: true },
                   ]}
-                  onClick={(action: string) => handleFileAction(action, file)}
+                  onClick={(key: string) => handleFileAction(key, file)}
                 />
-              </div>
-
-              <div className="flex flex-col items-start gap-2 w-full">
-                <div className="text-[#2B3738] text-lg font-medium break-words">
-                  {file.name}
-                </div>
-                {file.sharedWith && file.sharedWith.length > 0 && (
-                  <div className="text-xs text-blue-500 mt-1">
-                    Shared with {file.sharedWith.length} user(s)
-                  </div>
-                )}
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-gray-500">No files uploaded yet.</p>
+        <div className="flex justify-center items-center h-60 mt-20">
+          <p>No files have been uploaded yet.</p>
+        </div>
       )}
+
+      {/* Upload Modal for Documents */}
+      <Modal
+        title="Upload Documents"
+        open={uploaderOpen}
+        onCancel={() => setUploaderOpen(false)}
+        footer={null}
+        width={500}
+        destroyOnClose
+      >
+        <ImageUploader
+          uploading={creatingDoc}
+          onUploadSuccess={handleImageUploaderSuccess}
+        />
+      </Modal>
+
+      {/* View modal */}
+      <Modal
+        title={selectedFile?.name || "File Viewer"}
+        open={viewModalOpen}
+        onCancel={() => {
+          setViewModalOpen(false);
+          setSelectedFileId(null);
+        }}
+        footer={null}
+        width={900}
+        destroyOnClose
+      >
+        <CertificateDocumentSceoundFixViewer
+          propfileUrl={singleDocData?.file || singleSecondFixData?.file}
+        />
+      </Modal>
 
       {/* Share modal */}
       <Modal
@@ -1214,11 +1108,11 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
               ? singleDocData?.sharedWith
               : singleSecondFixData?.sharedWith
             )?.map((u: any) => ({
-              userId: u.userId?._id,
-              name: u.userId.name,
-              role: u.userId.role,
-              email: u.userId.email || "",
-              profileImg: u.userId.profileImg,
+              userId: u.userId?._id || u.userId,
+              name: u.userId?.name || "Unknown User",
+              role: u.userId?.role || "Unknown Role",
+              email: u.userId?.email || "",
+              profileImg: u.userId?.profileImg,
             })) || []
           }
           onUnshare={handleConfirmUnshare}
@@ -1227,9 +1121,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
 
       {/* Second Fix Drawer + Form */}
       <Drawer
-        title={
-          editingFile ? "Update Second Fix File" : "Create Second Fix File"
-        }
+        title={editingFile ? "Update File" : "Create File"}
         open={drawerOpen}
         onClose={() => {
           setDrawerOpen(false);
@@ -1250,7 +1142,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
                   room: editingFile.room || "",
                   surface: editingFile.surface || "",
                   productCode: editingFile.productCode || "",
-                  supplierName: editingFile.suplierName || "",
+                  suplierName: editingFile.suplierName || "",
                   text: editingFile.text || "",
                   file: null,
                 }
@@ -1259,7 +1151,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
                   room: "",
                   surface: "",
                   productCode: "",
-                  supplierName: "",
+                  suplierName: "",
                   text: "",
                   file: null,
                 }

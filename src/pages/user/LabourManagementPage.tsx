@@ -15,7 +15,7 @@ import {
   useUpdateLabourMutation,
   useDeleteLabourMutation,
 } from "../../Redux/features/labour/labourApi";
-import { errorAlert, successAlert } from "../../utils/alerts";
+import { errorAlert } from "../../utils/alerts";
 import { showDeleteAlert } from "../../utils/deleteAlert";
 
 interface LaborItem {
@@ -88,7 +88,7 @@ const LaborTable: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteLabour(String(id)).unwrap();
-      successAlert("Labour deleted successfully");
+      // successAlert("Labour deleted successfully");
       refetch();
     } catch {
       errorAlert("Failed to delete labour");
@@ -104,7 +104,7 @@ const LaborTable: React.FC = () => {
         </div>
         <div className="flex justify-end mb-2">
           <CustomCreateButton
-            title="Add Entry"
+            title="Create Labour"
             onClick={() => {
               setMode("create");
               setSelected(null);
@@ -143,9 +143,10 @@ const LaborTable: React.FC = () => {
                     <td className="px-4 py-3">
                       <CustomViewMoreButton
                         items={[
-                          { key: "view", label: "View Details" },
-                          { key: "edit", label: "Edit Entry" },
-                          { key: "delete", label: "Delete Entry" },
+                          { key: "view", label: "👁️View Labour" },
+                          { key: "edit", label: "✏️ Edit Labour" },
+
+                          { key: "delete", label: "🗑️ Delete Labour" },
                         ]}
                         onClick={async (key) => {
                           if (key === "view") {
@@ -205,7 +206,7 @@ const LaborTable: React.FC = () => {
       <Drawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        title={mode === "create" ? "Add Labor Entry" : "Edit Labor Entry"}
+        title={mode === "create" ? "Create Labor " : "Edit Labor "}
         width={720}
         destroyOnClose
       >

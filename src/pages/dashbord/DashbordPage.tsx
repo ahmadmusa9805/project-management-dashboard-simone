@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
 import {
   LineChart,
   Line,
@@ -8,75 +9,100 @@ import {
   Legend,
   ResponsiveContainer,
   CartesianGrid,
-} from 'recharts';
-import DashboardSummaryCards from './UserCard';
-import EarningsChart from './EarningsChart';
+} from "recharts";
+import { Spin } from "antd";
+import DashboardSummaryCards from "./UserCard";
+import EarningsChart from "./EarningsChart";
+import { useGetProjectsWithstatusQuery } from "../../Redux/features/projects/projectsApi";
 
+// Helper: Group projects by month
+const groupByMonth = (projects: any[]) => {
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
+  const result: { month: string; count: number }[] = months.map((m) => ({
+    month: m,
+    count: 0,
+  }));
 
-const clientData = [
-  { month: 'Jan', thisYear: 5000, lastYear: 4000 },
-  { month: 'Feb', thisYear: 6000, lastYear: 4500 },
-  { month: 'Mar', thisYear: 5500, lastYear: 4200 },
-  { month: 'Apr', thisYear: 7000, lastYear: 5000 },
-  { month: 'May', thisYear: 8000, lastYear: 6200 },
-  { month: 'Jun', thisYear: 9000, lastYear: 7000 },
-  { month: 'Jul', thisYear: 9500, lastYear: 7200 },
-  { month: 'Aug', thisYear: 9700, lastYear: 7400 },
-  { month: 'Sep', thisYear: 10000, lastYear: 8000 },
-  { month: 'Oct', thisYear: 8700, lastYear: 7600 },
-  { month: 'Nov', thisYear: 9200, lastYear: 7800 },
-  { month: 'Dec', thisYear: 9400, lastYear: 8100 },
-];
+  projects.forEach((project) => {
+    if (project.createdAt) {
+      const date = new Date(project.createdAt);
+      const monthIndex = date.getMonth();
+      result[monthIndex].count += 1;
+    }
+  });
 
-// const earningsData = [
-//   { month: 'May', earning: 3000 },
-//   { month: 'June', earning: 3500 },
-//   { month: 'July', earning: 4000 },
-//   { month: 'Aug', earning: 2800 },
-//   { month: 'Sep', earning: 3200 },
-//   { month: 'Oct', earning: 3760 },
-// ];
+  return result;
+};
 
 const DashboardAnalytics: React.FC = () => {
+  const { data: ongoingProjects = [], isLoading } =
+    useGetProjectsWithstatusQuery(
+      { status: "ongoing" },
+      {
+        refetchOnFocus: true,
+        refetchOnReconnect: true,
+      }
+    );
+
+  // Format ongoing projects by month
+  const ongoingData = groupByMonth(ongoingProjects);
+
   return (
-    <div className="p-6 space-y-10">
+    <div className="w-full  gap-4 bg-white min-h-screen p-6">
       {/* Users Section */}
       <DashboardSummaryCards />
 
-      {/* Clients Chart Section */}
-      <div className="bg-white rounded shadow p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h3 className="text-xl font-medium">Clients</h3>
-            <p className="text-sm text-gray-500">Last 12 months report</p>
-          </div>
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-[#0d542b] rounded" />
-              <span className="text-sm text-gray-700">This year</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-gray-400 rounded" />
-              <span className="text-sm text-gray-700">Last year</span>
-            </div>
-          </div>
+      {/* Ongoing Projects Chart Section */}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
         </div>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={clientData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="thisYear" stroke="#001D01" strokeWidth={2} />
-            <Line type="monotone" dataKey="lastYear" stroke="#969C9D" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      ) : (
+        <div className="bg-[#f1f1f1] rounded shadow p-6 mb-5">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-xl font-medium ">Ongoing Projects</h3>
+            <p className="text-xl font-medium text-gray-600">
+              Total: {ongoingProjects.length}
+            </p>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart
+              data={ongoingData}
+              margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="count"
+                name="Projects"
+                stroke="#0d542b"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Earnings Section */}
-     <EarningsChart></EarningsChart> 
+      <EarningsChart />
     </div>
   );
 };

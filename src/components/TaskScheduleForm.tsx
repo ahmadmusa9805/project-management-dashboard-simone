@@ -1,10 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button, Upload } from "antd";
+import { CloudUpload } from "lucide-react";
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+
+const { Dragger } = Upload;
 
 interface TaskScheduleFormProps {
   entityName: string; // "Schedule" or "Task"
   mode: "create" | "edit";
+  creating?: boolean;
+  updating?: boolean;
+
   initialData?: {
     title?: string;
     startDate?: string;
@@ -19,6 +26,8 @@ interface TaskScheduleFormProps {
 
 const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
   entityName,
+  creating,
+  updating,
   mode,
   initialData = {},
   onCancel,
@@ -27,7 +36,6 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(
     initialData?.file || null
   );
-  const [dragOver, setDragOver] = useState(false);
 
   const {
     control,
@@ -48,25 +56,6 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
   const handleFileChange = (file: File) => {
     setSelectedFile(file);
     setValue("file", file);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileChange(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
   };
 
   return (
@@ -106,55 +95,50 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
         <label className="block text-xs font-semibold text-[#2B3738] mb-1 tracking-wide">
           File Attachment
         </label>
-        <div
-          className={`w-full border-2 border-dashed rounded px-4 py-6 flex flex-col justify-center items-center gap-4 cursor-pointer
-            ${dragOver ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => document.getElementById("file-input")?.click()}
-        >
-          <div className="w-6 h-6 relative">
-            <div className="absolute w-[22px] h-[15px] left-[2px] top-[2px] bg-gray-500 rounded-sm"></div>
-            <div className="absolute w-[2px] h-[11px] left-[11px] top-[11px] bg-gray-500"></div>
-            <div className="absolute w-[10px] h-[6px] left-[7px] top-[11px] bg-gray-500"></div>
-          </div>
-          <p className="text-[#2B3738] text-base font-medium">
-            {selectedFile
-              ? selectedFile.name
-              : "Upload file or drag & drop here"}
-          </p>
-          <p className="text-sm text-gray-500">
-            {selectedFile
-              ? `Size: ${Math.round(selectedFile.size / 1024)} KB`
-              : "Supports JPG, PNG, PDF up to 10MB"}
-          </p>
-
-          <input
-            id="file-input"
-            type="file"
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                handleFileChange(e.target.files[0]);
-              }
-            }}
-          />
-        </div>
-        {selectedFile && (
-          <div className="mt-2 flex items-center">
-            <button
-              type="button"
-              className="text-red-600 text-sm"
-              onClick={() => {
-                setSelectedFile(null);
-                setValue("file", null);
+        <Controller
+          name="file"
+          control={control}
+          render={({ field }) => (
+            <Dragger
+              name="file"
+              multiple={false}
+              beforeUpload={(file) => {
+                field.onChange(file);
+                handleFileChange(file);
+                return false; // prevent auto upload
               }}
+              onRemove={() => {
+                field.onChange(null);
+                setSelectedFile(null);
+              }}
+              fileList={
+                field.value
+                  ? [
+                      {
+                        uid: "-1",
+                        name: field.value.name,
+                        status: "done",
+                      } as any,
+                    ]
+                  : []
+              }
+              accept=".jpg,.jpeg,.png,.pdf"
+              style={{ padding: "16px" }}
             >
-              Remove file
-            </button>
-          </div>
-        )}
+              <p className="text-center flex flex-col items-center">
+                <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+              </p>
+              <p className="text-[#2B3738] text-base font-medium">
+                {selectedFile
+                  ? selectedFile.name
+                  : "Click or drag file to upload"}
+              </p>
+              <p className="text-sm text-gray-500">
+                Supports JPG, PNG, PDF up to 10MB
+              </p>
+            </Dragger>
+          )}
+        />
       </div>
 
       {/* Start & End Date – Always Visible */}
@@ -237,19 +221,21 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
 
       {/* Buttons */}
       <div className="flex justify-end gap-4 mt-4">
-        <button
-          type="button"
+        <Button
+          type="text"
           onClick={onCancel}
-          className="px-6 py-2 bg-gray-100 text-[#001D01] rounded font-medium tracking-wider"
+          className="px-6 py-2 cancel rounded font-medium tracking-wider"
         >
           Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-6 py-2 bg-[#001D01] text-white rounded font-medium tracking-wider"
+        </Button>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="px-6 py-2 tracking-wider"
+          loading={creating || updating}
         >
           {mode === "create" ? `Create ${entityName}` : `Update ${entityName}`}
-        </button>
+        </Button>
       </div>
     </form>
   );

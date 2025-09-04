@@ -274,6 +274,7 @@ import { errorAlert, successAlert } from "../../../utils/alerts";
 import { showDeleteAlert } from "../../../utils/deleteAlert";
 import CustomShareSelector from "../../../components/CustomShareSelector";
 import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
+import { Unlink } from "lucide-react";
 
 const QuoteDetailsPage = () => {
   const navigate = useNavigate();
@@ -377,12 +378,13 @@ const QuoteDetailsPage = () => {
 
   // ✅ Confirm Share
   const handleConfirmShare = async (selectedUsers: any[]) => {
+    console.log(selectedUsers);
     try {
-      const res = await shareQuote({
+      await shareQuote({
         id: shareQuoteItem._id,
         sharedWith: selectedUsers,
       }).unwrap();
-      successAlert(res.message || "Quote shared successfully!");
+      successAlert("Quote shared successfully!");
       setShareModalOpen(false);
       setShareQuoteItem(null);
       refetch();
@@ -403,11 +405,11 @@ const QuoteDetailsPage = () => {
   // ✅ Confirm Unshare
   const handleConfirmUnshare = async (selectedUsers: any[]) => {
     try {
-      const res = await unShareQuote({
+      await unShareQuote({
         id: selectedQuoteId!,
         unShareWith: selectedUsers.map((u) => u.userId),
       }).unwrap();
-      successAlert(res.message || "Quote unshared successfully!");
+      successAlert("Quote unshared successfully!");
       setUnshareModalOpen(false);
       setSelectedQuoteId(null);
       refetch();
@@ -421,7 +423,7 @@ const QuoteDetailsPage = () => {
 
   return (
     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
-      <div className="flex justify-between">
+      <div className="flex justify-between mt-10">
         <h1 className="text-2xl font-semibold mb-4">Manage Quote</h1>
         <CustomSearchInput onSearch={() => {}} />
       </div>
@@ -431,6 +433,7 @@ const QuoteDetailsPage = () => {
       </div>
 
       <ResuableDocumentForm
+        title="Quote"
         mode={mode}
         creating={creating}
         updating={updating}
@@ -465,10 +468,18 @@ const QuoteDetailsPage = () => {
             .map((quote: any) => (
               <div
                 key={quote._id}
-                className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
+                className="p-6 hover:bg-[#e6f4ea] bg-[#f1f1f1]  rounded shadow flex flex-col h-full cursor-pointer"
+                onClick={() => handleViewClick(quote)}
               >
-                <div className="flex justify-between items-start w-full">
-                  <h3 className="text-lg font-medium text-gray-900 w-36 truncate">
+                {/* Header (title + menu) */}
+                <div className="flex justify-between items-start w-[300px]">
+                  {/* <h3 className="mt-2 flex">
+                    <span className="text-3xl">📁</span>
+                    <span className="font-semibold ml-1 text-xl text-gray-900 truncate">
+                      {quote.title}
+                    </span>
+                  </h3> */}
+                  <h3 className="text-lg font-medium text-gray-900 w-[150px] truncate">
                     {quote.title}
                   </h3>
                   <CustomViewMoreButton
@@ -476,7 +487,15 @@ const QuoteDetailsPage = () => {
                       { key: "view quote", label: "👁️ View Quote" },
                       { key: "edit", label: "✏️ Edit Quote" },
                       { key: "share", label: "🔗 Share Quote" },
-                      { key: "unshare", label: "🚫 Unshare Quote" },
+                      {
+                        key: "unshare",
+                        label: (
+                          <div className="flex items-center gap-1">
+                            <Unlink className="text-green-500" size={14} />
+                            Unshare Quote
+                          </div>
+                        ),
+                      },
                       { key: "delete", label: "🗑️ Delete Quote", danger: true },
                     ]}
                     onClick={async (key) => {
@@ -498,7 +517,6 @@ const QuoteDetailsPage = () => {
                             onConfirm: async () => {
                               try {
                                 await deleteQuote(quote._id).unwrap();
-                                successAlert("Quote deleted successfully!");
                                 refetch();
                               } catch (err: any) {
                                 errorAlert(
@@ -513,8 +531,13 @@ const QuoteDetailsPage = () => {
                     }}
                   />
                 </div>
+
+                {/* Spacer to push footer down */}
+                <div className="flex-grow mt-10" />
+
+                {/* Footer (price at bottom) */}
                 <p className="text-lg font-medium text-gray-900">
-                  ${quote.value}
+                  $ {quote.value}
                 </p>
               </div>
             ))}
@@ -534,7 +557,7 @@ const QuoteDetailsPage = () => {
       >
         <CustomShareSelector
           title="Share this quote"
-          roles={["super-admin", "prime-admin", "basic-admin", "client"]}
+          roles={["prime-admin", "basic-admin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>

@@ -225,10 +225,10 @@
 // export default DocumentsPage;
 
 import { useState } from "react";
-import { Modal } from "antd";
+import { Modal, Spin } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomCreateButton from "../../../components/CustomCreateButton";
-import CustomSearchInput from "../../../components/CustomSearchInput";
+// import CustomSearchInput from "../../../components/CustomSearchInput";
 import CreateFolder from "../../../components/CreateFolder";
 import {
   useGetAllDocumentsQuery,
@@ -340,9 +340,9 @@ const DocumentsPage = ({ title }: DocumentsPageProps) => {
   return (
     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 mt-10">
         <h1 className="text-2xl font-semibold">{pageTitle} Manage</h1>
-        <CustomSearchInput onSearch={() => {}} />
+        {/* <CustomSearchInput onSearch={() => {}} /> */}
       </div>
 
       {/* Create Button */}
@@ -355,14 +355,16 @@ const DocumentsPage = ({ title }: DocumentsPageProps) => {
 
       {/* Folder List */}
       {isLoading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {folders.map((folder) => (
             <div
               key={folder.id}
               onClick={() => handleFolderClick(folder)}
-              className="p-4 border border-gray-300 rounded shadow bg-white cursor-pointer hover:bg-gray-100 transition"
+              className="p-4 rounded hover:shadow-md cursor-pointer hover:bg-[#e6f4ea] bg-[#f1f1f1] transition w-[250px] h-30"
             >
               <h3 className="text-lg font-medium truncate">📁 {folder.name}</h3>
             </div>

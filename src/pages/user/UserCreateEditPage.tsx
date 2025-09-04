@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Input, Select, Button, Upload } from "antd";
-import { UploadOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -41,14 +41,16 @@ interface Props {
   defaultValues?: Partial<FormData>;
   onSubmitSuccess?: () => void;
   onCancel: () => void;
+  onClose: () => void;
 }
 
 const UserCreateEditPage = ({
   mode,
   defaultValues,
-
+  onClose,
   onCancel,
-}: Props) => {
+}: // onClose,
+Props) => {
   const {
     control,
     handleSubmit,
@@ -71,8 +73,8 @@ const UserCreateEditPage = ({
   const location = useLocation();
   const path = location.pathname;
 
-  const [createUser] = useCreateUserMutation();
-  const [updateUser] = useUpdateUserMutation();
+  const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
   const allowedRoles = useMemo<FormData["role"][]>(() => {
     if (path.includes("prime-admins")) {
@@ -144,6 +146,7 @@ const UserCreateEditPage = ({
       // Reset form
       reset();
       setPhotoFile(null);
+      onClose();
       // Close drawer/modal
     } catch (error) {
       errorAlert("Error while saving user");
@@ -230,8 +233,32 @@ const UserCreateEditPage = ({
           )}
         />
       </div>
-
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 ">
+        <h3 className="text-lg font-medium">Upload Photo</h3>
+        <Upload.Dragger
+          accept="image/*"
+          beforeUpload={(file) => {
+            setPhotoFile(file); // save file to state
+            return false; // prevent auto upload
+          }}
+          multiple={false}
+          fileList={photoFile ? [photoFile as any] : []} // show selected image
+          onRemove={() => setPhotoFile(null)}
+          style={{ padding: "1px" }}
+        >
+          <p className="text-center flex flex-col items-center">
+            <CloudUploadOutlined style={{ fontSize: 24, color: "#0d542b" }} />
+          </p>
+          <p className="text-sm text-center">Click or drag image to upload</p>
+          {errors.profileImg && (
+            <p className="text-red-600 text-sm">
+              {/* {errors.profileImg} */}
+              <span>upload an image</span>
+            </p>
+          )}
+        </Upload.Dragger>
+      </div>
+      {/* <div className="flex flex-col gap-2">
         <h3 className="text-lg font-medium">Upload Photo</h3>
         <Controller
           control={control}
@@ -252,7 +279,7 @@ const UserCreateEditPage = ({
             </Upload>
           )}
         />
-      </div>
+      </div> */}
 
       <div className="flex flex-col gap-2">
         <h3 className="text-lg font-medium">User Type</h3>
@@ -349,8 +376,15 @@ const UserCreateEditPage = ({
       </div>
 
       <div className="flex gap-4 justify-end">
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button htmlType="submit" type="primary" className="bg-[#001D01]">
+        <Button type="text" className="cancel" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button
+          htmlType="submit"
+          type="primary"
+          className="bg-[#001D01]"
+          loading={isCreating || isUpdating}
+        >
           {mode === "edit" ? "Update" : "Create"}
         </Button>
       </div>

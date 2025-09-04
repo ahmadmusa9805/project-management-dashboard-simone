@@ -1,15 +1,15 @@
 import React from "react";
 
 interface CertificateCardProps {
-  title: string;
-  size: string;
+  title?: string;
+  size?: string;
 }
 
-const CertificateCard: React.FC<CertificateCardProps> = ({ title, size }) => {
+const CertificateCard: React.FC<CertificateCardProps> = ({ title }) => {
   // Define dropdown actions
 
   return (
-    <div className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between">
+    <div className="p-6 hover:bg-[#e6f4ea] bg-[#f1f1f1] rounded flex flex-col justify-between">
       {/* Top Row */}
       <div className="w-[151px] flex justify-between items-start">
         {/* Icon (mock) */}
@@ -29,8 +29,10 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ title, size }) => {
 
       {/* Title and Size */}
       <div className="flex flex-col items-start gap-2 w-full">
-        <div className="text-[#2B3738] text-[18px] font-medium">{title}</div>
-        <div className="text-[#6B7374] text-sm font-normal">{size}</div>
+        <div className="text-[#2B3738] text-[18px] w-[250px] truncate font-medium ">
+          {title}
+        </div>
+        {/* <div className="text-[#6B7374] text-sm font-normal">{size}</div> */}
       </div>
     </div>
   );

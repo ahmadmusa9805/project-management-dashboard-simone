@@ -441,12 +441,14 @@
 
 import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { DatePicker, Button, Input, Select, Upload, Spin } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { DatePicker, Button, Input, Select, Spin } from "antd";
+
 import dayjs from "dayjs";
 import type { ExpenseType } from "../types/projectAllTypes/expense";
 import { useGetAllLaboursQuery } from "../Redux/features/labour/labourApi";
 import { ErrorMessage } from "@hookform/error-message";
+import Dragger from "antd/es/upload/Dragger";
+import { CloudUpload } from "lucide-react";
 
 export interface ExpenseFormValues {
   _id?: string;
@@ -602,7 +604,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="w-full bg-white rounded shadow-lg p-6 flex flex-col gap-6"
+      className="w-full bg-white rounded  p-6 flex flex-col gap-6"
     >
       <h2 className="text-2xl font-semibold text-[#000E0F]">
         {mode === "edit" ? "Edit Expense" : "Create Expense"}
@@ -961,7 +963,55 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       </div>
 
       {/* Upload */}
-      <div className="flex flex-col gap-2">
+
+      <Controller
+        control={control}
+        name="file"
+        rules={{ required: "File is required" }}
+        render={({ field }) => (
+          <div className="flex flex-col gap-2">
+            <label className="font-medium">Upload Files</label>
+            <Dragger
+              name="file"
+              accept=".pdf"
+              beforeUpload={() => false} // prevent auto upload
+              multiple={false}
+              fileList={
+                field.value
+                  ? [
+                      {
+                        uid: "-1",
+                        name: field.value.name,
+                        status: "done",
+                        originFileObj: field.value,
+                      },
+                    ]
+                  : []
+              }
+              onChange={({ fileList }) => {
+                field.onChange(fileList?.[0]?.originFileObj || undefined);
+              }}
+              onRemove={() => field.onChange(undefined)}
+              style={{ padding: "8px" }}
+            >
+              <p className="text-center flex flex-col items-center">
+                <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+              </p>
+              <p className="text-[10px]">Click or drag PDF to upload</p>
+            </Dragger>
+
+            <ErrorMessage
+              errors={errors}
+              name="file"
+              render={({ message }: { message: string }) => (
+                <p className="text-red-500 text-sm">{message}</p>
+              )}
+            />
+          </div>
+        )}
+      />
+
+      {/* <div className="flex flex-col gap-2">
         <label>Upload Files</label>
         <Controller
           control={control}
@@ -986,11 +1036,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
             <p className="text-red-500 text-sm">{message}</p>
           )}
         />
-      </div>
+      </div> */}
 
       {/* Buttons */}
       <div className="flex justify-end gap-4">
-        <Button onClick={onCancel}>Cancel</Button>
+        <Button type="text" onClick={onCancel} className="cancel">
+          Cancel
+        </Button>
         <Button type="primary" htmlType="submit" loading={creating || updating}>
           {mode === "edit" ? "Update" : "Create"}
         </Button>

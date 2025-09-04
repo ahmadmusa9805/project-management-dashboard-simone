@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { Modal } from "antd";
 import { setCurrentFile } from "../Redux/features/projects/project/shared/documentSlice";
 import ReusableDocumentViewer from "./ReusableDocumentViewer";
+import { ChevronLeft } from "lucide-react";
 
 interface DocumentItem {
   id: number;
@@ -32,28 +33,38 @@ const ReusableDocumentPage: React.FC = () => {
     }
   };
 
-  if (!documents) {
-    return (
-      <div className="p-4">
-        <h2 className="text-xl font-semibold mb-4">No documents found.</h2>
-        <button
-          className="text-blue-600 underline"
-          onClick={() => navigate(-1)}
-        >
-          ← Back
-        </button>
-      </div>
-    );
-  }
+  console.log("Documents:", documents);
+  // if (!documents) {
+  //   return (
+  //     <div className="p-4">
+  //       <h2 className="text-xl font-semibold mb-4">No documents found.</h2>
+  //       <button
+  //         className="text-blue-600 underline"
+  //         onClick={() => navigate(-1)}
+  //       >
+  //         ← Back
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <h1 className="text-2xl font-bold mb-2">Documents for {quoteTitle}</h1>
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+      <div className="flex items-center gap-1 pt-10 mb-3">
+        <ChevronLeft
+          onClick={() => navigate(-1)}
+          className="w-10 h-10 cursor-pointer -translate-y-[4px]" // Adjust -translate-y value as needed
+        />
+        <h1 className="text-2xl font-bold leading-tight ">
+          Documents for {quoteTitle}
+          {/* {quoteTitle} */}
+        </h1>
+      </div>
 
       {documents.map((doc) => (
         <div key={doc.id} className="flex flex-col gap-4">
           <div
-            className="w-full p-4 bg-[#F1F1F1] border border-[#E6E7E7] rounded flex items-center gap-4 cursor-pointer hover:bg-gray-100 transition-colors"
+            className="w-full p-4 bg-[#f1f1f1]  hover:bg-[#e6f4ea] cursor-pointer rounded flex items-center gap-4  transition-colors"
             onClick={() => handleDocumentClick(doc.fileUrl)}
           >
             {/* Icon */}
@@ -81,7 +92,7 @@ const ReusableDocumentPage: React.FC = () => {
               Value
             </p>
             <span className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
-              {doc.amount ?? "N/A"}
+              $ {doc.amount ?? "N/A"}
             </span>
           </div>
         </div>
@@ -91,8 +102,8 @@ const ReusableDocumentPage: React.FC = () => {
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
-        width="50vw"
-        height={"80vh"}
+        width="80vw"
+        height={"90vh"}
         style={{
           maxWidth: "1200px",
           margin: "0 auto",

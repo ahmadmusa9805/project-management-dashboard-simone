@@ -131,6 +131,7 @@
 // };
 
 // export default SnaggingListPage;
+
 import React, { useState, useEffect } from "react";
 import { Drawer, Modal, Spin } from "antd";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
@@ -158,6 +159,7 @@ import { successAlert, errorAlert } from "../../../utils/alerts";
 import { showDeleteAlert } from "../../../utils/deleteAlert";
 
 import { buildFormData } from "../../../utils/buildFormData";
+import { Unlink } from "lucide-react";
 
 // Define the full user interface for unsharing
 interface FullSharedUser {
@@ -184,8 +186,10 @@ const SnaggingListPage: React.FC = () => {
     skip: !selectedSnagId,
   });
 
-  const [createSnagging] = useCreateSnaggingMutation();
-  const [updateSnagging] = useUpdateSnaggingMutation();
+  const [createSnagging, { isLoading: isCreating }] =
+    useCreateSnaggingMutation();
+  const [updateSnagging, { isLoading: isUpdating }] =
+    useUpdateSnaggingMutation();
   const [deleteSnagging] = useDeleteSnaggingMutation();
   const [shareSnagging] = useShareSnaggingMutation();
   const [unShareSnagging] = useUnShareSnaggingMutation();
@@ -356,49 +360,64 @@ const SnaggingListPage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="p-6 flex justify-center items-center h-40">
-        <Spin size="large" />
-      </div>
-    );
-  }
-
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-6">Manage Snagging List</h1>
+    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3 ">
+      <h1 className="text-xl font-bold mb-6 pt-8">Manage Snagging List</h1>
 
       <div className="flex justify-end mb-4">
         <CustomCreateButton title="Create Task" onClick={handleCreateClick} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {snaggingList.map((snag: any) => (
-          <div
-            key={snag._id}
-            className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
-          >
-            <div className="flex justify-between">
-              <h3 className="text-lg font-semibold">{snag.title}</h3>
-              <CustomViewMoreButton
-                items={[
-                  { key: "view", label: "View" },
-                  { key: "edit", label: "Edit" },
-                  { key: "share", label: "Share" },
-                  { key: "unshare", label: "Unshare" },
-                  { key: "delete", label: "Delete", danger: true },
-                ]}
-                onClick={(key) => handleMenuClick(key, snag)}
-              />
-            </div>
-            <p className="mt-2 text-gray-700">{snag.description}</p>
-            <div className="mt-2 text-sm text-gray-500">
-              {snag.startDate && <p>Start: {snag.startDate}</p>}
-              {snag.endDate && <p>End: {snag.endDate}</p>}
-              {snag.isShared && <p className="text-green-600">Shared</p>}
-            </div>
+        {isLoading ? (
+          <div className="col-span-3 flex justify-center items-center h-40">
+            <Spin size="large" />
           </div>
-        ))}
+        ) : snaggingList.length > 0 ? (
+          snaggingList.map((snag: any) => (
+            <div
+              key={snag._id}
+              className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
+            >
+              <div className="flex justify-between">
+                <h3 className="text-lg font-semibold">{snag.title}</h3>
+                <CustomViewMoreButton
+                  items={[
+                    //TODO: Add View Snagging option will be implemented
+                    // { key: "view", label: "👁️ View Snagging" },
+                    { key: "edit", label: "✏️ Edit Snagging" },
+                    { key: "share", label: "🔗 Share Snagging" },
+                    {
+                      key: "unshare",
+                      label: (
+                        <div className="flex items-center gap-1">
+                          <Unlink className="text-green-500" size={14} />
+                          Unshare Snagging
+                        </div>
+                      ),
+                    },
+                    {
+                      key: "delete",
+                      label: "🗑️ Delete Snagging",
+                      danger: true,
+                    },
+                  ]}
+                  onClick={(key) => handleMenuClick(key, snag)}
+                />
+              </div>
+              <p className="mt-2 text-gray-700">{snag.description}</p>
+              <div className="mt-2 text-sm text-gray-500">
+                {snag.startDate && <p>Start: {snag.startDate}</p>}
+                {snag.endDate && <p>End: {snag.endDate}</p>}
+                {snag.isShared && <p className="text-green-600">Shared</p>}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-3 text-center py-10 text-gray-500">
+            No snagging tasks found. Create your first task.
+          </div>
+        )}
       </div>
 
       {/* Drawer for create/edit snag */}
@@ -410,6 +429,8 @@ const SnaggingListPage: React.FC = () => {
         open={isFormOpen}
       >
         <TaskScheduleForm
+          creating={isCreating}
+          updating={isUpdating}
           entityName="Task"
           mode={formMode}
           initialData={selectedSnag}

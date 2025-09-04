@@ -6,10 +6,9 @@
     --color-lightPrimary: "#e6f4ea",   // Light green
   } */
 
-  /* hover:bg-[#0b4725]   #0d542b  -p */
+/* hover:bg-[#0b4725]   #0d542b  -p */
 
-
-  /* Dropdown menu item default */
+/* Dropdown menu item default */
 /* Override Ant Design Input, TextArea borders and focus */
 /* INPUT, TEXTAREA, SELECT, DATEPICKER, INPUTNUMBER */
 
@@ -73,6 +72,7 @@
 }
 .ant-btn-primary:hover,
 .ant-btn-primary:focus {
+  border-width: 2px !important;
   background-color: #0d542b !important;
   border-color: #0d542b !important;
   color: white !important;
@@ -86,10 +86,54 @@
 .ant-select-item-option-active:not(.ant-select-item-option-disabled),
 .ant-select-item-option:hover:not(.ant-select-item-option-disabled) {
   background-color: #e6f4ea !important;
-  
 }
 
 .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
   background-color: #e6f4ea !important;
-  
 }
+.ant-btn-text.cancel:hover {
+  border-color: #0d542b !important; /* Optional, if you want a border */
+  background-color: #e6f4ea !important; /* Correct syntax for no background */
+  /* font-weight: bold !important; */
+  color: #0d542b !important; /* Text color on hover */
+}
+
+/* ================= Checkbox custom color ================= */
+.ant-checkbox-inner {
+  border-color: #0d542b !important; /* border of the checkbox */
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #0d542b !important; /* background when checked */
+  border-color: #0d542b !important; /* border when checked */
+}
+
+.ant-checkbox-checked::after {
+  border-color: white !important; /* check mark color inside */
+}
+
+.ant-checkbox:hover .ant-checkbox-inner {
+  border-color: #0d542b !important; /* hover border color */
+}
+
+/* ================= Spin (loading) custom color ================= */
+.ant-spin-dot-item {
+  background-color: #0d542b !important; /* small spinning dots color */
+}
+
+.ant-spin-dot-item:nth-child(1),
+.ant-spin-dot-item:nth-child(2),
+.ant-spin-dot-item:nth-child(3),
+.ant-spin-dot-item:nth-child(4) {
+  background-color: #0d542b !important; /* ensure all dots match */
+}
+
+/* ================= Optional: Spinner text color ================= */
+.ant-spin-text {
+  color: #0d542b !important;
+}
+
+/* .react-pdf__Page__canvas {
+  background-color: #0d542b; /* Tailwind gray-50 */
+/* border-radius: 8px;
+} */

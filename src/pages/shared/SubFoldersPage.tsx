@@ -222,7 +222,7 @@
 
 import React, { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Modal } from "antd";
+import { Modal, Spin } from "antd";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CreateFolder from "../../components/CreateFolder";
 import {
@@ -233,6 +233,7 @@ import {
   useCreateSecondFixSubFolderMutation,
   useGetAllSecondFixSubFoldersQuery,
 } from "../../Redux/features/projects/project/SecondFixedList/SecondFixSubFolderApi";
+import { ChevronLeft } from "lucide-react";
 
 // Import the second fix subfolders API hooks
 
@@ -340,10 +341,17 @@ const SubFoldersPage: React.FC<SubFoldersPageProps> = ({
   return (
     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">
-          📁 {folder?.name || mainFolderId} — Subfolders
-        </h1>
+      <div className="flex justify-between items-center mb-4 mt-10">
+        <div className="flex items-center gap-1 pt-10 mb-3">
+          <ChevronLeft
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 cursor-pointer -translate-y-[4px]" // Adjust -translate-y value as needed
+          />
+          <h1 className="text-2xl font-semibold">
+            {folder?.name || mainFolderId}
+          </h1>
+        </div>
+
         <CustomCreateButton
           title="Create Subfolder"
           onClick={() => setIsModalOpen(true)}
@@ -352,16 +360,20 @@ const SubFoldersPage: React.FC<SubFoldersPageProps> = ({
 
       {/* Subfolder list */}
       {isLoading ? (
-        <p>Loading subfolders...</p>
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mt-20">
           {subfolders.map((sub: { id: any; name: any }) => (
             <div
               key={sub.id}
               onClick={() => handleSubfolderClick(sub)}
-              className="p-4 border border-gray-300 rounded shadow bg-white text-gray-800 cursor-pointer hover:bg-gray-100 transition"
+              className="p-4 rounded hover:shadow-md cursor-pointer hover:bg-[#e6f4ea] bg-[#f1f1f1] transition w-[250px] h-30 "
             >
-              <h3 className="text-lg font-medium truncate">📂 {sub.name}</h3>
+              <h3 className="text-lg font-medium truncate w-[150px]">
+                📁 {sub.name}
+              </h3>
             </div>
           ))}
         </div>

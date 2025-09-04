@@ -233,6 +233,8 @@ import {
 
 import type { SharedUser } from "../../../Redux/features/projects/projectsApi";
 import { errorAlert, successAlert } from "../../../utils/alerts";
+import { showDeleteAlert } from "../../../utils/deleteAlert";
+import { Unlink } from "lucide-react";
 
 interface DocumentType {
   _id: string;
@@ -248,9 +250,11 @@ const InterimEvaluationPage: React.FC = () => {
   const { projectId } = useParams();
 
   // API hooks
-  const { data: documentsFromApi = [], isLoading } = useGetAllInterimsQuery(
-    projectId ? { projectId } : undefined
-  );
+  const {
+    data: documentsFromApi = [],
+    isLoading,
+    refetch,
+  } = useGetAllInterimsQuery(projectId ? { projectId } : undefined);
   const [createInterim, { isLoading: creating }] = useCreateInterimMutation();
   const [updateInterim, { isLoading: updating }] = useUpdateInterimMutation();
   const [deleteInterim] = useDeleteInterimMutation();
@@ -295,12 +299,26 @@ const InterimEvaluationPage: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await deleteInterim(id).unwrap();
-      successAlert("Interim deleted successfully.");
-    } catch (error) {
-      errorAlert("Failed to delete interim.");
-    }
+    showDeleteAlert({
+      onConfirm: async () => {
+        try {
+          await deleteInterim(id).unwrap();
+          // successAlert("Quote deleted successfully!");
+          refetch();
+        } catch (err: any) {
+          errorAlert(
+            "Delete Error",
+            err?.data?.message || "Failed to delete quote"
+          );
+        }
+      },
+    });
+    // try {
+    //   await deleteInterim(id).unwrap();
+    //   // successAlert("Interim deleted successfully.");
+    // } catch (error) {
+    //   errorAlert("Failed to delete interim.");
+    // }
   };
 
   // ✅ Open Share Modal
@@ -403,7 +421,8 @@ const InterimEvaluationPage: React.FC = () => {
           {documents.map((doc) => (
             <div
               key={doc._id}
-              className="relative p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
+              className="relative p-6 hover:bg-[#e6f4ea] bg-[#f1f1f1] w-[300px] rounded shadow flex flex-col h-full cursor-pointer"
+              onClick={() => handleViewMoreAction("view Interim", doc)}
             >
               <div
                 className="absolute top-2 right-2 opacity-100 z-10"
@@ -414,20 +433,31 @@ const InterimEvaluationPage: React.FC = () => {
                     { key: "view Interim", label: "👁️ View Interim" },
                     { key: "edit", label: "✏️ Edit Interim" },
                     { key: "share", label: "🔗 Share Interim" },
-                    { key: "unshare", label: "🚫 Unshare Interim" },
+                    {
+                      key: "unshare",
+                      label: (
+                        <div className="flex items-center gap-1">
+                          <Unlink className="text-green-500" size={14} />
+                          Unshare Interim
+                        </div>
+                      ),
+                    },
                     { key: "delete", label: "🗑️ Delete Interim", danger: true },
                   ]}
                   onClick={(key) => handleViewMoreAction(key, doc)}
                 />
               </div>
 
-              <h3 className="text-lg font-semibold text-gray-800 truncate mt-2">
-                📁 {doc.title}
+              <h3 className="mt-2">
+                {/* <span className="text-3xl">📁</span> */}
+                <span className="font-semibold ml-1 text-xl text-gray-900 w-[150px] truncate">
+                  {doc.title}
+                </span>
               </h3>
-              <p className="text-sm text-gray-600">Value: ${doc.value}</p>
 
-              <div className="mt-3 flex items-center gap-2">
-                <span
+              <div className="mt-3 flex items-center justify-between">
+                <p className="text-sm font-semibold">Value: $ {doc.value}</p>
+                <p
                   className={`text-sm font-semibold ${
                     doc.status === "pending"
                       ? "text-yellow-700"
@@ -435,7 +465,7 @@ const InterimEvaluationPage: React.FC = () => {
                   }`}
                 >
                   {doc.status === "pending" ? "⏳ Pending" : "✅ Paid"}
-                </span>
+                </p>
               </div>
             </div>
           ))}
@@ -444,6 +474,7 @@ const InterimEvaluationPage: React.FC = () => {
 
       {/* Drawer Form */}
       <ResuableDocumentForm
+        title="Interim"
         creating={creating}
         updating={updating}
         mode={mode}

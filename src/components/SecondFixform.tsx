@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Select, Input, Button, Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Select, Input, Button } from "antd";
+
 import { ErrorMessage } from "@hookform/error-message";
+import { CloudUpload } from "lucide-react";
+import Dragger from "antd/es/upload/Dragger";
 
 export interface SecondFixFormValues {
   _id?: string;
@@ -10,7 +13,7 @@ export interface SecondFixFormValues {
   room: string;
   surface: string;
   productCode: string;
-  supplierName: string;
+  suplierName: string;
   text: string;
   file?: File | null;
 }
@@ -44,7 +47,7 @@ const SecondFixForm: React.FC<SecondFixFormProps> = ({
       title: "",
       surface: "",
       productCode: "",
-      supplierName: "",
+      suplierName: "",
       text: "",
       file: null,
     },
@@ -57,7 +60,7 @@ const SecondFixForm: React.FC<SecondFixFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="w-full bg-white rounded shadow-lg p-6 flex flex-col gap-6"
+      className="w-full bg-white rounded  p-6 flex flex-col gap-6"
     >
       <h2 className="text-2xl font-semibold text-[#000E0F]">
         {" "}
@@ -153,7 +156,7 @@ const SecondFixForm: React.FC<SecondFixFormProps> = ({
         <label>Supplier Name</label>
         <Controller
           control={control}
-          name="supplierName"
+          name="suplierName"
           render={({ field }) => (
             <Input {...field} placeholder="Enter supplier name" />
           )}
@@ -188,27 +191,59 @@ const SecondFixForm: React.FC<SecondFixFormProps> = ({
 
       {/* File Upload */}
       <div className="flex flex-col gap-2">
-        <label>Upload Files</label>
         <Controller
           control={control}
           name="file"
           render={({ field }) => (
-            <Upload
-              beforeUpload={() => false}
-              onChange={({ fileList }) => {
-                field.onChange(fileList?.[0]?.originFileObj ?? undefined);
-              }}
-              maxCount={1}
-            >
-              <Button icon={<UploadOutlined />}>Upload</Button>
-            </Upload>
+            <div className="flex flex-col gap-1">
+              <label className="font-medium">Upload File</label>
+              <Dragger
+                name="file"
+                accept=".pdf"
+                beforeUpload={(file) => {
+                  field.onChange(file);
+                  return false;
+                }}
+                multiple={false}
+                fileList={
+                  field.value
+                    ? [
+                        {
+                          uid:
+                            (field.value as any).uid ||
+                            field.value.name ||
+                            `${Date.now()}`,
+                          name: field.value.name,
+                          status: "done" as const,
+                          originFileObj: field.value,
+                          lastModified: field.value.lastModified,
+                          lastModifiedDate:
+                            (field.value as any).lastModifiedDate || new Date(),
+                          size: field.value.size,
+                          type: field.value.type,
+                          percent: 100,
+                        } as any, // Cast to UploadFile to satisfy type checker
+                      ]
+                    : []
+                }
+                onRemove={() => field.onChange(undefined)}
+                style={{ padding: "8px" }}
+              >
+                <p className="text-center flex flex-col items-center">
+                  <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+                </p>
+                <p className="text-[10px]">Click or drag file to upload</p>
+              </Dragger>
+            </div>
           )}
         />
       </div>
 
       {/* Buttons */}
       <div className="flex justify-end gap-4">
-        <Button onClick={onCancel}>Cancel</Button>
+        <Button type="text" className="cancel" onClick={onCancel}>
+          Cancel
+        </Button>
         <Button type="primary" htmlType="submit" loading={creating || updating}>
           {mode === "edit" ? "Update" : "Create"}
         </Button>

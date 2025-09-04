@@ -37,7 +37,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   const handleUnshare = async (userId: string) => {
     if (!projectId) return;
     try {
-      await unShareProject({ id: projectId, userId }).unwrap();
+      await unShareProject({ id: projectId, unShareWith: [userId] }).unwrap();
       successAlert("User unshared from project successfully.");
       refetch(); // Refresh project details after unsharing
     } catch (error) {

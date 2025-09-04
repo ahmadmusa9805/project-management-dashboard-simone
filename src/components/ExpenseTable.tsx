@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState } from "react";
-import { Drawer } from "antd";
+import { Drawer, Spin } from "antd";
 import type {
   ExpenseItem,
   ExpenseType,
@@ -123,7 +123,7 @@ const ExpenseTable = ({
             await deleteSubContractor(id).unwrap();
           }
 
-          successAlert("Expense deleted");
+          // successAlert("Expense deleted");
           refetch?.();
         } catch {
           errorAlert("Failed to delete expense");
@@ -199,19 +199,18 @@ const ExpenseTable = ({
     <div className="max-w-7xl mx-auto p-4">
       <div className="flex justify-between items-center mb-4 gap-4 flex-wrap">
         <h2 className="text-xl font-semibold">{title} Expenses</h2>
-        <CustomCreateButton
-          title={`Create ${title} Expense`}
-          onClick={handleCreate}
-        />
+        <CustomCreateButton title={`Create ${title}`} onClick={handleCreate} />
       </div>
 
       {isLoading ? (
-        <div>Loading...</div>
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
+        </div>
       ) : (
         <>
           <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
             <thead className="bg-gray-100 border-b border-gray-200">
-              <tr>
+              <tr className="bg-[#e6f4ea] border-b border-gray-300">
                 <th className="text-left px-4 py-2 text-gray-700">Name</th>
                 <th className="text-left px-4 py-2 text-gray-700">
                   Expense Type
@@ -234,7 +233,7 @@ const ExpenseTable = ({
                 expenses.map((item) => (
                   <tr
                     key={item._id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
+                    className="border-b border-gray-100 hover:bg-[#e6f4ea] transition"
                   >
                     <td className="px-4 py-2">{item.name}</td>
                     <td className="px-4 py-2">{item.type}</td>
@@ -293,9 +292,7 @@ const ExpenseTable = ({
       <Drawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        title={
-          mode === "edit" ? `Edit ${title} Expense` : `Create ${title} Expense`
-        }
+        title={mode === "edit" ? `Edit ${title}` : `Create ${title}`}
         width={720}
         destroyOnClose
       >

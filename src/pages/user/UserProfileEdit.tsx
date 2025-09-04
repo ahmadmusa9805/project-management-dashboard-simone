@@ -446,7 +446,10 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
               className="px-4 py-[5px] bg-[#0d542b] text-white font-semibold rounded"
               disabled={isUpdatingUser}
             >
-              {isUpdatingUser ? "Updating..." : "Update Details"}
+              <span className="text-white">
+                {" "}
+                {isUpdatingUser ? "Updating..." : "Update Details"}
+              </span>
             </button>
           )}
         </div>

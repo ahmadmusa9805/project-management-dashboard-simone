@@ -126,8 +126,142 @@
 // };
 // export default CostManagementPage;
 
+//TODO: after ckecked bellow delete
+// import { useNavigate, useParams } from "react-router-dom";
+// import CustomSearchInput from "../../../components/CustomSearchInput";
+// import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
+// import { useGetAllExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/costManagementApi";
+
+// const CostManagementPage = () => {
+//   const navigate = useNavigate();
+//   const { projectId } = useParams();
+
+//   // Fetch expenses for the projectId
+//   const {
+//     data: response,
+//     isLoading,
+//     isError,
+//   } = useGetAllExpensesQuery({ projectId });
+
+//   if (isLoading) {
+//     return <div>Loading cost data...</div>;
+//   }
+//   if (isError || !response) {
+//     return <div>Error loading cost data. Please try again later.</div>;
+//   }
+
+//   // Extract the expenses array from the response data
+//   const expensesArray = response || [];
+
+//   // Helper to get amount by expense name (case insensitive)
+//   const getAmountByName = (name: string) => {
+//     const normalizedName = name.trim().toLowerCase();
+//     const item = expensesArray.find(
+//       (exp: { name: string }) =>
+//         exp.name.trim().toLowerCase() === normalizedName
+//     );
+//     return item ? item.amount : 0;
+//   };
+
+//   const totalLabor = getAmountByName("Labour");
+//   const totalMaterial = getAmountByName("Material");
+//   const totalSubcontractor = getAmountByName("SubContractor");
+//   const totalProject = getAmountByName("Total");
+
+//   const handleViewCost = (type: string) => {
+//     // You might want to fetch or pass detailed documents here
+//     // For now, just navigate with the type name
+//     navigate(`/projects/${projectId}/expense-documents`, {
+//       state: {
+//         quoteTitle: `${type} Expense List`,
+//         documents: [],
+//         expenseType: type,
+//         projectId: projectId, // Replace with actual docs if available
+//       },
+//     });
+//   };
+
+//   return (
+//     <div className="w-full bg-white h-full p-6 min-h-screen">
+//       {/* Header */}
+//       <div className="flex justify-between">
+//         <h1 className="text-2xl font-semibold mb-4">Manage Cost Management</h1>
+//         <CustomSearchInput onSearch={() => {}} />
+//       </div>
+
+//       {/* Cost Cards */}
+//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+//         {[
+//           { label: "Material", value: totalMaterial },
+//           { label: "Labour", value: totalLabor },
+//           { label: "Subcontractor", value: totalSubcontractor },
+//         ].map(({ label, value }) => (
+//           <div
+//             key={label}
+//             className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
+//           >
+//             <div className="flex justify-between items-start w-full">
+//               <h3 className="text-lg font-medium text-gray-900 truncate">
+//                 {`Total ${label} Expense${
+//                   label === "Subcontractor" ? "s" : ""
+//                 }`}
+//               </h3>
+//               <CustomViewMoreButton
+//                 items={[
+//                   { key: "view Cost", label: "👁️ View Cost" },
+
+//                   // { key: "share", label: "🔗 Share Cost" },
+//                   // { key: "unshare", label: "🚫 Unshare Cost" },
+//                 ]}
+//                 onClick={(key) => {
+//                   if (key === "view Cost") handleViewCost(label);
+//                   // if (key === "share") {
+//                   //   console.log(`Share ${label} cost clicked`);
+//                   // }
+//                 }}
+//               />
+//             </div>
+//             <p className="text-lg font-medium text-gray-900">
+//               Value $ : {value}
+//             </p>
+//           </div>
+//         ))}
+
+//         <div className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between">
+//           <div className="flex justify-between items-start w-full">
+//             <h3 className="text-lg font-medium text-gray-900 w-36 truncate">
+//               Total Project Cost
+//             </h3>
+//             {/* <CustomViewMoreButton
+//               items={[
+//                 { key: "share", label: "🔗 Share Total Cost" },
+//                 { key: "unshare", label: "🚫 Unshare Total Cost" },
+//               ]}
+//               onClick={(key) => {
+//                 switch (key) {
+//                   case "view Cost List":
+//                     // Implement if needed
+//                     break;
+//                   case "share":
+//                     console.log("Share total project cost");
+//                     break;
+//                 }
+//               }}
+//             /> */}
+//           </div>
+//           <p className="text-lg font-medium text-gray-900">
+//             Value $ : {totalProject}
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CostManagementPage;
 import { useNavigate, useParams } from "react-router-dom";
-import CustomSearchInput from "../../../components/CustomSearchInput";
+import { Spin } from "antd"; // ← Import Spin here
+
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import { useGetAllExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/costManagementApi";
 
@@ -140,14 +274,13 @@ const CostManagementPage = () => {
     data: response,
     isLoading,
     isError,
-  } = useGetAllExpensesQuery({ projectId });
-
-  if (isLoading) {
-    return <div>Loading cost data...</div>;
-  }
-  if (isError || !response) {
-    return <div>Error loading cost data. Please try again later.</div>;
-  }
+  } = useGetAllExpensesQuery(
+    { projectId },
+    {
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    }
+  );
 
   // Extract the expenses array from the response data
   const expensesArray = response || [];
@@ -168,14 +301,12 @@ const CostManagementPage = () => {
   const totalProject = getAmountByName("Total");
 
   const handleViewCost = (type: string) => {
-    // You might want to fetch or pass detailed documents here
-    // For now, just navigate with the type name
     navigate(`/projects/${projectId}/expense-documents`, {
       state: {
         quoteTitle: `${type} Expense List`,
         documents: [],
         expenseType: type,
-        projectId: projectId, // Replace with actual docs if available
+        projectId: projectId,
       },
     });
   };
@@ -183,76 +314,60 @@ const CostManagementPage = () => {
   return (
     <div className="w-full bg-white h-full p-6 min-h-screen">
       {/* Header */}
-      <div className="flex justify-between">
-        <h1 className="text-2xl font-semibold mb-4">Manage Cost Management</h1>
-        <CustomSearchInput onSearch={() => {}} />
+      <div className="flex justify-between py-8">
+        <h1 className="text-2xl font-semibold mb-4">Live Project Cost</h1>
+        {/* <CustomSearchInput onSearch={() => {}} /> */}
       </div>
 
-      {/* Cost Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {[
-          { label: "Material", value: totalMaterial },
-          { label: "Labour", value: totalLabor },
-          { label: "Subcontractor", value: totalSubcontractor },
-        ].map(({ label, value }) => (
-          <div
-            key={label}
-            className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
-          >
-            <div className="flex justify-between items-start w-full">
-              <h3 className="text-lg font-medium text-gray-900 truncate">
-                {`Total ${label} Expense${
-                  label === "Subcontractor" ? "s" : ""
-                }`}
-              </h3>
-              <CustomViewMoreButton
-                items={[
-                  { key: "view Cost", label: "👁️ View Cost" },
+      {/* Loading spinner */}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
+        </div>
+      ) : isError || !response ? (
+        <div>Error loading cost data. Please try again later.</div>
+      ) : (
+        // Cost Cards
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { label: "Material", value: totalMaterial },
+            { label: "Labour", value: totalLabor },
+            { label: "Subcontractor", value: totalSubcontractor },
+          ].map(({ label, value }) => (
+            <div
+              key={label}
+              className="p-6 hover:bg-[#e6f4ea] bg-[#f1f1f1] rounded shadow flex flex-col justify-between cursor-pointer"
+              onClick={() => handleViewCost(label)}
+            >
+              <div className="flex justify-between items-start w-full">
+                <h3 className="text-lg font-medium text-gray-900 truncate">
+                  {`${label} Expense${label === "Subcontractor" ? "s" : ""}`}
+                </h3>
+                <CustomViewMoreButton
+                  items={[{ key: "view Cost", label: "👁️ View Cost" }]}
+                  onClick={(key) => {
+                    if (key === "view Cost") handleViewCost(label);
+                  }}
+                />
+              </div>
+              <p className="text-lg font-medium text-gray-900">
+                Value $ : {value}
+              </p>
+            </div>
+          ))}
 
-                  // { key: "share", label: "🔗 Share Cost" },
-                  // { key: "unshare", label: "🚫 Unshare Cost" },
-                ]}
-                onClick={(key) => {
-                  if (key === "view Cost") handleViewCost(label);
-                  // if (key === "share") {
-                  //   console.log(`Share ${label} cost clicked`);
-                  // }
-                }}
-              />
+          <div className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between">
+            <div className="flex justify-between items-start w-full">
+              <h3 className="text-lg font-medium text-gray-900 w-36 truncate">
+                Total Project Cost
+              </h3>
             </div>
             <p className="text-lg font-medium text-gray-900">
-              Value $ : {value}
+              Value $ : {totalProject}
             </p>
           </div>
-        ))}
-
-        <div className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between">
-          <div className="flex justify-between items-start w-full">
-            <h3 className="text-lg font-medium text-gray-900 w-36 truncate">
-              Total Project Cost
-            </h3>
-            {/* <CustomViewMoreButton
-              items={[
-                { key: "share", label: "🔗 Share Total Cost" },
-                { key: "unshare", label: "🚫 Unshare Total Cost" },
-              ]}
-              onClick={(key) => {
-                switch (key) {
-                  case "view Cost List":
-                    // Implement if needed
-                    break;
-                  case "share":
-                    console.log("Share total project cost");
-                    break;
-                }
-              }}
-            /> */}
-          </div>
-          <p className="text-lg font-medium text-gray-900">
-            Value $ : {totalProject}
-          </p>
         </div>
-      </div>
+      )}
     </div>
   );
 };

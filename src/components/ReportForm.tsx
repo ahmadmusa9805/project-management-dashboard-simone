@@ -426,7 +426,7 @@ const ReportForm: React.FC<ReportFormProps> = ({
               <input
                 {...field}
                 placeholder="Report Title"
-                className="text-2xl font-bold flex-1 border-b border-gray-300 focus:outline-none focus:border-blue-600 px-2 py-1"
+                className="text-2xl font-bold flex-1 border-b border-[#0d542b]  focus:outline-none focus:border-[#0d542b] px-2 py-1"
               />
             )}
           />
@@ -449,8 +449,6 @@ const ReportForm: React.FC<ReportFormProps> = ({
           <ToastEditor
             initialValue={overviewContent}
             height="400px"
-            previewStyle="vertical"
-            theme="light"
             onChange={(val) => {
               setOverviewContent(val);
               setValue("overviewText", val);
@@ -510,8 +508,9 @@ const ReportForm: React.FC<ReportFormProps> = ({
       {/* Actions */}
       <section className="flex justify-end gap-4">
         <Button
+          type="text"
           onClick={handleCancel}
-          className="flex-1 h-12 px-6 bg-[#172B4D0F] rounded text-[#001D01] text-base font-medium leading-6 "
+          className="flex-1 h-12 px-6  rounded cancel text-base font-medium leading-6 "
         >
           Cancel
         </Button>

@@ -60,12 +60,12 @@ export const projectsApi = baseApi.injectEndpoints({
 
     unShareProject: builder.mutation<
       any, // Response type
-      { id: string; userId: string } // Argument type
+      { id: string; unShareWith: string[] } // Argument type
     >({
-      query: ({ id, userId }) => ({
+      query: ({ id, unShareWith }) => ({
         url: `/projects/${id}/unshare`,
         method: "POST",
-        body: { userId },
+        body: { unShareWith },
       }),
       invalidatesTags: ["Projects"],
     }),

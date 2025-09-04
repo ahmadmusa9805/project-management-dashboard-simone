@@ -11,6 +11,7 @@ export type SharedUser = {
 
 interface CustomUnshareSelectorProps {
   title?: string;
+  unsharing?: boolean;
   sharedUsers: SharedUser[]; // Already shared users
   onUnshare: (selectedUsers: SharedUser[]) => void;
 }
@@ -18,6 +19,7 @@ interface CustomUnshareSelectorProps {
 const CustomUnshareSelector = ({
   title = "Unshare with",
   sharedUsers,
+  unsharing,
   onUnshare,
 }: CustomUnshareSelectorProps) => {
   const [selectedUsers, setSelectedUsers] = useState<SharedUser[]>([]);
@@ -35,7 +37,6 @@ const CustomUnshareSelector = ({
       {/* Title */}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-medium text-[#000E0F]">{title}</h2>
-        <div className="w-6 h-6 bg-[#8B0000] rounded" />
       </div>
 
       {/* User List */}
@@ -82,9 +83,10 @@ const CustomUnshareSelector = ({
         type="primary"
         className="w-full text-white text-base font-medium h-12"
         onClick={() => onUnshare(selectedUsers)}
-        disabled={selectedUsers.length === 0}
+        disabled={selectedUsers.length === 0} // always disabled
+        loading={unsharing}
       >
-        Unshare
+        {unsharing ? "Unsharing..." : "Unshare"}
       </Button>
     </div>
   );

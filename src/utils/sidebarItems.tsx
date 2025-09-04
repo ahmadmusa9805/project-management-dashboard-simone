@@ -62,7 +62,8 @@ const rawSidebarItems: SidebarItem[] = [
     children: [
       {
         key: "/projects?status=pending", // Correct spelling: ongoing (not onging)
-        label: "Pending Projects",
+        // label: "Pending Projects",
+        label: "Create Projects",
         icon: <LayoutList />,
         allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
       },

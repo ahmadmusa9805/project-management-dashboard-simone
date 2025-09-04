@@ -176,7 +176,7 @@ const DashboardLayout: React.FC = () => {
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>
-            themvv.co.uk ©{new Date().getFullYear()} Created by Ant UED
+            themvv.co.uk ©{new Date().getFullYear()} Created by aradun
           </Footer>
         </Layout>
       </Layout>

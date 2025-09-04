@@ -53,6 +53,7 @@
 
 // export default CreateFolder;
 
+import { Button } from "antd";
 import React, { useState } from "react";
 
 interface CreateFolderProps {
@@ -61,7 +62,7 @@ interface CreateFolderProps {
 }
 
 const CreateFolder: React.FC<CreateFolderProps> = ({ onCreate, onCancel }) => {
-  const [folderName, setFolderName] = useState("Untitled folder");
+  const [folderName, setFolderName] = useState("");
 
   const handleCreate = () => {
     if (!folderName.trim()) return;
@@ -69,7 +70,7 @@ const CreateFolder: React.FC<CreateFolderProps> = ({ onCreate, onCancel }) => {
   };
 
   return (
-    <div className="w-full h-full p-6 bg-white shadow-xl rounded-md flex flex-col gap-6">
+    <div className="w-full h-full p-6 bg-white shadow-md rounded-md flex flex-col gap-6">
       {/* Header & Input */}
       <div className="flex flex-col gap-3 w-full">
         <h2 className="text-[24px] font-medium text-[#000E0F]">New folder</h2>
@@ -78,25 +79,27 @@ const CreateFolder: React.FC<CreateFolderProps> = ({ onCreate, onCancel }) => {
           type="text"
           value={folderName}
           onChange={(e) => setFolderName(e.target.value)}
-          placeholder="Untitled folder"
+          placeholder="folder name"
           className="w-full px-2 py-3 border-2 border-[#001D01] outline-none text-sm rounded"
         />
       </div>
 
       {/* Buttons */}
       <div className="flex items-center gap-4 w-full">
-        <button
+        <Button
           onClick={onCancel}
-          className="h-12 px-6 bg-[#172B4D0F] text-[#001D01] rounded hover:bg-[#172B4D1A] transition"
+          type="text"
+          className="h-12 px-6 cancel transition"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
+          type="primary"
           onClick={handleCreate}
-          className="h-12 px-6 bg-[#001D01] text-white rounded hover:bg-[#003A03] transition"
+          className="h-12 px-6  text-white rounded  transition"
         >
           Create folder
-        </button>
+        </Button>
       </div>
     </div>
   );

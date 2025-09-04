@@ -8,6 +8,8 @@ import ExpenseTable from "../../../components/ExpenseTable";
 import { useGetAllLabourExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/labourExpensesApi";
 import { useGetAllMaterialExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/materialExpensesApi";
 import { useGetAllSubContractorsQuery } from "../../../Redux/features/projects/project/costManagenent/subContractorExpensesApi";
+import CustomSearchInput from "../../../components/CustomSearchInput";
+import { ChevronLeft } from "lucide-react";
 
 const ExpenseDocumentsPage = () => {
   const { projectId } = useParams();
@@ -62,19 +64,29 @@ const ExpenseDocumentsPage = () => {
   if (!state) {
     return <div className="p-4 text-red-600">No expense data found.</div>;
   }
-  if (isLoading) return <div>Loading...</div>;
+  // if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading expenses.</div>;
 
   return (
     <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
       <div className="mb-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{quoteTitle}</h1>
-        <button
+        <div className="flex items-center gap-1 pt-10 mb-3">
+          <ChevronLeft
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 cursor-pointer -translate-y-[4px]" // Adjust -translate-y value as needed
+          />
+          <h1 className="text-2xl font-bold leading-tight ">{quoteTitle}</h1>
+        </div>
+        {/* <h1 className="text-2xl font-bold">{quoteTitle}</h1> */}
+        <div>
+          <CustomSearchInput onSearch={() => {}} />
+        </div>
+        {/* <button
           className="bg-blue-600 text-white px-4 py-2 rounded"
           onClick={() => navigate(-1)}
         >
           Back
-        </button>
+        </button> */}
       </div>
 
       <ExpenseTable

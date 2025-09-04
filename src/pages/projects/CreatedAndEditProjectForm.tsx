@@ -322,10 +322,13 @@ const { Text } = Typography;
 type ProjectForm = z.infer<typeof projectSchema>;
 
 interface CreateProjectFormProps {
+  creating?: boolean;
+  updating?: boolean;
   onSubmit: (data: ProjectForm) => void;
   defaultValues?: Partial<ProjectForm>;
   submitText?: string;
   isEdit?: boolean;
+  // onClose: () => void;
 }
 
 const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
@@ -333,6 +336,9 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
   defaultValues,
   submitText = "Create Project",
   isEdit = false,
+  // onClose,
+  creating,
+  updating,
 }) => {
   const {
     control,
@@ -594,7 +600,11 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
       </div>
 
       <div className="flex justify-end">
-        <Button htmlType="submit" className="!bg-[#0d542b] !text-white">
+        <Button
+          htmlType="submit"
+          className="!bg-[#0d542b] !text-white"
+          loading={creating || updating}
+        >
           {submitText}
         </Button>
       </div>

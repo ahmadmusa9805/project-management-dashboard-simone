@@ -147,31 +147,46 @@
 
 // components/CustomShareSelector.tsx
 import { useState } from "react";
-import { Input, Checkbox, Button } from "antd";
+import { Input, Checkbox, Button, Spin } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+import { useSelector } from "react-redux";
+
 import { useGetAllUsersQuery } from "../Redux/features/users/usersApi";
+import type { RootState } from "../Redux/app/store";
 
 export type SharedUser = { userId: string; role: string };
 
 interface CustomShareSelectorProps {
   title?: string;
-  roles: string[]; // Example: ['prime-admin', 'basic-admin', 'client']
-  // <- accept array of objects, not string[]
+  shareing?: boolean;
+  roles: string[];
   onShare: (selectedUsers: SharedUser[]) => void;
 }
 
 const CustomShareSelector = ({
   title = "Share with",
   roles,
+  shareing,
   onShare,
 }: CustomShareSelectorProps) => {
-  const { data: response } = useGetAllUsersQuery({ status: "active" });
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userRole = user?.role;
+
+  const { data: response, isLoading } = useGetAllUsersQuery({
+    status: "active",
+  });
+
+  // Filter users who have all required info and optionally exclude superAdmin if logged-in user is superAdmin
   const users = (response?.data || []).filter(
-    (item: any) => item._id && item.name && item.role && item.email
+    (item: any) =>
+      item._id &&
+      item.name &&
+      item.role &&
+      item.email &&
+      !(userRole === "superAdmin" && item.role === "superAdmin")
   );
 
   const [searchText, setSearchText] = useState("");
-  // rename to selectedUsers for clarity and correct type
   const [selectedUsers, setSelectedUsers] = useState<SharedUser[]>([]);
   const [selectedRole, setSelectedRole] = useState<string>("all");
 
@@ -193,12 +208,15 @@ const CustomShareSelector = ({
     );
   };
 
+  // Filter roles for buttons: remove superAdmin if logged-in user is superAdmin
+  const filteredRoles =
+    userRole === "superAdmin" ? roles.filter((r) => r !== "superAdmin") : roles;
+
   return (
     <div className="w-full h-full p-4 bg-white rounded flex flex-col gap-4">
       {/* Title */}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-medium text-[#000E0F]">{title}</h2>
-        <div className="w-6 h-6 bg-[#001D01] rounded" />
       </div>
 
       {/* Role Filter Buttons */}
@@ -213,7 +231,7 @@ const CustomShareSelector = ({
         >
           All
         </div>
-        {roles.map((role) => (
+        {filteredRoles.map((role) => (
           <div
             key={role}
             onClick={() => setSelectedRole(role)}
@@ -228,7 +246,7 @@ const CustomShareSelector = ({
         ))}
       </div>
 
-      {/* Search Bar */}
+      {/* Search and Users (remain unchanged) */}
       <div className="flex items-center gap-3 px-2 py-3 border-2 border-gray-200 rounded">
         <div className="flex items-center gap-1">
           {filteredUsers.slice(0, 3).map((user) => (
@@ -250,8 +268,8 @@ const CustomShareSelector = ({
         />
       </div>
 
-      {/* User List */}
       <div className="flex flex-col gap-4 max-h-60 overflow-y-auto">
+        {isLoading && <Spin size="large" />}
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => (
             <div
@@ -288,13 +306,17 @@ const CustomShareSelector = ({
         )}
       </div>
 
-      {/* Share Button */}
       <Button
         type="primary"
         className="w-full bg-[#001D01] text-white text-base font-medium h-12"
-        onClick={() => onShare(selectedUsers)}
+        disabled={selectedUsers.length === 0}
+        onClick={() => {
+          onShare(selectedUsers);
+          setSelectedUsers([]);
+        }}
+        loading={shareing}
       >
-        Share
+        {shareing ? "Sharing..." : "Share"}
       </Button>
     </div>
   );
