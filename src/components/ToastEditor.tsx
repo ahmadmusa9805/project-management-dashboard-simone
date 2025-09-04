@@ -1,56 +1,69 @@
 // import React, { useEffect, useRef, useState } from "react";
-// import Editor from "@toast-ui/editor";
-// import "@toast-ui/editor/dist/toastui-editor.css"; // Light theme
-// import "@toast-ui/editor/dist/theme/toastui-editor-dark.css"; // Dark theme
+// import Quill from "quill";
+// import "quill/dist/quill.snow.css";
 
-// interface ToastEditorProps {
+// interface QuillEditorProps {
+//   readOnly?: boolean;
 //   initialValue?: string;
 //   height?: string;
-//   previewStyle?: "vertical" | "tab";
-//   theme?: "light" | "dark";
-//   onChange?: (value: string) => void;
+//   onChange?: (value: string) => void; // returns plain text only
 // }
 
-// const ToastEditor: React.FC<ToastEditorProps> = ({
+// const QuillEditor: React.FC<QuillEditorProps> = ({
 //   initialValue = "",
-//   previewStyle = "vertical",
-//   theme = "light",
+//   height = "400px",
 //   onChange,
 // }) => {
-//   const editorRef = useRef<Editor | null>(null);
+//   const editorRef = useRef<Quill | null>(null);
 //   const editorContainerRef = useRef<HTMLDivElement | null>(null);
 //   const fileInputRef = useRef<HTMLInputElement | null>(null);
 //   const [, setContent] = useState(initialValue);
 
 //   useEffect(() => {
 //     if (!editorContainerRef.current) return;
+//     if (editorRef.current) return; // prevent double initialization
 
-//     editorRef.current = new Editor({
-//       el: editorContainerRef.current,
-
-//       previewStyle,
-//       initialValue,
-//       theme,
-//       usageStatistics: false,
-//       toolbarItems: [
-//         ["heading", "bold", "italic", "strike"],
-//         ["hr", "quote"],
-//         ["ul", "ol", "task"],
-//         ["code", "codeblock"],
-//       ],
+//     // Initialize Quill
+//     editorRef.current = new Quill(editorContainerRef.current, {
+//       theme: "snow",
+//       modules: {
+//         toolbar: [
+//           ["bold", "italic", "underline", "strike"],
+//           ["blockquote", "code-block"],
+//           [{ header: 1 }, { header: 2 }],
+//           [{ list: "ordered" }, { list: "bullet" }],
+//           [{ indent: "-1" }, { indent: "+1" }],
+//           [{ size: ["small", false, "large", "huge"] }],
+//           [{ color: [] }, { background: [] }],
+//           [{ align: [] }],
+//           ["clean"],
+//         ],
+//       },
 //     });
 
-//     editorRef.current.on("change", () => {
-//       const markdown = editorRef.current?.getMarkdown() || "";
-//       setContent(markdown);
-//       onChange?.(markdown);
+//     // Set initial content
+//     if (initialValue && editorRef.current.getLength() === 1) {
+//       editorRef.current.clipboard.dangerouslyPasteHTML(initialValue);
+//     }
+
+//     // Listen for changes
+//     editorRef.current.on("text-change", () => {
+//       const textValue = editorRef.current?.getText().trim() || "";
+//       setContent(textValue);
+//       onChange?.(textValue); // send plain text only
 //     });
+
+//     editorContainerRef.current.style.height = height;
 
 //     return () => {
-//       editorRef.current?.destroy();
+//       if (editorRef.current) {
+//         editorRef.current.root.innerHTML = "";
+//         editorRef.current = null;
+//       }
 //     };
 //   }, []);
 
+//   // Handle image upload
 //   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 //     const file = e.target.files?.[0];
 //     if (!file) return;
@@ -58,7 +71,8 @@
 //     const reader = new FileReader();
 //     reader.onload = () => {
 //       const imageUrl = reader.result as string;
-//       editorRef.current?.insertText(`![alt text](${imageUrl})\n`);
+//       const range = editorRef.current?.getSelection(true) || { index: 0 };
+//       editorRef.current?.insertEmbed(range.index, "image", imageUrl, "user");
 
 //       if (fileInputRef.current) fileInputRef.current.value = "";
 //     };
@@ -67,8 +81,10 @@
 
 //   return (
 //     <div>
-//       <div ref={editorContainerRef} />
-
+//       <div
+//         ref={editorContainerRef}
+//         style={{ borderRadius: "8px", backgroundColor: "#fff" }}
+//       />
 //       <input
 //         type="file"
 //         accept="image/*"
@@ -80,104 +96,179 @@
 //   );
 // };
 
-// export default ToastEditor;
+// export default QuillEditor;
 
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useRef, useState } from "react";
+// import React, { useEffect, useRef, useState } from "react";
+// import Quill from "quill";
+// import "quill/dist/quill.snow.css";
+
+// interface QuillEditorProps {
+//   readOnly?: boolean;
+//   initialValue?: string;
+//   height?: string;
+//   onChange?: (value: string) => void; // returns plain text only
+// }
+
+// const QuillEditor: React.FC<QuillEditorProps> = ({
+//   readOnly = false,
+//   initialValue = "",
+//   height = "400px",
+//   onChange,
+// }) => {
+//   const editorRef = useRef<Quill | null>(null);
+//   const editorContainerRef = useRef<HTMLDivElement | null>(null);
+//   const fileInputRef = useRef<HTMLInputElement | null>(null);
+//   const [, setContent] = useState(initialValue);
+
+//   useEffect(() => {
+//     if (!editorContainerRef.current) return;
+//     if (editorRef.current) return; // prevent double initialization
+
+//     // Initialize Quill
+//     editorRef.current = new Quill(editorContainerRef.current, {
+//       theme: "snow",
+//       readOnly, // set initial readonly state
+//       modules: {
+//         toolbar: readOnly
+//           ? false // hide toolbar if readonly
+//           : [
+//               ["bold", "italic", "underline", "strike"],
+//               ["blockquote", "code-block"],
+//               [{ header: 1 }, { header: 2 }],
+//               [{ list: "ordered" }, { list: "bullet" }],
+//               [{ indent: "-1" }, { indent: "+1" }],
+//               [{ size: ["small", false, "large", "huge"] }],
+//               [{ color: [] }, { background: [] }],
+//               [{ align: [] }],
+//               ["clean"],
+//             ],
+//       },
+//     });
+
+//     // Set initial content
+//     if (initialValue && editorRef.current.getLength() === 1) {
+//       editorRef.current.clipboard.dangerouslyPasteHTML(initialValue);
+//     }
+
+//     // Listen for changes (only if not readonly)
+//     if (!readOnly) {
+//       editorRef.current.on("text-change", () => {
+//         const textValue = editorRef.current?.getText().trim() || "";
+//         setContent(textValue);
+//         onChange?.(textValue); // send plain text only
+//       });
+//     }
+
+//     editorContainerRef.current.style.height = height;
+
+//     return () => {
+//       if (editorRef.current) {
+//         editorRef.current.root.innerHTML = "";
+//         editorRef.current = null;
+//       }
+//     };
+//   }, [readOnly]);
+
+//   // Handle image upload (disable if readonly)
+//   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     if (readOnly) return; // block file insert
+//     const file = e.target.files?.[0];
+//     if (!file) return;
+
+//     const reader = new FileReader();
+//     reader.onload = () => {
+//       const imageUrl = reader.result as string;
+//       const range = editorRef.current?.getSelection(true) || { index: 0 };
+//       editorRef.current?.insertEmbed(range.index, "image", imageUrl, "user");
+
+//       if (fileInputRef.current) fileInputRef.current.value = "";
+//     };
+//     reader.readAsDataURL(file);
+//   };
+
+//   return (
+//     <div>
+//       <div
+//         ref={editorContainerRef}
+//         style={{ borderRadius: "8px", backgroundColor: "#fff" }}
+//       />
+//       {!readOnly && (
+//         <input
+//           type="file"
+//           accept="image/*"
+//           style={{ display: "none" }}
+//           ref={fileInputRef}
+//           onChange={onFileChange}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// export default QuillEditor;
+
+import React, { useEffect, useRef } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 
-interface QuillEditorProps {
+interface ToastEditorProps {
   initialValue?: string;
+  readOnly?: boolean;
+  value?: string;
   height?: string;
-  onChange?: (value: string) => void; // returns plain text only
+  onChange?: (value: string) => void; // HTML string
 }
 
-const QuillEditor: React.FC<QuillEditorProps> = ({
-  initialValue = "",
+const ToastEditor: React.FC<ToastEditorProps> = ({
+  readOnly = false,
+  value = "",
   height = "400px",
   onChange,
 }) => {
   const editorRef = useRef<Quill | null>(null);
-  const editorContainerRef = useRef<HTMLDivElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [, setContent] = useState(initialValue);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Initialize Quill
   useEffect(() => {
-    if (!editorContainerRef.current) return;
-    if (editorRef.current) return; // prevent double initialization
+    if (!containerRef.current || editorRef.current) return;
 
-    // Initialize Quill
-    editorRef.current = new Quill(editorContainerRef.current, {
+    editorRef.current = new Quill(containerRef.current, {
       theme: "snow",
+      readOnly,
       modules: {
-        toolbar: [
-          ["bold", "italic", "underline", "strike"],
-          ["blockquote", "code-block"],
-          [{ header: 1 }, { header: 2 }],
-          [{ list: "ordered" }, { list: "bullet" }],
-          [{ indent: "-1" }, { indent: "+1" }],
-          [{ size: ["small", false, "large", "huge"] }],
-          [{ color: [] }, { background: [] }],
-          [{ align: [] }],
-          ["clean"],
-        ],
+        toolbar: readOnly
+          ? false
+          : [
+              ["bold", "italic", "underline", "strike"],
+              ["blockquote", "code-block"],
+              [{ header: 1 }, { header: 2 }],
+              [{ list: "ordered" }, { list: "bullet" }],
+              [{ indent: "-1" }, { indent: "+1" }],
+              [{ size: ["small", false, "large", "huge"] }],
+              [{ color: [] }, { background: [] }],
+              [{ align: [] }],
+              ["clean"],
+            ],
       },
     });
 
-    // Set initial content
-    if (initialValue && editorRef.current.getLength() === 1) {
-      editorRef.current.clipboard.dangerouslyPasteHTML(initialValue);
-    }
-
-    // Listen for changes
     editorRef.current.on("text-change", () => {
-      const textValue = editorRef.current?.getText().trim() || "";
-      setContent(textValue);
-      onChange?.(textValue); // send plain text only
+      onChange?.(editorRef.current?.root.innerHTML || "");
     });
 
-    editorContainerRef.current.style.height = height;
+    containerRef.current.style.height = height;
+  }, [readOnly, onChange, height]);
 
-    return () => {
-      if (editorRef.current) {
-        editorRef.current.root.innerHTML = "";
-        editorRef.current = null;
-      }
-    };
-  }, []);
+  // Update content whenever value changes
+  useEffect(() => {
+    if (!editorRef.current) return;
+    const current = editorRef.current.root.innerHTML;
+    if (value !== current) {
+      editorRef.current.clipboard.dangerouslyPasteHTML(value || "");
+    }
+  }, [value]);
 
-  // Handle image upload
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const imageUrl = reader.result as string;
-      const range = editorRef.current?.getSelection(true) || { index: 0 };
-      editorRef.current?.insertEmbed(range.index, "image", imageUrl, "user");
-
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    };
-    reader.readAsDataURL(file);
-  };
-
-  return (
-    <div>
-      <div
-        ref={editorContainerRef}
-        style={{ borderRadius: "8px", backgroundColor: "#fff" }}
-      />
-      <input
-        type="file"
-        accept="image/*"
-        style={{ display: "none" }}
-        ref={fileInputRef}
-        onChange={onFileChange}
-      />
-    </div>
-  );
+  return <div ref={containerRef} style={{ borderRadius: "8px" }} />;
 };
 
-export default QuillEditor;
+export default ToastEditor;
