@@ -1,21 +1,83 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { AuthResponse ,LoginPayload} from './auth.types';
+//------------------//--------------------------------//--------------------------------
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Adjust path if needed
 
-export const authApi = createApi({
-  reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://350c6bd4-4a04-4d89-bf9d-1f835ff83bd4.mock.pstmn.io' }),
+import { baseApi } from "../../app/api/baseApi";
+import type {
+  AuthResponse,
+  LoginPayload,
+  ChangePasswordPayload,
+  ForgetPasswordPayload,
+  OtpVerifyForgetPasswordPayload,
+  RefreshTokenResponse,
+  OtpResponse,
+} from "./auth.types";
+
+export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<AuthResponse, LoginPayload>({
-      
       query: (credentials) => ({
-        url: 'login',
-        method: 'POST',
+        url: "/auth/login",
+        method: "POST",
         body: credentials,
-        
+      }),
+      transformResponse: (response: any) => response.data,
+    }),
+
+    changePassword: builder.mutation<any, ChangePasswordPayload>({
+      query: (data) => ({
+        url: "/auth/change-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    forgetPassword: builder.mutation<any, ForgetPasswordPayload>({
+      query: (data) => ({
+        url: "/auth/forget-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    resetPassword: builder.mutation<
+      any,
+      { email: string; newPassword: string; token: string }
+    >({
+      query: ({ email, newPassword, token }) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body: { email, newPassword },
+        token,
+      }),
+    }),
+
+    refreshToken: builder.mutation<RefreshTokenResponse, void>({
+      query: () => ({
+        url: "/auth/refresh-token",
+        method: "POST",
+      }),
+    }),
+
+    otpVerifyForgetPassword: builder.mutation<
+      OtpResponse,
+      OtpVerifyForgetPasswordPayload
+    >({
+      query: (data) => ({
+        url: "/otps/verify-forget-password",
+        method: "POST",
+        body: data,
       }),
     }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const {
+  useLoginMutation,
+  useChangePasswordMutation,
+  useForgetPasswordMutation,
+  useResetPasswordMutation,
+  useRefreshTokenMutation,
+  useOtpVerifyForgetPasswordMutation,
+} = authApi;

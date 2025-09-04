@@ -1,9 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { AuthResponse } from "./auth.types";
+import type { AuthResponse, User } from "./auth.types";
+import { jwtDecode } from "jwt-decode";
+
+interface JwtPayload {
+  userEmail: string;
+  role: "superAdmin" | "primeAdmin" | "basicAdmin" | "client";
+  iat: number;
+  exp: number;
+}
 
 interface AuthState {
-  user: AuthResponse["user"] | null;
+  user: User | null;
   token: string | null;
 }
 
@@ -17,24 +25,35 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action: PayloadAction<AuthResponse>) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
+      const { accessToken } = action.payload;
+      state.token = accessToken;
+
+      try {
+        const decoded = jwtDecode<JwtPayload>(accessToken);
+        console.log("Decoded JWT:", decoded);
+        state.user = { email: decoded.userEmail, role: decoded.role };
+      } catch {
+        state.user = null;
+      }
     },
     clearCredentials: (state) => {
-      state.user = null;
       state.token = null;
+      state.user = null;
     },
-    loadFromStorage: (state) => {
-      const token = localStorage.getItem("token");
-      const user = localStorage.getItem("user");
-      if (token && user) {
-        state.token = token;
-        state.user = JSON.parse(user);
+    rehydrateUserFromToken: (state) => {
+      if (state.token) {
+        try {
+          const decoded = jwtDecode<JwtPayload>(state.token);
+          state.user = { email: decoded.userEmail, role: decoded.role };
+        } catch {
+          state.user = null; // invalid/expired token in storage
+          state.token = null;
+        }
       }
     },
   },
 });
 
-export const { setCredentials, clearCredentials, loadFromStorage } = authSlice.actions;
-
+export const { setCredentials, clearCredentials, rehydrateUserFromToken } =
+  authSlice.actions;
 export default authSlice.reducer;

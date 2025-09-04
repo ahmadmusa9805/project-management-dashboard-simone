@@ -1,0 +1,21 @@
+/* Base styles */
+.custom-dropdown-menu .ant-dropdown-menu-item,
+.custom-dropdown-menu .ant-dropdown-menu-submenu-title {
+  font-weight: 600;
+  font-size: large;
+  border-radius: 0 !important;
+  transition: background-color 0.2s ease;
+}
+
+
+.custom-dropdown-menu .ant-dropdown-menu-item:hover {
+  background-color: #e6f4ea !important;
+}
+
+/* Selected item */
+.custom-dropdown-menu .ant-dropdown-menu-item-selected {
+  background-color: #e6f4ea !important;
+  color: black !important;
+  border-radius: 0 !important;
+  border-right: 6px solid #0d542b !important;
+}

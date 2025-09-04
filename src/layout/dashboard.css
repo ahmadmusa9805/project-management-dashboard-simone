@@ -1,0 +1,144 @@
+/* ========= CUSTOM SIDEBAR MENU STYLES ========= */
+
+/* Scrollable sidebar menu */
+.custom-sidebar-menu-wrapper {
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  padding-top: 16px;
+}
+
+/* Default bold & square text */
+.custom-sidebar-menu .ant-menu-item,
+.custom-sidebar-menu .ant-menu-submenu-title {
+  font-weight: 600;
+  font-size: large;
+  border-radius: 0 !important;
+}
+
+/* Selected menu item (main item or leaf) */
+.custom-sidebar-menu .ant-menu-item-selected {
+  background-color: transparent !important;
+  color: black !important;
+  border-radius: 0 !important;
+  border-right: 6px solid #0d542b !important;
+}
+
+/* Selected submenu title (expanded) */
+.custom-sidebar-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  background-color: transparent !important;
+  color: black !important;
+  border-radius: 0 !important;
+  border-right: 6px solid #0d542b !important;
+}
+
+/* Hover effect */
+.custom-sidebar-menu .ant-menu-item:hover,
+.custom-sidebar-menu .ant-menu-submenu-title:hover {
+  background-color: #e6f4ea !important;
+  color: #0d542b !important;
+  border-radius: 0 !important;
+}
+
+/* Collapse button style */
+.ant-layout-sider-trigger {
+  background-color: #0d542b !important;
+  color: white !important;
+  border-radius: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Collapsed sidebar menu item */
+.ant-layout-sider-collapsed .custom-sidebar-menu .ant-menu-item,
+.ant-layout-sider-collapsed .custom-sidebar-menu .ant-menu-submenu-title {
+  background-color: #0d542b !important;
+  color: white !important;
+  border-radius: 0 !important;
+}
+
+/* Icons inside collapsed menu */
+.ant-layout-sider-collapsed .custom-sidebar-menu .ant-menu-item .anticon,
+.ant-layout-sider-collapsed
+  .custom-sidebar-menu
+  .ant-menu-submenu-title
+  .anticon {
+  color: white !important;
+}
+
+/* Tooltip style */
+.ant-tooltip-inner {
+  background-color: #0d542b !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+.ant-tooltip-arrow-content {
+  background-color: #0d542b !important;
+}
+
+/* Popup submenu in collapsed state */
+.ant-layout-sider-collapsed .custom-sidebar-menu .ant-menu-sub {
+  background-color: #0d542b !important;
+}
+
+/* Popup submenu item */
+.ant-layout-sider-collapsed .custom-sidebar-menu .ant-menu-sub .ant-menu-item {
+  background-color: #0d542b !important;
+  color: white !important;
+}
+
+/* Hover effect inside popup */
+.ant-layout-sider-collapsed
+  .custom-sidebar-menu
+  .ant-menu-sub
+  .ant-menu-item:hover {
+  background-color: #084729 !important;
+  color: #ffffff !important;
+}
+
+/* Popup arrow */
+.ant-layout-sider-collapsed .custom-sidebar-menu .ant-menu-submenu-arrow {
+  color: white !important;
+}
+
+/* Submenu popup when sidebar is collapsed (no class selector) */
+.ant-menu-submenu-popup {
+  background-color: #0d542b !important;
+  padding: 0 !important;
+}
+
+/* Popup child item default */
+.ant-menu-submenu-popup .ant-menu-item {
+  background-color: #0d542b !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 0 !important;
+}
+
+/* Popup child item hover */
+.ant-menu-submenu-popup .ant-menu-item:hover {
+  background-color: #084729 !important;
+  color: white !important;
+}
+
+/* ✅ Right border only when popup is OPEN and sidebar is collapsed */
+[data-collapsed="true"] .ant-menu-submenu-popup .ant-menu-item-selected {
+  background-color: #084729 !important;
+  color: white !important;
+  font-weight: 700;
+  border-right: 6px solid #ffffff !important;
+}
+
+/* ✅ When expanded: right border stays */
+[data-collapsed="false"] .custom-sidebar-menu .ant-menu-item-selected {
+  background-color: transparent !important;
+  color: black !important;
+  border-right: 6px solid #0d542b !important;
+}
+
+/* Popup icon color for selected */
+.ant-menu-submenu-popup .ant-menu-item-selected .anticon {
+  color: white !important;
+}

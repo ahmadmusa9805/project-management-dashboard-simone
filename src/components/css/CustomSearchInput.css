@@ -1,0 +1,10 @@
+.custom-search-button {
+  background-color: #0d542b !important;
+  border-color: #0d542b !important;
+  color: #ffffff !important;
+}
+
+.custom-search-button:hover {
+  background-color: #0b4a26 !important;
+  border-color: #0b4a26 !important;
+}

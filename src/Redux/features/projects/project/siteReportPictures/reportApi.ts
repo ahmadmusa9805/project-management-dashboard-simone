@@ -1,0 +1,136 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { baseApi } from "../../../../app/api/baseApi";
+
+export interface SiteReport {
+  _id: string;
+  projectId: string;
+  title: string;
+  date: string;
+  overviewText: string;
+  overviewFile?: string[];
+  weather?: string[];
+  workingDays?: string[];
+  LaborTeam?: string[];
+  isShared: boolean;
+  sharedWith?: any[]; // Add this field to match the expected response
+  createdAt: string;
+  updatedAt: string;
+}
+
+// interface SiteReportsApiResponse {
+//   data: SiteReport[];
+//   message: string;
+//   meta: {
+//     page: number;
+//     limit: number;
+//     total: number;
+//     totalPage: number;
+//   };
+//   success: boolean;
+// }
+
+export interface CreateSiteReportRequest {
+  projectId: string;
+  title: string;
+  date: string;
+  overviewText: string;
+  overviewFile?: File[];
+  weather?: File[];
+  workingDays?: File[];
+  LaborTeam?: File[];
+}
+
+export interface UpdateSiteReportRequest {
+  title?: string;
+  date?: string;
+  overviewText?: string;
+  overviewFile?: File[];
+  weather?: File[];
+  workingDays?: File[];
+  LaborTeam?: File[];
+}
+
+export const reportApi = baseApi.injectEndpoints({
+  endpoints: (build) => ({
+    createSiteReport: build.mutation<SiteReport, FormData>({
+      query: (formData) => ({
+        url: "/site-reports/create-site-report",
+        method: "POST",
+        body: formData,
+        formData: true,
+      }),
+      invalidatesTags: ["SiteReports"],
+    }),
+
+    getSiteReports: build.query<SiteReport[], string>({
+      query: (projectId) => ({
+        url: `/site-reports?projectId=${projectId}`,
+        method: "GET",
+      }),
+      transformResponse: (response: { status: string; data: any }) =>
+        response.data,
+    }),
+
+    getSingleSiteReport: build.query<SiteReport, string>({
+      query: (id) => ({
+        url: `/site-reports/${id}`,
+        method: "GET",
+      }),
+      transformResponse: (response: { data: SiteReport }) => response.data,
+      providesTags: ["SiteReports"],
+    }),
+
+    updateSiteReport: build.mutation<
+      SiteReport,
+      { id: string; data: FormData }
+    >({
+      query: ({ id, data }) => ({
+        url: `/site-reports/${id}`,
+        method: "PATCH",
+        body: data,
+        formData: true,
+      }),
+      invalidatesTags: ["SiteReports"],
+    }),
+
+    deleteSiteReport: build.mutation<void, string>({
+      query: (id) => ({
+        url: `/site-reports/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["SiteReports"],
+    }),
+
+    // ✅ Fixed: Accept object with id and sharedWith array
+    shareSiteReport: build.mutation<void, { id: string; sharedWith: any[] }>({
+      query: ({ id, sharedWith }) => ({
+        url: `/site-reports/${id}/share`,
+        method: "POST",
+        body: { sharedWith },
+      }),
+      invalidatesTags: ["SiteReports"],
+    }),
+
+    // ✅ Fixed: Accept object with id and unShareWith array
+    unshareSiteReport: build.mutation<void, { id: string; unShareWith: any[] }>(
+      {
+        query: ({ id, unShareWith }) => ({
+          url: `/site-reports/${id}/unshare`,
+          method: "POST",
+          body: { unShareWith },
+        }),
+        invalidatesTags: ["SiteReports"],
+      }
+    ),
+  }),
+});
+
+export const {
+  useCreateSiteReportMutation,
+  useGetSiteReportsQuery,
+  useGetSingleSiteReportQuery,
+  useUpdateSiteReportMutation,
+  useDeleteSiteReportMutation,
+  useShareSiteReportMutation,
+  useUnshareSiteReportMutation,
+} = reportApi;

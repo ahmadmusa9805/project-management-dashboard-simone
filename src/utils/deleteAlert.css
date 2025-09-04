@@ -1,0 +1,10 @@
+/* Full warning icon color change */
+.custom-warning-icon.swal2-icon.swal2-warning {
+  border-color: #0d542b !important; /* circle border */
+  color: #0d542b !important; /* exclamation mark */
+}
+
+.custom-warning-icon.swal2-icon.swal2-warning::before,
+.custom-warning-icon.swal2-icon.swal2-warning::after {
+  background-color: #0d542b !important; /* circle fill (for animation) */
+}
