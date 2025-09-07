@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import "./dashboard.css";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Button, Layout, Menu, Modal } from "antd";
+import { Breadcrumb, Button, Layout, Menu, Modal, Spin } from "antd";
 import {
   useLocation,
   useNavigate,
@@ -14,8 +15,8 @@ import { FaRegUser } from "react-icons/fa6";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { notificationData } from "../data/notification";
 import NotificationModal from "../pages/shared/NotificationPage";
-import { useSelector } from "react-redux";
-import type { RootState } from "../Redux/app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { persistor, type RootState } from "../Redux/app/store";
 
 import {
   getProjectMenuItems,
@@ -25,6 +26,7 @@ import UserProfileEdit from "../pages/user/UserProfileEdit";
 
 import { USER_ROLE } from "../types/userAllTypes/user";
 import { useGetMeUserQuery } from "../Redux/features/users/usersApi";
+import { clearCredentials } from "../Redux/features/auth/authSlice";
 
 const { Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
@@ -38,10 +40,15 @@ const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { projectId } = useParams();
+  const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
   console.log("user from layout:", user?.role);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const { data: userInfo, isLoading: userLoading } = useGetMeUserQuery();
+  const {
+    data: userInfo,
+    isLoading: userLoading,
+    error: userError,
+  } = useGetMeUserQuery();
   const path = location.pathname;
   const userRole = user?.role;
   const validRoles = [
@@ -69,9 +76,46 @@ const DashboardLayout: React.FC = () => {
   } else {
     mainItems = getSidebarMenuItems(userRole);
   }
+  if (userLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
-  if (userLoading || !userInfo) return <div>Loading user info...</div>;
+  if (userError) {
+    const errMsg =
+      (userError as any)?.data?.message || "Failed to fetch user info!";
+    return (
+      <div className="flex justify-center items-center min-h-screen text-red-600 font-medium">
+        🚫 {errMsg}
+      </div>
+    );
+  }
 
+  if (!userInfo) {
+    return (
+      <div className="flex justify-center items-center min-h-screen text-gray-600">
+        No user info available
+      </div>
+    );
+  }
+
+  //LogoutwrapperFunction
+
+  const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
+    if (key === "/logout") {
+      // ✅ Custom logout
+      dispatch(clearCredentials());
+      persistor.purge();
+      navigate("/login", { replace: true }); // redirect if you want
+      return;
+    }
+
+    // ✅ Normal navigation
+    navigate(key);
+  };
   // On avatar click, open modal
   const handleAvatarClick = () => {
     setIsProfileModalOpen(true);
@@ -158,7 +202,8 @@ const DashboardLayout: React.FC = () => {
             <Menu
               selectedKeys={[location.pathname + location.search]}
               defaultSelectedKeys={[path + location.search]}
-              onClick={({ key }) => navigate(key)}
+              // onClick={({ key }) => navigate(key)}
+              onClick={handleMenuClick}
               mode="inline"
               items={mainItems}
               className="custom-sidebar-menu"

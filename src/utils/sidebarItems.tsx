@@ -19,6 +19,7 @@ import {
   LayoutList,
   ListChecksIcon,
   ListTodoIcon,
+  LogOut,
   RefreshCw,
   ShieldCheckIcon,
   SquareUserRoundIcon,
@@ -47,7 +48,7 @@ const rawSidebarItems: SidebarItem[] = [
     key: "/dashboard",
     label: "Dashboard",
     icon: <LayoutDashboardIcon />,
-    allowedRoles: [USER_ROLE.superAdmin],
+    allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
   },
   {
     key: "/projects",
@@ -105,13 +106,24 @@ const rawSidebarItems: SidebarItem[] = [
     key: "/labours",
     label: "Labour Management",
     icon: <HardHatIcon />,
-    allowedRoles: [USER_ROLE.superAdmin],
+    allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
   },
   {
     key: "/clients",
     label: "Clients",
     icon: <UserPlus></UserPlus>,
     allowedRoles: [USER_ROLE.superAdmin],
+  },
+  {
+    key: "/logout",
+    label: "Logout",
+    icon: <LogOut />,
+    allowedRoles: [
+      USER_ROLE.superAdmin,
+      USER_ROLE.primeAdmin,
+      USER_ROLE.basicAdmin,
+      USER_ROLE.client,
+    ],
   },
 ];
 
@@ -261,6 +273,17 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
       label: "Client Details",
       icon: <SquareUserRoundIcon />,
       allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
+    },
+    {
+      key: "/logout",
+      label: "Logout",
+      icon: <LogOut />,
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+        USER_ROLE.client,
+      ],
     },
   ];
 
