@@ -182,6 +182,7 @@ const PasswordUpdateModal: React.FC<PasswordUpdateModalProps> = ({
           </Button>
           <Button
             type="primary"
+            htmlType="submit"
             className="px-4 py-2 b  font-semibold rounded flex items-center gap-2"
             disabled={isSaving}
           >

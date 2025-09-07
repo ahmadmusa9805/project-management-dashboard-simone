@@ -828,6 +828,7 @@ import {
   CheckCircle,
   Clock,
   DollarSign,
+  Unlink,
   XCircle,
 } from "lucide-react";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
@@ -982,7 +983,7 @@ const NotesPage = () => {
           {notes.map((note: any) => (
             <div
               key={note._id}
-              className="bg-gray-100 rounded shadow flex flex-col justify-between p-5 h-40 w-[300px] relative"
+              className="bg-gray-100 rounded shadow flex flex-col justify-between p-5 h-40 w-[320px] relative"
             >
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
@@ -995,7 +996,15 @@ const NotesPage = () => {
                     { key: "view", label: "👁️ View" },
                     { key: "edit", label: "✏️ Edit" },
                     { key: "share", label: "🔗 Share" },
-                    { key: "unshare", label: "🚫 Unshare" },
+                    {
+                      key: "unshare",
+                      label: (
+                        <div className="flex items-center gap-1">
+                          <Unlink className="text-green-500" size={14} />
+                          Unshare Quote
+                        </div>
+                      ),
+                    },
                     { key: "delete", label: "🗑️ Delete", danger: true },
                   ]}
                   onClick={(key) => {

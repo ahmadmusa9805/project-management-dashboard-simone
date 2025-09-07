@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 // import React, { useState } from "react";
 // import { useForm } from "react-hook-form";
 // import { useUpdateUserMutation } from "../../Redux/features/users/usersApi";
@@ -10,7 +9,7 @@
 // import { CameraIcon } from "lucide-react";
 
 // interface UserProfileEditProps {
-//   user: User;
+//   user?: User;
 // }
 
 // type FormData = {
@@ -22,15 +21,16 @@
 
 // const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
 //   const [isEditing, setIsEditing] = useState(false);
-//   const [actionType, setActionType] = useState<"updateDetails" | "changePassword" | null>(null);
+//   const [actionType, setActionType] = useState<
+//     "updateDetails" | "changePassword" | null
+//   >(null);
 
 //   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 //   const [profileImage, setProfileImage] = useState<File | null>(null);
 //   const [profileImagePreview, setProfileImagePreview] = useState(
-//     user.profileImg || "https://placehold.co/80x80"
+//     user?.profileImg || "https://placehold.co/80x80"
 //   );
 
-//   // RTK Query mutations
 //   const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
 //   const [changePassword, { isLoading: isChangingPassword }] =
 //     useChangePasswordMutation();
@@ -42,14 +42,13 @@
 //     formState: { errors },
 //   } = useForm<FormData>({
 //     defaultValues: {
-//       firstName: user.name?.split(" ")[0] || "",
-//       lastName: user.name?.split(" ")[1] || "",
-//       phone: user.contactNo,
-//       email: user.email,
+//       firstName: user?.name?.split(" ")[0] || "",
+//       lastName: user?.name?.split(" ")[1] || "",
+//       phone: user?.contactNo,
+//       email: user?.email,
 //     },
 //   });
 
-//   // Handle profile image selection and preview
 //   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 //     const file = e.target.files?.[0] || null;
 //     if (file) {
@@ -58,33 +57,36 @@
 //     }
 //   };
 
-//   // Handler for user details update
 //   const onSubmitUserDetails = async (data: FormData) => {
-//     if (!user._id) {
-//       alert("User ID not found!");
+//     if (!user?._id) {
+//       // You can handle this silently or with a UI message if needed
 //       return;
 //     }
+
+//     setActionType("updateDetails"); // track action before the API call
 
 //     const formData = new FormData();
 //     formData.append("name", `${data.firstName} ${data.lastName}`);
 //     formData.append("email", data.email);
 //     formData.append("contactNo", data.phone);
-
-//     if (profileImage) {
-//       formData.append("profileImg", profileImage);
-//     }
+//     if (profileImage) formData.append("profileImg", profileImage);
 
 //     try {
 //       await updateUser({ id: user._id, body: formData }).unwrap();
-//       successAlert("User updated", "Profile updated successfully.");
+
+//       // Show success alert only if actionType is updateDetails
+//       if (actionType === "updateDetails") {
+//         successAlert("User updated", "Profile updated successfully.");
+//       }
 //       setIsEditing(false);
+//       setActionType(null); // reset after success
 //     } catch (err) {
 //       console.error(err);
 //       errorAlert("Failed to update user.");
+//       setActionType(null);
 //     }
 //   };
 
-//   // Handler for password change (passed to modal)
 //   const handleChangePassword = async (
 //     current: string,
 //     newPass: string,
@@ -95,18 +97,24 @@
 //       return;
 //     }
 
+//     setActionType("changePassword"); // track action
+
 //     try {
 //       const data = { oldPassword: current, newPassword: newPass };
 //       await changePassword(data).unwrap();
-//       successAlert("Password updated", "Password changed successfully.");
+
+//       if (actionType === "changePassword") {
+//         successAlert("Password updated", "Password changed successfully.");
+//       }
 //       setIsPasswordModalOpen(false);
+//       setActionType(null); // reset after success
 //     } catch (err: any) {
 //       console.error(err);
 //       errorAlert(err?.data?.message || "Failed to change password.");
+//       setActionType(null);
 //     }
 //   };
 
-//   // Helper to render input fields with validation error display
 //   const renderInput = (
 //     label: string,
 //     name: keyof FormData,
@@ -196,7 +204,10 @@
 //               className="px-4 py-[5px] bg-[#0d542b] text-white font-semibold rounded"
 //               disabled={isUpdatingUser}
 //             >
-//               {isUpdatingUser ? "Updating..." : "Update Details"}
+//               <span className="text-white">
+//                 {" "}
+//                 {isUpdatingUser ? "Updating..." : "Update Details"}
+//               </span>
 //             </button>
 //           )}
 //         </div>
@@ -249,6 +260,8 @@ import type { User } from "../../Redux/features/users/users.types";
 import PasswordUpdateModal from "../../components/PasswordUpdateModal";
 import { successAlert, errorAlert } from "../../utils/alerts";
 import { CameraIcon } from "lucide-react";
+import { Tooltip } from "antd"; // ✅ added
+import { USER_ROLE } from "../../types/userAllTypes/user";
 
 interface UserProfileEditProps {
   user?: User;
@@ -301,11 +314,10 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
 
   const onSubmitUserDetails = async (data: FormData) => {
     if (!user?._id) {
-      // You can handle this silently or with a UI message if needed
       return;
     }
 
-    setActionType("updateDetails"); // track action before the API call
+    setActionType("updateDetails");
 
     const formData = new FormData();
     formData.append("name", `${data.firstName} ${data.lastName}`);
@@ -316,12 +328,11 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
     try {
       await updateUser({ id: user._id, body: formData }).unwrap();
 
-      // Show success alert only if actionType is updateDetails
       if (actionType === "updateDetails") {
         successAlert("User updated", "Profile updated successfully.");
       }
       setIsEditing(false);
-      setActionType(null); // reset after success
+      setActionType(null);
     } catch (err) {
       console.error(err);
       errorAlert("Failed to update user.");
@@ -339,17 +350,17 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
       return;
     }
 
-    setActionType("changePassword"); // track action
+    setActionType("changePassword");
 
     try {
       const data = { oldPassword: current, newPassword: newPass };
       await changePassword(data).unwrap();
 
-      if (actionType === "changePassword") {
-        successAlert("Password updated", "Password changed successfully.");
-      }
+      // if (actionType === "changePassword") {
+      //   successAlert("Password updated", "Password changed successfully.");
+      // }
       setIsPasswordModalOpen(false);
-      setActionType(null); // reset after success
+      setActionType(null);
     } catch (err: any) {
       console.error(err);
       errorAlert(err?.data?.message || "Failed to change password.");
@@ -362,23 +373,41 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
     name: keyof FormData,
     disabled: boolean = false,
     placeholder?: string
-  ) => (
-    <div className="w-[364px] flex flex-col justify-start items-start gap-2">
-      <label className="text-[#2B3738] text-sm font-normal">{label}</label>
+  ) => {
+    const isEmailField = name === "email";
+    const isSuperAdmin = user?.role === USER_ROLE.superAdmin; // ✅ check role
+
+    const fieldDisabled =
+      !isEditing || disabled || (isEmailField && !isSuperAdmin);
+
+    const inputElement = (
       <input
         type="text"
         {...register(name, { required: `${label} is required` })}
-        disabled={!isEditing || disabled}
+        disabled={fieldDisabled}
         placeholder={placeholder}
         className={`w-full px-3 py-1 border border-gray-300 rounded focus:outline-none disabled:bg-gray-100 ${
           errors[name] ? "border-red-500" : ""
         }`}
       />
-      {errors[name] && (
-        <span className="text-sm text-red-500">{errors[name]?.message}</span>
-      )}
-    </div>
-  );
+    );
+
+    return (
+      <div className="w-[364px] flex flex-col justify-start items-start gap-2">
+        <label className="text-[#2B3738] text-sm font-normal">{label}</label>
+        {isEmailField && !isSuperAdmin ? (
+          <Tooltip title="You can't change your email. Please contact superadmin.">
+            {inputElement}
+          </Tooltip>
+        ) : (
+          inputElement
+        )}
+        {errors[name] && (
+          <span className="text-sm text-red-500">{errors[name]?.message}</span>
+        )}
+      </div>
+    );
+  };
 
   return (
     <form
@@ -447,7 +476,6 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ user }) => {
               disabled={isUpdatingUser}
             >
               <span className="text-white">
-                {" "}
                 {isUpdatingUser ? "Updating..." : "Update Details"}
               </span>
             </button>
