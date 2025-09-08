@@ -34,6 +34,7 @@ export const baseApi = createApi({
     "Dashbord",
     "Projects",
     "Users",
+    "Me",
     "Quotes",
     "Labours",
     "Interims",

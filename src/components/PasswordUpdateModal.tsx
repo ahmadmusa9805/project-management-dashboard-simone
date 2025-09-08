@@ -119,6 +119,7 @@ const PasswordUpdateModal: React.FC<PasswordUpdateModalProps> = ({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSave(current, newPass, confirm);
+    onClose();
   };
 
   return (

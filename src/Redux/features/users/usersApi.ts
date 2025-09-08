@@ -64,7 +64,8 @@ export const usersApi = baseApi.injectEndpoints({
     getMeUser: builder.query<User, void>({
       query: () => `/users/me`,
       transformResponse: (response: SingleUserResponse): User => response.data,
-      providesTags: ["Users"],
+      providesTags: (result) =>
+        result ? [{ type: "Users", id: result._id }, "Me"] : ["Me"],
     }),
 
     createUser: builder.mutation({

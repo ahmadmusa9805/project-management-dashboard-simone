@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import "./dashboard.css";
 import type { MenuProps } from "antd";
@@ -27,6 +26,7 @@ import UserProfileEdit from "../pages/user/UserProfileEdit";
 import { USER_ROLE } from "../types/userAllTypes/user";
 import { useGetMeUserQuery } from "../Redux/features/users/usersApi";
 import { clearCredentials } from "../Redux/features/auth/authSlice";
+import { baseApi } from "../Redux/app/api/baseApi";
 
 const { Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
@@ -42,13 +42,16 @@ const DashboardLayout: React.FC = () => {
   const { projectId } = useParams();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const token = useSelector((state: RootState) => state.auth.token);
   console.log("user from layout:", user?.role);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const {
     data: userInfo,
     isLoading: userLoading,
-    error: userError,
-  } = useGetMeUserQuery();
+    // error: userError,
+  } = useGetMeUserQuery(undefined, { skip: !token });
+  console.log(user?.email);
+
   const path = location.pathname;
   const userRole = user?.role;
   const validRoles = [
@@ -84,15 +87,15 @@ const DashboardLayout: React.FC = () => {
     );
   }
 
-  if (userError) {
-    const errMsg =
-      (userError as any)?.data?.message || "Failed to fetch user info!";
-    return (
-      <div className="flex justify-center items-center min-h-screen text-red-600 font-medium">
-        🚫 {errMsg}
-      </div>
-    );
-  }
+  // if (userError) {
+  //   const errMsg =
+  //     (userError as any)?.data?.message || "Failed to fetch user info!";
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen text-red-600 font-medium">
+  //       🚫 {errMsg}
+  //     </div>
+  //   );
+  // }
 
   if (!userInfo) {
     return (
@@ -109,7 +112,9 @@ const DashboardLayout: React.FC = () => {
       // ✅ Custom logout
       dispatch(clearCredentials());
       persistor.purge();
-      navigate("/login", { replace: true }); // redirect if you want
+      navigate("/login", { replace: true });
+      // clear all cached queries (projects, users, etc.)
+      dispatch(baseApi.util.resetApiState()); // redirect if you want
       return;
     }
 
