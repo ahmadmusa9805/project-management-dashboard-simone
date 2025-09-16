@@ -50,13 +50,14 @@ export const timeScheduleApi = baseApi.injectEndpoints({
     // ✅ Update TimeSchedule (multipart if updating file)
     updateTimeSchedule: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => {
+        console.log(data);
         return {
           url: `/time-schedules/${id}`,
           method: "PATCH",
           body: data,
         };
       },
-      invalidatesTags: (_res, _err, { id }) => [{ type: "TimeSchedule", id }],
+      invalidatesTags: ["TimeSchedule"],
     }),
 
     // ✅ Delete TimeSchedule

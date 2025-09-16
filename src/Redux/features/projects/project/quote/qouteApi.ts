@@ -43,7 +43,12 @@ export const quoteApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Quotes"],
+      invalidatesTags: [
+        "Quotes",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
 
     updateQuote: builder.mutation<any, { id: string; data: any }>({
@@ -60,7 +65,12 @@ export const quoteApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Quotes"],
+      invalidatesTags: [
+        "Quotes",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
 
     deleteQuote: builder.mutation<any, string>({
@@ -68,7 +78,12 @@ export const quoteApi = baseApi.injectEndpoints({
         url: `/quotes/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Quotes"],
+      invalidatesTags: [
+        "Quotes",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
 
     shareQuote: builder.mutation<any, { id: string; sharedWith: string[] }>({
@@ -77,7 +92,12 @@ export const quoteApi = baseApi.injectEndpoints({
         method: "POST",
         body: { sharedWith },
       }),
-      invalidatesTags: ["Quotes"],
+      invalidatesTags: [
+        "Quotes",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
 
     unShareQuote: builder.mutation<any, { id: string; unShareWith: string[] }>({
@@ -86,7 +106,12 @@ export const quoteApi = baseApi.injectEndpoints({
         method: "POST",
         body: { unShareWith },
       }),
-      invalidatesTags: ["Quotes"],
+      invalidatesTags: [
+        "Quotes",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
   }),
 });

@@ -122,7 +122,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
     mode === "edit" && isApprovedOrRejected
       ? false
       : mode === "view" && isApprovedOrRejected
-      ? false // enable only in view + approved/rejected
+      ? true // enable only in view + approved/rejected
       : true;
 
   // const isDeleteButtonVisible = mode === "edit" && onDelete;
@@ -246,7 +246,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
               <Dragger
                 disabled={isFormDisabled}
                 name="file"
-                accept=".pdf"
+                accept="*"
                 beforeUpload={(file) => {
                   field.onChange(file);
                   return false;
@@ -417,6 +417,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
             </Button>
             <Button
               type="primary"
+              htmlType="submit"
               className="px-6 py-2 bg-[#001D01] text-white text-sm font-medium rounded hover:bg-[#003F03]"
               loading={updating}
             >

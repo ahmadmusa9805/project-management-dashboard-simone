@@ -32,7 +32,7 @@ export const labourExpensesApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["LabourExpenses"],
+      invalidatesTags: ["LabourExpenses", "ProjectCosts", "PaymentTrackers"],
     }),
 
     updateLabourExpense: builder.mutation<any, { id: string; data: any }>({
@@ -43,7 +43,7 @@ export const labourExpensesApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["LabourExpenses"],
+      invalidatesTags: ["LabourExpenses", "ProjectCosts", "PaymentTrackers"],
     }),
 
     deleteLabourExpense: builder.mutation<any, string>({
@@ -51,7 +51,7 @@ export const labourExpensesApi = baseApi.injectEndpoints({
         url: `/labour-expenses/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["LabourExpenses"],
+      invalidatesTags: ["LabourExpenses", "ProjectCosts", "PaymentTrackers"],
     }),
   }),
 });

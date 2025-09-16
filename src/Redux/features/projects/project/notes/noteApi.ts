@@ -168,7 +168,25 @@ export const noteApi = baseApi.injectEndpoints({
     // Update Note
     updateNote: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => {
-        console.log("Data:", data);
+        console.log("Update Note Data:", data);
+
+        // ✅ If only adminComment is present → send as JSON
+        if (Object.keys(data).length === 1 && data.adminComment) {
+          return {
+            url: `/notes/${id}`,
+            method: "PATCH",
+            body: data,
+          };
+        }
+
+        // ✅ Otherwise: if approved/rejected → still JSON
+        if (data.status === "approved" || data.status === "rejected") {
+          return {
+            url: `/notes/${id}`,
+            method: "PATCH",
+            body: data,
+          };
+        }
         // const formData = buildFormData({
         //   file: data.file,
         //   title: data.title,

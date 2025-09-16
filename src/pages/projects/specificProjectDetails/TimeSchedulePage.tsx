@@ -102,6 +102,7 @@ const TimeSchedulePage: React.FC = () => {
   };
 
   const handleFormSubmit = async (formData: any) => {
+    console.log("Form Data Submitted:", formData);
     try {
       if (formMode === "create") {
         // For creation, use the FormData structure expected by the API
@@ -124,8 +125,12 @@ const TimeSchedulePage: React.FC = () => {
           })
         );
 
-        await createTimeSchedule(submitData);
-        successAlert("Schedule created successfully");
+        const res = await createTimeSchedule(submitData);
+        if (res.data.success) {
+          successAlert("Schedule created successfully");
+        } else {
+          errorAlert("Failed to create schedule");
+        }
       } else {
         // For update, use the correct parameter structure
         const submitData = new FormData();
@@ -149,14 +154,15 @@ const TimeSchedulePage: React.FC = () => {
 
         await updateTimeSchedule({
           id: editingSchedule._id,
-          data: { formData: submitData }, // Fixed parameter structure
-        });
+          data: submitData, // Fixed parameter structure
+        }).unwrap();
         successAlert("Schedule updated successfully");
       }
 
       setIsFormOpen(false);
       setEditingSchedule(null);
     } catch (error) {
+      errorAlert("Save Error", "Failed to save schedule");
       errorAlert("Failed to save schedule");
     }
   };

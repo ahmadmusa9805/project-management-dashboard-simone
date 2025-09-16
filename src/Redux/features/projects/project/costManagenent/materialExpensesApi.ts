@@ -33,7 +33,7 @@ export const materialExpensesApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["MaterialExpenses"],
+      invalidatesTags: ["MaterialExpenses", "ProjectCosts", "PaymentTrackers"],
     }),
 
     updateMaterialExpense: builder.mutation<any, { id: string; data: any }>({
@@ -44,7 +44,7 @@ export const materialExpensesApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["MaterialExpenses"],
+      invalidatesTags: ["MaterialExpenses", "ProjectCosts", "PaymentTrackers"],
     }),
 
     deleteMaterialExpense: builder.mutation<any, string>({
@@ -52,7 +52,7 @@ export const materialExpensesApi = baseApi.injectEndpoints({
         url: `/material-expenses/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["MaterialExpenses"],
+      invalidatesTags: ["MaterialExpenses", "ProjectCosts", "PaymentTrackers"],
     }),
   }),
 });

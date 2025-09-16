@@ -30,14 +30,43 @@ const StatCard: React.FC<CardProps> = ({ title, value }) => {
 };
 
 const DashboardSummaryCards = () => {
-  const { data: projects = [], isLoading } = useGetProjectsWithstatusQuery(
-    {},
+  const {
+    data: projects = {
+      data: [],
+      meta: { page: 1, limit: 10, total: 0, totalPage: 1 },
+    },
+    isLoading,
+  } = useGetProjectsWithstatusQuery(
+    {
+      status: ["ongoing", "completed"],
+    },
     {
       refetchOnFocus: true,
       refetchOnReconnect: true,
     }
   );
-  const { data: users = [], isLoading: isLoadingUsers } = useGetAllUsersQuery(
+  const {
+    data: completedProjects = {
+      data: [],
+      meta: { page: 1, limit: 10, total: 0, totalPage: 1 },
+    },
+    isLoading: isLoadingCompletedProjects,
+  } = useGetProjectsWithstatusQuery(
+    {
+      status: "completed",
+    },
+    {
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    }
+  );
+  const {
+    data: users = {
+      data: [],
+      meta: { page: 1, limit: 10, total: 0, totalPage: 1 },
+    },
+    isLoading: isLoadingUsers,
+  } = useGetAllUsersQuery(
     {
       status: undefined,
     },
@@ -47,38 +76,38 @@ const DashboardSummaryCards = () => {
     }
   );
 
-  if (isLoading || isLoadingUsers)
+  if (isLoading || isLoadingUsers || isLoadingCompletedProjects)
     return (
       <div className="flex justify-center items-center h-40">
         <Spin size="large"></Spin>
       </div>
     );
+  console.log(projects.data.length, "projects");
 
-  const completedProjects = Array.isArray(projects)
-    ? projects.filter((p: any) => p.status === "completed")
-    : [];
-
-  const usersList =
-    users &&
-    typeof users === "object" &&
-    "data" in users &&
-    Array.isArray((users as any).data)
-      ? (users as any).data
-      : [];
+  // const usersList =
+  //   users &&
+  //   typeof users === "object" &&
+  //   "data" in users &&
+  //   Array.isArray((users as any).data)
+  //     ? (users as any).data
+  //     : [];
 
   // ✅ Direct totals (no lastMonth needed)
-  const totalProjects = projects.length;
-  const completed = completedProjects.length;
-  const totalEarnings = completedProjects.reduce(
+  // const totalProjects = projects?.data?.length;
+  const totalProjects = projects?.meta?.total;
+  const completed = completedProjects?.meta?.total;
+  //TODO:TOTAL PROFIT from Api All projects
+  //   // totalProfit
+  const totalEarnings = projects?.data?.reduce(
     (sum: number, p: any) => sum + (p.value || 0),
     0
   );
-  const totalUsers = usersList.length;
+  const totalUsers = users?.meta?.total;
 
   return (
     <div className="w-full flex gap-6 my-5">
       <StatCard
-        title="Total earning"
+        title="Total Profit"
         value={`$${totalEarnings.toLocaleString()}`}
       />
       <StatCard title="Total projects" value={totalProjects.toString()} />

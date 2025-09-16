@@ -538,6 +538,9 @@ import {
   useDeleteSiteReportMutation,
 } from "../Redux/features/projects/project/siteReportPictures/reportApi";
 
+import { useGetSingleProjectQuery } from "../Redux/features/projects/projectsApi";
+import { useGetMeUserQuery } from "../Redux/features/users/usersApi";
+
 import { showDeleteAlert } from "../utils/deleteAlert";
 import type { ReportFormData } from "./ReportForm";
 import { errorAlert, successAlert } from "../utils/alerts";
@@ -578,7 +581,16 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
   } = useGetSiteReportsQuery(projectId as string, { skip: !isReport });
   const [createSiteReport, { isLoading: isLoadingCreateReport }] =
     useCreateSiteReportMutation();
-  const [deleteSiteReport] = useDeleteSiteReportMutation(); // Pictures transform
+  const [deleteSiteReport] = useDeleteSiteReportMutation();
+
+  // Fetch project and current user data
+  const { data: projectData } = useGetSingleProjectQuery(
+    { id: projectId as string },
+    { skip: !projectId }
+  );
+  const { data: currentUserData } = useGetMeUserQuery();
+
+  // Pictures transform
 
   const pictures = (imagesData?.data || []).reduce((acc: any[], group: any) => {
     if (Array.isArray(group.file)) {
@@ -761,6 +773,8 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
           ) : reportsData?.length ? (
             <SiteReportsList
               reports={reportsData}
+              project={projectData}
+              currentUser={currentUserData}
               onDelete={handleDeleteReport}
             />
           ) : (

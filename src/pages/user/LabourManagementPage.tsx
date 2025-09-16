@@ -17,6 +17,7 @@ import {
 } from "../../Redux/features/labour/labourApi";
 import { errorAlert } from "../../utils/alerts";
 import { showDeleteAlert } from "../../utils/deleteAlert";
+import CustomPagination from "../../components/CustomPagination";
 
 interface LaborItem {
   id: string;
@@ -172,7 +173,15 @@ const LaborTable: React.FC = () => {
               </tbody>
             </table>
 
-            <div className="flex justify-evenly items-center mt-4">
+            {!isLoading && currentData.length > 10 && (
+              <CustomPagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={(newPage) => setPage(newPage)}
+              />
+            )}
+
+            {/* <div className="flex justify-evenly items-center mt-4">
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page <= 1}
@@ -198,7 +207,7 @@ const LaborTable: React.FC = () => {
               >
                 Next
               </button>
-            </div>
+            </div> */}
           </>
         )}
       </div>

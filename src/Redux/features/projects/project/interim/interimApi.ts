@@ -44,7 +44,12 @@ export const interimApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Interims"],
+      invalidatesTags: [
+        "Interims",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
 
     // Update Interim
@@ -70,7 +75,12 @@ export const interimApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Interims"],
+      invalidatesTags: [
+        "Interims",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
 
     // Delete Interim
@@ -79,7 +89,12 @@ export const interimApi = baseApi.injectEndpoints({
         url: `/interims/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Interims"],
+      invalidatesTags: [
+        "Interims",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
 
     // Share Interim
@@ -89,17 +104,30 @@ export const interimApi = baseApi.injectEndpoints({
         method: "POST",
         body: { sharedWith },
       }),
-      invalidatesTags: ["Interims"],
+      invalidatesTags: [
+        "Interims",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
 
     // Unshare Interim
-    unShareInterim: builder.mutation<any, { id: string; unShareWith: any[] }>({
+    unShareInterim: builder.mutation<
+      any,
+      { id: string; unShareWith: string[] }
+    >({
       query: ({ id, unShareWith }) => ({
         url: `/interims/${id}/unshare`,
         method: "POST",
         body: { unShareWith },
       }),
-      invalidatesTags: ["Interims"],
+      invalidatesTags: [
+        "Interims",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Projects",
+      ],
     }),
   }),
 });

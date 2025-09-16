@@ -289,7 +289,7 @@ const CustomShareSelector = ({
                   <div className="text-xs text-[#6B7374] ">
                     {user.role
                       .replace("-", " ")
-                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                      .replace(/\b\w/g, (c: string) => c.toUpperCase())}
                   </div>
                 </div>
               </div>
