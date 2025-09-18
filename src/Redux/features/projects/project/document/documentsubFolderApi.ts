@@ -39,7 +39,7 @@ export const documentSubFolderApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["DocumentSubfolders"],
+      invalidatesTags: ["DocumentSubfolders", "Notifications"],
     }),
 
     // ✅ Update Subfolder

@@ -53,7 +53,7 @@ export const handoverApi = baseApi.injectEndpoints({
           formData: true,
         };
       },
-      invalidatesTags: ["Handover"],
+      invalidatesTags: ["Handover", "Notifications"],
     }),
 
     // ✅ Update Handover (with file upload support)

@@ -58,7 +58,7 @@ export const documentFileApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["DocumentFiles"],
+      invalidatesTags: ["DocumentFiles", "Notifications"],
     }),
 
     // ✅ Update Document File

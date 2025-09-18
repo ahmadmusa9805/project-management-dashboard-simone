@@ -30,7 +30,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const props = {
     name: "file",
     multiple: fileType === "image", // multiple only for images
-    accept: fileType === "image" ? "image/*" : ".pdf",
+    accept: fileType === "image" ? "*" : "*",
     fileList,
     beforeUpload: (file: UploadFile) => {
       // block auto-upload
@@ -42,8 +42,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       if (!isValid) {
         message.error(
           fileType === "image"
-            ? "You can only upload image files!"
-            : "Only PDF files are allowed!"
+            ? "You can upload image file"
+            : "All files are allowed"
         );
       }
       return false;
@@ -79,8 +79,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         </p>
         <p className="text-[10px]">
           {fileType === "image"
-            ? "Click or drag image(s) to upload"
-            : "Click or drag PDF to upload"}
+            ? "Click or drag files to upload"
+            : "Click or drag files to upload"}
         </p>
       </Dragger>
 

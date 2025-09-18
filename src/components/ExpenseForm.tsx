@@ -515,6 +515,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     ];
   }
 
+  console.log("defaultValue", defaultValues);
+
   const {
     control,
     handleSubmit,
@@ -527,7 +529,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       type: defaultTypeValue,
       name: "",
       quantity: 0,
-      unit: "",
+      // unit: "",
       unitPrice: 0,
       days: 0,
       vat: 0,
@@ -736,7 +738,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               )}
             />
           </div>
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <label>Unit</label>
             <Controller
               control={control}
@@ -753,7 +755,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 <p className="text-red-500 text-sm">{message}</p>
               )}
             />
-          </div>
+          </div> */}
           <div className="flex flex-col gap-2">
             <label>Unit Price</label>
             <Controller
@@ -772,6 +774,80 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               )}
             />
           </div>
+
+          {/* VAT */}
+          <div className="flex flex-col gap-2">
+            <label>VAT %</label>
+            <Controller
+              control={control}
+              name="vat"
+              rules={{ required: "VAT is required" }}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  value={field.value ?? 20} // ensure default value
+                  disabled
+                  placeholder="VAT"
+                />
+              )}
+            />
+            <ErrorMessage
+              errors={errors}
+              name="vat"
+              render={({ message }: { message: string }) => (
+                <p className="text-red-500 text-sm">{message}</p>
+              )}
+            />
+          </div>
+
+          {/* Upload */}
+
+          <Controller
+            control={control}
+            name="file"
+            // rules={{ required:  }}
+            render={({ field }) => (
+              <div className="flex flex-col gap-2">
+                <label className="font-medium">Upload Files</label>
+                <Dragger
+                  name="file"
+                  accept="*"
+                  beforeUpload={() => false} // prevent auto upload
+                  multiple={false}
+                  fileList={
+                    field.value
+                      ? [
+                          {
+                            uid: "-1",
+                            name: field.value.name,
+                            status: "done",
+                            originFileObj: field.value,
+                          },
+                        ]
+                      : []
+                  }
+                  onChange={({ fileList }) => {
+                    field.onChange(fileList?.[0]?.originFileObj || undefined);
+                  }}
+                  onRemove={() => field.onChange(undefined)}
+                  style={{ padding: "8px" }}
+                >
+                  <p className="text-center flex flex-col items-center">
+                    <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+                  </p>
+                  <p className="text-[10px]">Click or drag file to upload</p>
+                </Dragger>
+
+                <ErrorMessage
+                  errors={errors}
+                  name="file"
+                  render={({ message }: { message: string }) => (
+                    <p className="text-red-500 text-sm">{message}</p>
+                  )}
+                />
+              </div>
+            )}
+          />
         </>
       )}
 
@@ -838,7 +914,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       {/* Subcontractor-specific fields */}
       {showSubcontractorFields && (
         <>
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <label>Days</label>
             <Controller
               control={control}
@@ -855,8 +931,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 <p className="text-red-500 text-sm">{message}</p>
               )}
             />
-          </div>
-          <div className="flex flex-col gap-2">
+          </div> */}
+          {/* <div className="flex flex-col gap-2">
             <label>Rate Per Day</label>
             <Controller
               control={control}
@@ -873,49 +949,30 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 <p className="text-red-500 text-sm">{message}</p>
               )}
             />
+          </div> */}
+
+          {/* total cost */}
+          <div className="flex flex-col gap-2">
+            <label>Total Cost</label>
+            <Controller
+              control={control}
+              name="amount"
+              defaultValue={defaultValues?.amount || 0}
+              rules={{ required: "Total cost is required" }}
+              render={({ field }) => (
+                <Input type="number" {...field} placeholder="Total Cost" />
+              )}
+            />
+            <ErrorMessage
+              errors={errors}
+              name="amount"
+              render={({ message }: { message: string }) => (
+                <p className="text-red-500 text-sm">{message}</p>
+              )}
+            />
           </div>
         </>
       )}
-
-      {/* VAT */}
-      <div className="flex flex-col gap-2">
-        <label>VAT (%)</label>
-        <Controller
-          control={control}
-          name="vat"
-          rules={{ required: "VAT is required" }}
-          render={({ field }) => (
-            <Input type="number" step="0.01" {...field} placeholder="VAT %" />
-          )}
-        />
-        <ErrorMessage
-          errors={errors}
-          name="vat"
-          render={({ message }: { message: string }) => (
-            <p className="text-red-500 text-sm">{message}</p>
-          )}
-        />
-      </div>
-
-      {/* Amount */}
-      <div className="flex flex-col gap-2">
-        <label>Total Amount</label>
-        <Controller
-          control={control}
-          name="amount"
-          rules={{ required: "Amount is required" }}
-          render={({ field }) => (
-            <Input type="number" {...field} placeholder="Total Amount" />
-          )}
-        />
-        <ErrorMessage
-          errors={errors}
-          name="amount"
-          render={({ message }: { message: string }) => (
-            <p className="text-red-500 text-sm">{message}</p>
-          )}
-        />
-      </div>
 
       {/* Date */}
       <div className="flex flex-col gap-2">
@@ -923,7 +980,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         <Controller
           control={control}
           name="date"
-          rules={{ required: "Date is required" }}
+          // rules={{ required: "Date is required" }}
           render={({ field }) => (
             <DatePicker
               className="w-full"
@@ -948,7 +1005,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         <Controller
           control={control}
           name="description"
-          rules={{ required: "Description is required" }}
+          // rules={{ required: "Description is required" }}
           render={({ field }) => (
             <TextArea {...field} rows={3} placeholder="Optional notes" />
           )}
@@ -961,55 +1018,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           )}
         />
       </div>
-
-      {/* Upload */}
-
-      <Controller
-        control={control}
-        name="file"
-        rules={{ required: "File is required" }}
-        render={({ field }) => (
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">Upload Files</label>
-            <Dragger
-              name="file"
-              accept=".pdf"
-              beforeUpload={() => false} // prevent auto upload
-              multiple={false}
-              fileList={
-                field.value
-                  ? [
-                      {
-                        uid: "-1",
-                        name: field.value.name,
-                        status: "done",
-                        originFileObj: field.value,
-                      },
-                    ]
-                  : []
-              }
-              onChange={({ fileList }) => {
-                field.onChange(fileList?.[0]?.originFileObj || undefined);
-              }}
-              onRemove={() => field.onChange(undefined)}
-              style={{ padding: "8px" }}
-            >
-              <p className="text-center flex flex-col items-center">
-                <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
-              </p>
-              <p className="text-[10px]">Click or drag PDF to upload</p>
-            </Dragger>
-
-            <ErrorMessage
-              errors={errors}
-              name="file"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
-          </div>
-        )}
-      />
 
       {/* <div className="flex flex-col gap-2">
         <label>Upload Files</label>

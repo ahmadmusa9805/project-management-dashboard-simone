@@ -32,7 +32,12 @@ export const subContractorExpensesApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["SubContractorsExpenses"],
+      invalidatesTags: [
+        "SubContractorsExpenses",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Notifications",
+      ],
     }),
 
     updateSubContractor: builder.mutation<any, { id: string; data: any }>({
@@ -43,7 +48,11 @@ export const subContractorExpensesApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["SubContractorsExpenses"],
+      invalidatesTags: [
+        "SubContractorsExpenses",
+        "ProjectCosts",
+        "PaymentTrackers",
+      ],
     }),
 
     deleteSubContractor: builder.mutation<any, string>({
@@ -51,7 +60,11 @@ export const subContractorExpensesApi = baseApi.injectEndpoints({
         url: `/sub-contractor-expenses/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["SubContractorsExpenses"],
+      invalidatesTags: [
+        "SubContractorsExpenses",
+        "ProjectCosts",
+        "PaymentTrackers",
+      ],
     }),
   }),
 });

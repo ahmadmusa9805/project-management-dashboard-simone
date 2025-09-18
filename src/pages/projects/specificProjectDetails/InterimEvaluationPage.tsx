@@ -240,7 +240,7 @@ interface DocumentType {
   _id: string;
   title: string;
   projectId: string;
-  value: string;
+  value: number;
   status: "pending" | "paid";
   file?: any;
 }
@@ -279,6 +279,7 @@ const InterimEvaluationPage: React.FC = () => {
     skip: !selectedDocId,
   });
 
+  console.log(singleInterimData);
   // Sync local state with API
   useEffect(() => {
     if (Array.isArray(documentsFromApi)) {

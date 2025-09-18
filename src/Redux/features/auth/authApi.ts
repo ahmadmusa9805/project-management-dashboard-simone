@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 //------------------//--------------------------------//--------------------------------
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -23,6 +24,14 @@ export const authApi = baseApi.injectEndpoints({
         body: credentials,
       }),
       transformResponse: (response: any) => response.data,
+      invalidatesTags: [
+        "Me",
+        "Users",
+        "Quotes",
+        "Projects",
+        "Dashbord",
+        "Labours",
+      ],
     }),
 
     changePassword: builder.mutation<any, ChangePasswordPayload>({
@@ -31,6 +40,10 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: (_result, _error) => [
+        { type: "Users" }, // refresh this user
+        "Me", // refresh /me if current user is updated
+      ],
     }),
 
     forgetPassword: builder.mutation<any, ForgetPasswordPayload>({

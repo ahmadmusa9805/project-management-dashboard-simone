@@ -3,16 +3,77 @@ import { baseApi } from "../../app/api/baseApi";
 export type SharedUser = { userId: string; role: string };
 export const projectsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getProjectsWithstatus: builder.query<any[], { status?: string } | void>({
-      query: (params) => {
-        const queryString = params?.status ? `?status=${params.status}` : "";
-        return `/projects${queryString}`;
+    // getProjectsWithstatus: builder.query<any[], { status?: string } | void>({
+    //   query: (params) => {
+    //     const queryString = params?.status ? `?status=${params.status}` : "";
+    //     return `/projects${queryString}`;
+    //   },
+    //   providesTags: ["Projects"],
+    //   transformResponse: (response: { status: string; data: any[] }) => {
+    //     return Array.isArray(response.data) ? response.data : [];
+    //   },
+    // }),
+
+    // getProjectsWithstatus: builder.query<
+    //   {
+    //     data: any[];
+    //     meta: { page: number; limit: number; total: number; totalPage: number };
+    //   },
+    //   { status?: string; page?: number; limit?: number; search?: string } | void
+    // >({
+    //   query: ({ status = "", page = 1, limit = 10, search = "" } = {}) => {
+    //     let qs = `?page=${page}&limit=${limit}`;
+    //     if (status) qs += `&status=${encodeURIComponent(status)}`;
+    //     if (search) qs += `&search=${encodeURIComponent(search)}`;
+    //     return `/projects${qs}`;
+    //   },
+    //   transformResponse: (response: any) => response,
+    //   providesTags: ["Projects"],
+    // }),
+
+    getProjectsWithstatus: builder.query<
+      {
+        data: any[];
+        meta: { page: number; limit: number; total: number; totalPage: number };
+      },
+      {
+        status?: string | string[];
+        page?: number;
+        limit?: number;
+        search?: string;
+      } | void
+    >({
+      query: ({ status = "", page = 1, limit = 10, search = "" } = {}) => {
+        let qs = `?page=${page}&limit=${limit}`;
+        // if (status) qs += `&status=${encodeURIComponent(status)}`;
+        if (status) {
+          if (Array.isArray(status)) {
+            // multiple statuses
+            qs += status
+              .map((s) => `&status=${encodeURIComponent(s)}`)
+              .join("");
+          } else {
+            // single status
+            qs += `&status=${encodeURIComponent(status)}`;
+          }
+        }
+        if (search) qs += `&search=${encodeURIComponent(search)}`;
+        return `/projects${qs}`;
+      },
+      transformResponse: (response: {
+        success: boolean;
+        message: string;
+        data: any[];
+        meta: any;
+      }) => {
+        return {
+          data: Array.isArray(response.data) ? response.data : [],
+          meta: response.meta || { page: 1, limit: 10, total: 0, totalPage: 1 },
+        };
       },
       providesTags: ["Projects"],
-      transformResponse: (response: { status: string; data: any[] }) => {
-        return Array.isArray(response.data) ? response.data : [];
-      },
     }),
+
     getSingleProject: builder.query<any, { id: string }>({
       query: ({ id }) => `/projects/${id}`,
       providesTags: ["Projects"],
@@ -27,7 +88,7 @@ export const projectsApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Projects"],
+      invalidatesTags: ["Projects", "Notifications"],
     }),
 
     updateProject: builder.mutation<any, { id: string; data: any }>({

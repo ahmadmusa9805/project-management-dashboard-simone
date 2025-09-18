@@ -116,6 +116,7 @@
 //   useUnShareNoteMutation,
 // } = noteApi;
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { baseApi } from "../../../../app/api/baseApi";
 
 export const noteApi = baseApi.injectEndpoints({
@@ -161,16 +162,49 @@ export const noteApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Notes"],
+      invalidatesTags: ["Notes", "Notifications"],
     }),
 
     // Update Note
     updateNote: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => {
+        console.log("Update Note Data:", data);
+
+        // ✅ If only adminComment is present → send as JSON
+        if (Object.keys(data).length === 1 && data.adminComment) {
+          return {
+            url: `/notes/${id}`,
+            method: "PATCH",
+            body: data,
+          };
+        }
+
+        // ✅ Otherwise: if approved/rejected → still JSON
+        if (data.status === "approved" || data.status === "rejected") {
+          return {
+            url: `/notes/${id}`,
+            method: "PATCH",
+            body: data,
+          };
+        }
+        // const formData = buildFormData({
+        //   file: data.file,
+        //   title: data.title,
+        //   projectId: data.projectId,
+        //   description: data.description,
+        //   value: data.value,
+        //   date: data.date,
+        //   clientComment: data.clientComment,
+        //   adminComment: data.adminComment,
+        //   status: data.status,
+        //   isDeleted: data.isDeleted ?? false,
+        // });
+
         const formData = new FormData();
 
         // Only append file if it exists and is a File object
-        if (data.file) {
+        if (data.file && data.file instanceof File) {
+          console.log("File:", data.file);
           formData.append("file", data.file);
         }
 
@@ -179,6 +213,7 @@ export const noteApi = baseApi.injectEndpoints({
           JSON.stringify({
             projectId: data.projectId,
             title: data.title,
+
             description: data.description,
             value: Number(data.value),
             date: data.date,
@@ -192,10 +227,10 @@ export const noteApi = baseApi.injectEndpoints({
         return {
           url: `/notes/${id}`,
           method: "PATCH",
-          body: data,
+          body: formData,
         };
       },
-      invalidatesTags: ["Notes"],
+      invalidatesTags: ["Notes", "Notifications"],
     }),
 
     // Delete Note

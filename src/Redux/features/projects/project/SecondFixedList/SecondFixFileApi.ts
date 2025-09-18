@@ -58,7 +58,7 @@ export const secondFixFileApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["SecondFixFiles"],
+      invalidatesTags: ["SecondFixFiles", "Notifications"],
     }),
 
     // ✅ Update SecondFixFile

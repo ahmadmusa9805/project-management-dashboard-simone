@@ -44,17 +44,135 @@
 // features/users/usersApi.ts
 
 import { baseApi } from "../../app/api/baseApi";
-import type { SingleUserResponse, User, UserApiResponse } from "./users.types";
+import type { SingleUserResponse, User } from "./users.types";
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllUsers: builder.query<UserApiResponse, { status?: string }>({
-      query: (params) => {
-        const queryString = params?.status ? `?status=${params.status}` : "";
-        return `/users${queryString}`;
+    // getAllUsers: builder.query<UserApiResponse, { status?: string }>({
+    //   query: (params) => {
+    //     const queryString = params?.status ? `?status=${params.status}` : "";
+    //     return `/users${queryString}`;
+    //   },
+    //   transformResponse: (response: any) => response,
+    //   providesTags: ["Users"],
+    // }),
+
+    getAllUsers: builder.query<
+      {
+        data: any[];
+        meta: { page: number; limit: number; total: number; totalPage: number };
       },
-      transformResponse: (response: any) => response,
+      {
+        status?: string;
+        page?: number;
+        limit?: number;
+        search?: string;
+        role?: string;
+      } | void
+    >({
+      query: ({
+        status = "",
+        page = 1,
+        limit = 10,
+        search = "",
+        role = "",
+      } = {}) => {
+        let qs = `?page=${page}&limit=${limit}`;
+        if (status) qs += `&status=${encodeURIComponent(status)}`;
+        if (search) qs += `&search=${encodeURIComponent(search)}`;
+        if (role) qs += `&role=${encodeURIComponent(role)}`;
+        return `/users${qs}`;
+      },
+      transformResponse: (response: {
+        success: boolean;
+        message: string;
+        data: any[];
+        meta: any;
+      }) => {
+        return {
+          data: Array.isArray(response.data) ? response.data : [],
+          meta: response.meta || { page: 1, limit: 10, total: 0, totalPage: 1 },
+        };
+      },
       providesTags: ["Users"],
     }),
+    // getAllPrimeAdmins: builder.query<
+    //   {
+    //     data: any[];
+    //     meta: { page: number; limit: number; total: number; totalPage: number };
+    //   },
+    //   { status?: string; page?: number; limit?: number; search?: string } | void
+    // >({
+    //   query: ({ status = "", page = 1, limit = 10, search = "" } = {}) => {
+    //     let qs = `?page=${page}&limit=${limit}`;
+    //     if (status) qs += `&status=${encodeURIComponent(status)}`;
+    //     if (search) qs += `&search=${encodeURIComponent(search)}`;
+    //     return `/users${qs}`;
+    //   },
+    //   transformResponse: (response: {
+    //     success: boolean;
+    //     message: string;
+    //     data: any[];
+    //     meta: any;
+    //   }) => {
+    //     return {
+    //       data: Array.isArray(response.data) ? response.data : [],
+    //       meta: response.meta || { page: 1, limit: 10, total: 0, totalPage: 1 },
+    //     };
+    //   },
+    //   providesTags: ["Users"],
+    // }),
+    // getAllBasicAdmins: builder.query<
+    //   {
+    //     data: any[];
+    //     meta: { page: number; limit: number; total: number; totalPage: number };
+    //   },
+    //   { status?: string; page?: number; limit?: number; search?: string } | void
+    // >({
+    //   query: ({ status = "", page = 1, limit = 10, search = "" } = {}) => {
+    //     let qs = `?page=${page}&limit=${limit}`;
+    //     if (status) qs += `&status=${encodeURIComponent(status)}`;
+    //     if (search) qs += `&search=${encodeURIComponent(search)}`;
+    //     return `/users${qs}`;
+    //   },
+    //   transformResponse: (response: {
+    //     success: boolean;
+    //     message: string;
+    //     data: any[];
+    //     meta: any;
+    //   }) => {
+    //     return {
+    //       data: Array.isArray(response.data) ? response.data : [],
+    //       meta: response.meta || { page: 1, limit: 10, total: 0, totalPage: 1 },
+    //     };
+    //   },
+    //   providesTags: ["Users"],
+    // }),
+    // getAllClients: builder.query<
+    //   {
+    //     data: any[];
+    //     meta: { page: number; limit: number; total: number; totalPage: number };
+    //   },
+    //   { status?: string; page?: number; limit?: number; search?: string } | void
+    // >({
+    //   query: ({ status = "", page = 1, limit = 10, search = "" } = {}) => {
+    //     let qs = `?page=${page}&limit=${limit}`;
+    //     if (status) qs += `&status=${encodeURIComponent(status)}`;
+    //     if (search) qs += `&search=${encodeURIComponent(search)}`;
+    //     return `/users${qs}`;
+    //   },
+    //   transformResponse: (response: {
+    //     success: boolean;
+    //     message: string;
+    //     data: any[];
+    //     meta: any;
+    //   }) => {
+    //     return {
+    //       data: Array.isArray(response.data) ? response.data : [],
+    //       meta: response.meta || { page: 1, limit: 10, total: 0, totalPage: 1 },
+    //     };
+    //   },
+    //   providesTags: ["Users"],
+    // }),
 
     getUserById: builder.query<User, string>({
       query: (id) => `/users/${id}`,
@@ -64,7 +182,8 @@ export const usersApi = baseApi.injectEndpoints({
     getMeUser: builder.query<User, void>({
       query: () => `/users/me`,
       transformResponse: (response: SingleUserResponse): User => response.data,
-      providesTags: ["Users"],
+      providesTags: (result) =>
+        result ? [{ type: "Users", id: result._id }, "Me"] : ["Me"],
     }),
 
     createUser: builder.mutation({
@@ -73,7 +192,7 @@ export const usersApi = baseApi.injectEndpoints({
         method: "POST",
         body: userData,
       }),
-      invalidatesTags: ["Users"],
+      invalidatesTags: ["Users", "Notifications"],
     }),
 
     changeUserStatus: builder.mutation({

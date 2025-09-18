@@ -43,7 +43,7 @@ export const sitePictureImageApi = baseApi.injectEndpoints({
         // Important: Don't set Content-Type header for FormData
         // The browser will set it automatically with the correct boundary
       }),
-      invalidatesTags: ["SitePictureImages"],
+      invalidatesTags: ["SitePictureImages", "Notifications"],
     }),
 
     // ✅ Update SitePictureImage (with file upload)

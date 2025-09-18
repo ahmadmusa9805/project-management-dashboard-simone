@@ -25,7 +25,10 @@ const schema = z.object({
   postCode: z.string().min(4, "Postal code is required"),
   estimateNumber: z.string().optional(),
   projectType: z.string().optional(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional(),
   role: z.enum(
     ["superAdmin", "primeAdmin", "basicAdmin", "client", "labor"],
     "User type is required"
@@ -357,7 +360,7 @@ Props) => {
         </div>
       )}
 
-      <div className="flex flex-col gap-2">
+      {/* <div className="flex flex-col gap-2">
         <h3 className="text-lg font-medium">Set Default Password</h3>
         <Controller
           control={control}
@@ -373,7 +376,27 @@ Props) => {
             </>
           )}
         />
-      </div>
+      </div> */}
+
+      {mode === "create" && (
+        <div className="flex flex-col gap-2">
+          <h3 className="text-lg font-medium">Set Default Password</h3>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field }) => (
+              <>
+                <Input.Password {...field} placeholder="Password" />
+                {errors.password && (
+                  <p className="text-red-600 text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
+              </>
+            )}
+          />
+        </div>
+      )}
 
       <div className="flex gap-4 justify-end">
         <Button type="text" className="cancel" onClick={onCancel}>
