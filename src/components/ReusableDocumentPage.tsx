@@ -5,6 +5,7 @@ import { Modal } from "antd";
 import { setCurrentFile } from "../Redux/features/projects/project/shared/documentSlice";
 import ReusableDocumentViewer from "./ReusableDocumentViewer";
 import { ChevronLeft } from "lucide-react";
+import { errorAlert } from "../utils/alerts";
 
 interface DocumentItem {
   id: number;
@@ -30,6 +31,8 @@ const ReusableDocumentPage: React.FC = () => {
     if (fileUrl) {
       dispatch(setCurrentFile(fileUrl));
       setModalOpen(true);
+    } else {
+      errorAlert("No File Found", "Please select a document first.");
     }
   };
 
@@ -62,7 +65,7 @@ const ReusableDocumentPage: React.FC = () => {
       </div>
 
       {documents.map((doc) => (
-        <div key={doc.id} className="flex flex-col gap-4">
+        <div key={doc.id} className="flex flex-col gap-4 my-3">
           <div
             className="w-full p-4 bg-[#f1f1f1]  hover:bg-[#e6f4ea] cursor-pointer rounded flex items-center gap-4  transition-colors"
             onClick={() => handleDocumentClick(doc.fileUrl)}

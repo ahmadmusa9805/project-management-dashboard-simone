@@ -2,14 +2,12 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "../store";
-
-// const musaVaiApi = "http://192.168.0.100:5001";
-const myApi = "http://52.44.187.49:5001";
+const musaVaiApi = "http://52.44.187.49:5001/"
 // const myApi = "http://localhost:5001";
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${myApi}/api/v1`,
+    baseUrl: `${musaVaiApi}/api/v1`,
     prepareHeaders: (headers, { getState, arg }) => {
       let token: string | undefined;
       if (
@@ -35,6 +33,7 @@ export const baseApi = createApi({
     "Dashbord",
     "Projects",
     "Users",
+    "Me",
     "Quotes",
     "Labours",
     "Interims",
@@ -58,6 +57,7 @@ export const baseApi = createApi({
     "Snagging",
     "TimeSchedule",
     "PaymentTrackers",
+    "Notifications",
   ],
   endpoints: () => ({}),
 });

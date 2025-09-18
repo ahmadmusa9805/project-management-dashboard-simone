@@ -59,7 +59,7 @@ export const reportApi = baseApi.injectEndpoints({
         body: formData,
         formData: true,
       }),
-      invalidatesTags: ["SiteReports"],
+      invalidatesTags: ["SiteReports", "Notifications"],
     }),
 
     getSiteReports: build.query<SiteReport[], string>({

@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, Col, Row, Statistic, Typography, Badge, Spin } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetSingleProjectQuery } from "../../../Redux/features/projects/projectsApi";
 import { useGetAllExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/costManagementApi";
 import { useGetAllPaymentTrackerElementsQuery } from "../../../Redux/features/projects/project/paymentTracker/paymentTrackerApi";
+import { useGetUserByIdQuery } from "../../../Redux/features/users/usersApi";
+import { useGetSingleProjectAnalyticsQuery } from "../../../Redux/features/analytics/analyticsApi";
 // import { useGetAllSnaggingsQuery } from "../../../Redux/features/projects/project/snaggingList/snaggingListApi";
 
 // import { useGetAllNotesQuery } from "../../../Redux/features/projects/project/notes/noteApi";
@@ -46,6 +49,10 @@ const ProjectDashboard = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
 
+  const { data: projectAnalticsData, isLoading: isAnalyticsLoading } =
+    useGetSingleProjectAnalyticsQuery(projectId!, {
+      skip: !projectId,
+    });
   // Queries
   const { data: singleProject, isLoading: projectLoading } =
     useGetSingleProjectQuery(
@@ -65,6 +72,26 @@ const ProjectDashboard = () => {
         refetchOnReconnect: true,
       }
     );
+
+  // console.log("projectAnalticsData", projectAnalticsData.data.totalQuoteeValue);
+
+  //  // Get single project
+  //   const { data: singleProject, isLoading: projectLoading } =
+  //     useGetSingleProjectQuery({ id: projectId! }, { skip: !projectId });
+
+  // Get clientId from sharedWith (role === client)
+  const clientId = singleProject?.sharedWith?.find(
+    (sw: any) => sw.role === "client"
+  )?.userId?._id;
+
+  // Fetch client data
+  const { data: clientData, isLoading: clientLoading } = useGetUserByIdQuery(
+    clientId!,
+    {
+      skip: !clientId,
+    }
+  );
+
   const { data: paymentData, isLoading: paymentLoading } =
     useGetAllPaymentTrackerElementsQuery(
       {
@@ -110,7 +137,12 @@ const ProjectDashboard = () => {
     );
     return item ? item.amount : 0;
   };
-  const isLoading = projectLoading || expenseLoading || paymentLoading;
+  const isLoading =
+    projectLoading ||
+    expenseLoading ||
+    paymentLoading ||
+    clientLoading ||
+    isAnalyticsLoading;
   const labourCost = getAmountByName("Labour");
   const materialCost = getAmountByName("Material");
   const subcontractorCost = getAmountByName("SubContractor");
@@ -118,13 +150,14 @@ const ProjectDashboard = () => {
 
   // Profit from paymentData
   const profit = paymentData?.profit || 0;
+  // const projectValue= paymentData?.
 
   const mappedData = {
     projectName: projectData.projectName || "N/A",
     projectStatus: projectData.status || "N/A",
-    clientName: projectData.clientName || "N/A",
+    clientName: clientData?.name || "N/A",
     // assignedAdmin: projectData.assignedAdmin || "N/A", // if you add later
-    budget: projectData.value || 0,
+    budget: projectAnalticsData?.data?.totalQuoteeValue || 0,
     // approvedBudget: projectData.approvedBudget || 0,
     materialCost: materialCost || 0,
     labourCost: labourCost || 0,
@@ -165,7 +198,7 @@ const ProjectDashboard = () => {
           <Col span={6}>
             <Card style={{ backgroundColor: "#f1f1f1" }}>
               <Statistic
-                title="Total Budget"
+                title="Total Value"
                 prefix="$"
                 value={mappedData.budget}
               />

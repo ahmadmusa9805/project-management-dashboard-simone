@@ -37,7 +37,7 @@ const groupByMonth = (projects: any[]) => {
     count: 0,
   }));
 
-  projects.forEach((project) => {
+  projects?.forEach((project) => {
     if (project.createdAt) {
       const date = new Date(project.createdAt);
       const monthIndex = date.getMonth();
@@ -49,17 +49,21 @@ const groupByMonth = (projects: any[]) => {
 };
 
 const DashboardAnalytics: React.FC = () => {
-  const { data: ongoingProjects = [], isLoading } =
-    useGetProjectsWithstatusQuery(
-      { status: "ongoing" },
-      {
-        refetchOnFocus: true,
-        refetchOnReconnect: true,
-      }
-    );
+  const {
+    data: ongoingProjects = { data: [], meta: { total: 0 } },
+    isLoading,
+  } = useGetProjectsWithstatusQuery(
+    { status: "ongoing" },
+    {
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    }
+  );
 
+  // console.log(isAnalyticLoading, "isAnalyticLoading");
+  // console.log(, "analtic");
   // Format ongoing projects by month
-  const ongoingData = groupByMonth(ongoingProjects);
+  const ongoingData = groupByMonth(ongoingProjects.data);
 
   return (
     <div className="w-full  gap-4 bg-white min-h-screen p-6">
@@ -76,7 +80,7 @@ const DashboardAnalytics: React.FC = () => {
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-xl font-medium ">Ongoing Projects</h3>
             <p className="text-xl font-medium text-gray-600">
-              Total: {ongoingProjects.length}
+              Total: {ongoingProjects.data?.length}
             </p>
           </div>
           <ResponsiveContainer width="100%" height={300}>

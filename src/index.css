@@ -77,6 +77,18 @@
   border-color: #0d542b !important;
   color: white !important;
 }
+.ant-btn-link {
+  /* background-color: #0d542b !important;
+  border-color: #0d542b !important; */
+  color: #0d542b !important;
+}
+.ant-btn-link:hover,
+.ant-btn-link:focus {
+  /* border-width: 2px !important;
+  background-color: #0d542b !important;
+  border-color: #0d542b !important; */
+  color: #0d542b !important;
+}
 
 /* Dropdown menu items */
 .ant-select-item-option {

@@ -1,4 +1,4 @@
-import { Modal, Spin } from "antd";
+import { Button, Modal, Spin } from "antd";
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 import { useGetUserByIdQuery } from "../../Redux/features/users/usersApi";
@@ -37,7 +37,7 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
           <img
             src={data.profileImg || "https://placehold.co/40x40"}
             alt="avatar"
-            className="w-10 h-10 rounded-full bg-gray-300"
+            className="w-14 h-14 rounded-full bg-gray-300"
           />
           <div className="flex flex-col">
             <div className="text-base font-medium text-[#000E0F]">
@@ -81,12 +81,13 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
 
         {/* Footer Buttons */}
         <div className="w-full flex gap-3">
-          <button
+          <Button
+            type="text"
             onClick={onClose}
-            className="h-12 px-6 bg-[rgba(23,43,77,0.06)] rounded flex items-center justify-center gap-1 text-[#001D01] text-base font-medium"
+            className="h-12 px-6 cancel text-base font-medium"
           >
             <ArrowLeft size={18} /> Go back
-          </button>
+          </Button>
 
           {/* <button className="h-12 px-6 bg-[#0d542b] rounded flex items-center justify-center gap-2 text-white text-base font-medium flex-1">
             Download PDF <Download size={16} />

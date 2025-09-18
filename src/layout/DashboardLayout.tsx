@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./dashboard.css";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Button, Layout, Menu, Modal } from "antd";
+import { Breadcrumb, Button, Layout, Menu, Modal, Spin } from "antd";
 import {
   useLocation,
   useNavigate,
@@ -12,10 +12,10 @@ import {
 import logo from "../assets/green-logo.png";
 import { FaRegUser } from "react-icons/fa6";
 import { IoNotificationsOutline } from "react-icons/io5";
-import { notificationData } from "../data/notification";
+// import { notificationData } from "../data/notification";
 import NotificationModal from "../pages/shared/NotificationPage";
-import { useSelector } from "react-redux";
-import type { RootState } from "../Redux/app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { persistor, type RootState } from "../Redux/app/store";
 
 import {
   getProjectMenuItems,
@@ -25,23 +25,52 @@ import UserProfileEdit from "../pages/user/UserProfileEdit";
 
 import { USER_ROLE } from "../types/userAllTypes/user";
 import { useGetMeUserQuery } from "../Redux/features/users/usersApi";
+import { clearCredentials } from "../Redux/features/auth/authSlice";
+import { baseApi } from "../Redux/app/api/baseApi";
+import { useGetUnreadNotificationsQuery } from "../Redux/features/notificationApi";
 
 const { Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
+interface NotificationItem {
+  _id: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+  isDeleted: boolean;
+  __v: number;
+}
 
 const DashboardLayout: React.FC = () => {
   // We'll use a ref to store the previous page URL
   const [collapsed, setCollapsed] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
-  const [notifications, setNotifications] = useState(notificationData);
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  // const [notifications, setNotifications] = useState(notificationData);
+
   const navigate = useNavigate();
   const location = useLocation();
   const { projectId } = useParams();
+  const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const token = useSelector((state: RootState) => state.auth.token);
   console.log("user from layout:", user?.role);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const { data: userInfo, isLoading: userLoading } = useGetMeUserQuery();
+
+  const {
+    data: userInfo,
+    isLoading: userLoading,
+    // error: userError,
+  } = useGetMeUserQuery(undefined, { skip: !token });
+  console.log(user?.email);
+  const { data, isLoading: notificationsLoading } =
+    useGetUnreadNotificationsQuery(undefined, {
+      skip: !token,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    });
+
+  const notificationsData: NotificationItem[] = data?.data || [];
+  const unreadCount = notificationsData.filter((n) => !n.isRead).length;
   const path = location.pathname;
   const userRole = user?.role;
   const validRoles = [
@@ -69,9 +98,48 @@ const DashboardLayout: React.FC = () => {
   } else {
     mainItems = getSidebarMenuItems(userRole);
   }
+  if (userLoading || notificationsLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
-  if (userLoading || !userInfo) return <div>Loading user info...</div>;
+  // if (userError) {
+  //   const errMsg =
+  //     (userError as any)?.data?.message || "Failed to fetch user info!";
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen text-red-600 font-medium">
+  //       🚫 {errMsg}
+  //     </div>
+  //   );
+  // }
 
+  if (!userInfo) {
+    return (
+      <div className="flex justify-center items-center min-h-screen text-gray-600">
+        No user info available
+      </div>
+    );
+  }
+
+  //LogoutwrapperFunction
+
+  const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
+    if (key === "/logout") {
+      // ✅ Custom logout
+      dispatch(clearCredentials());
+      persistor.purge();
+      navigate("/login", { replace: true });
+      // clear all cached queries (projects, users, etc.)
+      dispatch(baseApi.util.resetApiState()); // redirect if you want
+      return;
+    }
+
+    // ✅ Normal navigation
+    navigate(key);
+  };
   // On avatar click, open modal
   const handleAvatarClick = () => {
     setIsProfileModalOpen(true);
@@ -100,16 +168,11 @@ const DashboardLayout: React.FC = () => {
             <Button
               className="text-[#0d542b]"
               type="text"
-              onClick={() => {
-                setIsNotificationModalOpen(true);
-                setNotifications((prev) =>
-                  prev.map((n) => ({ ...n, isRead: true }))
-                );
-              }}
+              onClick={() => setIsNotificationModalOpen(true)}
             >
               <IoNotificationsOutline size={22} />
               {unreadCount > 0 && (
-                <span className="absolute top-0 left-6 bg-[#DA453F]  text-xs px-1 text-white border rounded-full">
+                <span className="absolute top-0 left-6 bg-[#DA453F] text-xs px-1 text-white border rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -158,7 +221,8 @@ const DashboardLayout: React.FC = () => {
             <Menu
               selectedKeys={[location.pathname + location.search]}
               defaultSelectedKeys={[path + location.search]}
-              onClick={({ key }) => navigate(key)}
+              // onClick={({ key }) => navigate(key)}
+              onClick={handleMenuClick}
               mode="inline"
               items={mainItems}
               className="custom-sidebar-menu"
@@ -184,7 +248,7 @@ const DashboardLayout: React.FC = () => {
       <NotificationModal
         open={isNotificationModalOpen}
         onClose={() => setIsNotificationModalOpen(false)}
-        notifications={notifications}
+        // notifications={notifications}
       />
     </>
   );

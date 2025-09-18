@@ -39,7 +39,7 @@ export const documentApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Documents"],
+      invalidatesTags: ["Documents", "Notifications"],
     }),
 
     // ✅ Update Document

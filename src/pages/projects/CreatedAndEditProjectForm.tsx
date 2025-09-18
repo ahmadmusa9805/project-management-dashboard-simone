@@ -383,8 +383,8 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
         {/* BASIC FIELDS */}
         {[
           ["projectName", "Project Name"],
-          ["clientName", "Client Name"],
-          ["clientEmail", "Client Email"],
+          // ["clientName", "Client Name"],
+          // ["clientEmail", "Client Email"],
           ["description", "Description"],
           ["reference", "Contract Reference"],
           ["address", "Project Address"],

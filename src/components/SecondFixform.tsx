@@ -199,7 +199,7 @@ const SecondFixForm: React.FC<SecondFixFormProps> = ({
               <label className="font-medium">Upload File</label>
               <Dragger
                 name="file"
-                accept=".pdf"
+                accept="*"
                 beforeUpload={(file) => {
                   field.onChange(file);
                   return false;

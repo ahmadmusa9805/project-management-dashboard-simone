@@ -81,6 +81,7 @@ const ExpenseTable = ({
 
   const handleEdit = async (item: ExpenseItem) => {
     setMode("edit");
+    // console.log(item);
     setEditingItem(item);
 
     try {
@@ -142,7 +143,7 @@ const ExpenseTable = ({
         projectId: projectId!,
         days: Number(restData.days) || 0,
         ratePerDay: Number(restData.ratePerDay) || 0,
-        vat: restData.vat !== undefined ? Number(restData.vat) : 0,
+        // vat: restData.vat !== undefined ? Number(restData.vat) : 0,
         amount: restData.amount !== undefined ? Number(restData.amount) : 0,
         unitPrice:
           restData.unitPrice !== undefined ? Number(restData.unitPrice) : 0,
@@ -170,7 +171,8 @@ const ExpenseTable = ({
             data: formData,
           }).unwrap();
         else if (title === "Subcontractor")
-          await updateSubContractor({ id: data._id!, data: formData }).unwrap();
+          console.log("editing subcontractor", data._id, formData);
+        await updateSubContractor({ id: data._id!, data: formData }).unwrap();
       } else {
         if (title === "Labour") await createLabourExpense(formData).unwrap();
         else if (title === "Material")
@@ -324,7 +326,7 @@ const ExpenseTable = ({
                   ratePerDay: 0,
                   quantity: 1,
                   amount: 0,
-                  vat: 0,
+                  vat: 20,
                   date: "",
                   description: "",
                   file: "",

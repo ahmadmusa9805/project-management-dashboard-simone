@@ -245,20 +245,20 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
 
         <div className="w-full flex flex-col gap-2">
           <label className="text-[#2B3738] text-xs font-medium">
-            Upload File (PDF only)
+            Upload File
           </label>
           <Controller
             control={control}
             name="file"
             rules={
               mode === "create"
-                ? { required: "File is required" } // ✅ Required only when creating
+                ? {} // ✅ Required only when creating
                 : {} // ✅ Optional when editing
             }
             render={({ field, fieldState }) => (
               <>
                 <Dragger
-                  accept=".pdf"
+                  accept="*"
                   beforeUpload={() => false}
                   multiple={false}
                   // ✅ keep existing file if in edit mode
@@ -280,7 +280,7 @@ const ResuableDocumentForm: React.FC<DocumentFormProps> = ({
                   <p className="text-center flex flex-col items-center">
                     <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
                   </p>
-                  <p className="text-[10px]">Click or drag PDF to upload</p>
+                  <p className="text-[10px]">Click or drag file to upload</p>
                 </Dragger>
                 {fieldState.error && (
                   <p className="text-red-500 text-xs mt-1">

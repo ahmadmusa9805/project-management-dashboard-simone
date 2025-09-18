@@ -39,7 +39,7 @@ export const secondFixFolderApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["SecondFixFolders"],
+      invalidatesTags: ["SecondFixFolders", "Notifications"],
     }),
 
     // ✅ Update SecondFixFolder
