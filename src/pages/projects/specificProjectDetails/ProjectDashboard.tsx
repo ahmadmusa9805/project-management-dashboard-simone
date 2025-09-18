@@ -198,7 +198,7 @@ const ProjectDashboard = () => {
           <Col span={6}>
             <Card style={{ backgroundColor: "#f1f1f1" }}>
               <Statistic
-                title="Total Budget"
+                title="Total Value"
                 prefix="$"
                 value={mappedData.budget}
               />
