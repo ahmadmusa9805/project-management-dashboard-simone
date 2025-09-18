@@ -192,7 +192,7 @@ export const usersApi = baseApi.injectEndpoints({
         method: "POST",
         body: userData,
       }),
-      invalidatesTags: ["Users"],
+      invalidatesTags: ["Users", "Notifications"],
     }),
 
     changeUserStatus: builder.mutation({

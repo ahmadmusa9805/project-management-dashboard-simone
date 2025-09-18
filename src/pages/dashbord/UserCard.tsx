@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { useGetProjectsWithstatusQuery } from "../../Redux/features/projects/projectsApi";
 import { useGetAllUsersQuery } from "../../Redux/features/users/usersApi";
 import { Spin } from "antd";
+import { useGetAllAnalyticsCombinedQuery } from "../../Redux/features/analytics/analyticsApi";
 
 interface CardProps {
   title: string;
@@ -20,7 +20,7 @@ const StatCard: React.FC<CardProps> = ({ title, value }) => {
         </div>
 
         <div className="w-full flex justify-between items-end">
-          <p className="text-[34px] font-medium leading-[39.78px] text-[#000E0F]">
+          <p className="text-xl font-medium leading-[39.78px] text-[#000E0F]">
             {value}
           </p>
         </div>
@@ -30,6 +30,11 @@ const StatCard: React.FC<CardProps> = ({ title, value }) => {
 };
 
 const DashboardSummaryCards = () => {
+  const { data: analtic, isLoading: isAnalyticLoading } =
+    useGetAllAnalyticsCombinedQuery(undefined, {
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    });
   const {
     data: projects = {
       data: [],
@@ -76,7 +81,12 @@ const DashboardSummaryCards = () => {
     }
   );
 
-  if (isLoading || isLoadingUsers || isLoadingCompletedProjects)
+  if (
+    isLoading ||
+    isLoadingUsers ||
+    isLoadingCompletedProjects ||
+    isAnalyticLoading
+  )
     return (
       <div className="flex justify-center items-center h-40">
         <Spin size="large"></Spin>
@@ -96,19 +106,19 @@ const DashboardSummaryCards = () => {
   // const totalProjects = projects?.data?.length;
   const totalProjects = projects?.meta?.total;
   const completed = completedProjects?.meta?.total;
-  //TODO:TOTAL PROFIT from Api All projects
+
   //   // totalProfit
-  const totalEarnings = projects?.data?.reduce(
-    (sum: number, p: any) => sum + (p.value || 0),
-    0
-  );
+  // const totalEarnings = projects?.data?.reduce(
+  //   (sum: number, p: any) => sum + (p.value || 0),
+  //   0
+  // );
   const totalUsers = users?.meta?.total;
 
   return (
     <div className="w-full flex gap-6 my-5">
       <StatCard
         title="Total Profit"
-        value={`$${totalEarnings.toLocaleString()}`}
+        value={`$ ${analtic?.data?.totalProfit?.toLocaleString()}`}
       />
       <StatCard title="Total projects" value={totalProjects.toString()} />
       <StatCard title="Completed projects" value={completed.toString()} />

@@ -25,7 +25,7 @@ export const labourApi = baseApi.injectEndpoints({
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["Labours"],
+      invalidatesTags: ["Labours", "Notifications", "Users"],
     }),
 
     // ✅ Update labour (with FormData)
@@ -37,6 +37,7 @@ export const labourApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, { id }) => [
         "Labours",
+        "Notifications",
         { type: "Labours", id },
       ],
     }),
@@ -47,7 +48,7 @@ export const labourApi = baseApi.injectEndpoints({
         url: `/labours/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Labours"],
+      invalidatesTags: ["Labours", "Notifications"],
     }),
   }),
 });

@@ -162,7 +162,7 @@ export const noteApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Notes"],
+      invalidatesTags: ["Notes", "Notifications"],
     }),
 
     // Update Note
@@ -230,7 +230,7 @@ export const noteApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Notes"],
+      invalidatesTags: ["Notes", "Notifications"],
     }),
 
     // Delete Note

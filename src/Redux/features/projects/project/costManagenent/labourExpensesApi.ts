@@ -32,7 +32,12 @@ export const labourExpensesApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["LabourExpenses", "ProjectCosts", "PaymentTrackers"],
+      invalidatesTags: [
+        "LabourExpenses",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Notifications",
+      ],
     }),
 
     updateLabourExpense: builder.mutation<any, { id: string; data: any }>({

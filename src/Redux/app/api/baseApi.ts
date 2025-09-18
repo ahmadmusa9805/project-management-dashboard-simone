@@ -57,6 +57,7 @@ export const baseApi = createApi({
     "Snagging",
     "TimeSchedule",
     "PaymentTrackers",
+    "Notifications",
   ],
   endpoints: () => ({}),
 });

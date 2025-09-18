@@ -33,7 +33,12 @@ export const materialExpensesApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["MaterialExpenses", "ProjectCosts", "PaymentTrackers"],
+      invalidatesTags: [
+        "MaterialExpenses",
+        "ProjectCosts",
+        "PaymentTrackers",
+        "Notifications",
+      ],
     }),
 
     updateMaterialExpense: builder.mutation<any, { id: string; data: any }>({

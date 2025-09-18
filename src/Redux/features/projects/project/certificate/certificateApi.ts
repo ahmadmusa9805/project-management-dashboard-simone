@@ -54,7 +54,7 @@ export const certificateApi = baseApi.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Certificates"],
+      invalidatesTags: ["Certificates", "Notifications"],
     }),
 
     // ✅ Update Certificate

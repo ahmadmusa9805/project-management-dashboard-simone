@@ -48,6 +48,7 @@ export const quoteApi = baseApi.injectEndpoints({
         "ProjectCosts",
         "PaymentTrackers",
         "Projects",
+        "Notifications",
       ],
     }),
 
@@ -111,6 +112,7 @@ export const quoteApi = baseApi.injectEndpoints({
         "ProjectCosts",
         "PaymentTrackers",
         "Projects",
+        "Notifications",
       ],
     }),
   }),

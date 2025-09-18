@@ -10,7 +10,7 @@ const handoverCombineApi = baseApi.injectEndpoints({
         method: "POST",
         body: handoverCombineData,
       }),
-      invalidatesTags: ["HandoverCombine"],
+      invalidatesTags: ["HandoverCombine", "Notifications"],
     }),
 
     // Get all handover combines

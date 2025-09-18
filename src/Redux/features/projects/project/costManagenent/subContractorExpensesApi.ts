@@ -36,6 +36,7 @@ export const subContractorExpensesApi = baseApi.injectEndpoints({
         "SubContractorsExpenses",
         "ProjectCosts",
         "PaymentTrackers",
+        "Notifications",
       ],
     }),
 

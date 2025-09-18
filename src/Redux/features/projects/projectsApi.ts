@@ -88,7 +88,7 @@ export const projectsApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Projects"],
+      invalidatesTags: ["Projects", "Notifications"],
     }),
 
     updateProject: builder.mutation<any, { id: string; data: any }>({

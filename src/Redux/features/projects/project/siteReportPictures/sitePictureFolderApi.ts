@@ -43,7 +43,7 @@ export const sitePictureFolderApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["SitePictureFolders"],
+      invalidatesTags: ["SitePictureFolders", "Notifications"],
     }),
 
     // ✅ Update SitePictureFolder

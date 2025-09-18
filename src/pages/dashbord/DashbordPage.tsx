@@ -60,6 +60,8 @@ const DashboardAnalytics: React.FC = () => {
     }
   );
 
+  // console.log(isAnalyticLoading, "isAnalyticLoading");
+  // console.log(, "analtic");
   // Format ongoing projects by month
   const ongoingData = groupByMonth(ongoingProjects.data);
 

@@ -44,7 +44,7 @@ export const timeScheduleApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["TimeSchedule"],
+      invalidatesTags: ["TimeSchedule", "Notifications"],
     }),
 
     // ✅ Update TimeSchedule (multipart if updating file)

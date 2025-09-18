@@ -49,6 +49,7 @@ export const interimApi = baseApi.injectEndpoints({
         "ProjectCosts",
         "PaymentTrackers",
         "Projects",
+        "Notifications",
       ],
     }),
 

@@ -45,7 +45,7 @@ export const snaggingListApi = baseApi.injectEndpoints({
           body: data,
         };
       },
-      invalidatesTags: ["Snagging"],
+      invalidatesTags: ["Snagging", "Notifications"],
     }),
 
     // ✅ Update Snagging

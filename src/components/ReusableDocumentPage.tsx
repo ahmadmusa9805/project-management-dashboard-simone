@@ -65,7 +65,7 @@ const ReusableDocumentPage: React.FC = () => {
       </div>
 
       {documents.map((doc) => (
-        <div key={doc.id} className="flex flex-col gap-4">
+        <div key={doc.id} className="flex flex-col gap-4 my-3">
           <div
             className="w-full p-4 bg-[#f1f1f1]  hover:bg-[#e6f4ea] cursor-pointer rounded flex items-center gap-4  transition-colors"
             onClick={() => handleDocumentClick(doc.fileUrl)}
