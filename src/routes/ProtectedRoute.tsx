@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../Redux/app/store";
+import { Spin } from "antd";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -25,7 +26,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           height: "100vh",
         }}
       >
-        <h2>Loading Session...</h2>
+        <div className="flex justify-center items-center min-h-screen">
+          <Spin size="large" />
+        </div>
       </div>
     );
   }
