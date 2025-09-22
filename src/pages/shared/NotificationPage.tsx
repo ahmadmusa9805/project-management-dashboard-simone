@@ -92,7 +92,9 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
           notifications.map((item) => (
             <div
               key={item._id}
-              className="bg-gray-100 p-3 rounded hover:bg-[#e6f4ea] transition-all duration-200 flex justify-between items-center"
+              className={` ${
+                !item.isRead ? "bg-[#e6f4ea]" : "bg-gray-100"
+              } p-3 rounded hover:bg-[#e6f4ea] transition-all duration-200 flex justify-between items-center`}
             >
               <div>
                 <div className="text-sm gap-3 flex font-medium text-gray-800">
