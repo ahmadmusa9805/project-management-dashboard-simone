@@ -114,9 +114,9 @@ const LaborCreateEdit: React.FC<Props> = ({
         <Input />
       </Form.Item>
 
-      <Form.Item label="Upload File" required={mode === "create"}>
+      <Form.Item label="Upload File">
         <div className="flex flex-col gap-1">
-          <label className="font-medium">Contract PDF</label>
+          <label className="font-medium">Contract PDF (Optional)</label>
           <Upload.Dragger
             name="file"
             accept=".pdf"
@@ -134,11 +134,6 @@ const LaborCreateEdit: React.FC<Props> = ({
             </p>
             <p className="text-[10px]">Click or drag PDF to upload</p>
           </Upload.Dragger>
-
-          {/* Optional: render validation error */}
-          {mode === "create" && !photoFile && (
-            <div className="text-red-500 text-xs mt-1">File is required</div>
-          )}
         </div>
       </Form.Item>
 

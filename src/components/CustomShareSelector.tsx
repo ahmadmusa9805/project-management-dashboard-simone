@@ -248,7 +248,7 @@ const CustomShareSelector = ({
 
       {/* Search and Users (remain unchanged) */}
       <div className="flex items-center gap-3 px-2 py-3 border-2 border-gray-200 rounded">
-        <div className="flex items-center gap-1">
+        {/* <div className="flex items-center gap-1">
           {filteredUsers.slice(0, 3).map((user) => (
             <img
               key={user._id}
@@ -257,7 +257,7 @@ const CustomShareSelector = ({
               alt={user.name}
             />
           ))}
-        </div>
+        </div> */}
         <Input
           placeholder="Search..."
           bordered={false}

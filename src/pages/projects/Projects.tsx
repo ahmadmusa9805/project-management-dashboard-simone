@@ -517,8 +517,16 @@ const Projects = () => {
           projects?.data?.map((project) => (
             <div
               key={project._id}
-              className="hover:bg-[#e6f4ea] bg-[#f1f1f1] cursor-pointer"
-              onClick={() => navigate(`/projects/${project._id}`)}
+              className={`hover:bg-[#e6f4ea] bg-[#f1f1f1] ${
+                project.status === "pending"
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              onClick={() => {
+                if (project.status !== "pending") {
+                  navigate(`/projects/${project._id}`);
+                }
+              }}
             >
               <div className="w-full px-4 py-2.5 flex items-center gap-2.5">
                 <div className="w-6 h-6">
@@ -537,16 +545,21 @@ const Projects = () => {
                   items={[
                     { key: "view", label: "👁️View Project" },
                     { key: "edit", label: "✏️ Edit Project" },
-                    { key: "share", label: "🔗 Share Project" },
-                    {
-                      key: "unshare",
-                      label: (
-                        <div className="flex items-center gap-1">
-                          <Unlink className="text-green-500" size={14} />
-                          Unshare Project
-                        </div>
-                      ),
-                    },
+                    // ✅ Show share/unshare only if not pending
+                    ...(project.status !== "pending"
+                      ? [
+                          { key: "share", label: "🔗 Share Project" },
+                          {
+                            key: "unshare",
+                            label: (
+                              <div className="flex items-center gap-1">
+                                <Unlink className="text-green-500" size={14} />
+                                Unshare Project
+                              </div>
+                            ),
+                          },
+                        ]
+                      : []),
                     { key: "delete", label: "🗑️ Delete Project" },
                   ]}
                   onClick={(key) => handleMoreClick(key, project._id)}

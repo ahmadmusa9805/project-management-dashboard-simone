@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import UserDetailsModal from "./UserDetailModal";
 import {
   useChangeUserStatusMutation,
+  useDeleteUserMutation,
   useGetAllUsersQuery,
 } from "../../Redux/features/users/usersApi";
 import { errorAlert, successAlert } from "../../utils/alerts";
@@ -18,6 +19,7 @@ import TabPane from "antd/es/tabs/TabPane";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Redux/app/store";
 import CustomPagination from "../../components/CustomPagination";
+import { showDeleteAlert } from "../../utils/deleteAlert";
 
 export interface DataItem {
   id: string;
@@ -98,10 +100,12 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
     status: statusFilter !== undefined ? statusFilter : activeTab,
     page,
     limit,
-    search: effectiveSearchTerm,
+    search: effectiveSearchTerm?.trim() ? effectiveSearchTerm : undefined,
     role: routeUserType ?? undefined, // ✅ backend filters role
     // ✅ newest first
   });
+
+  const [deleteUser] = useDeleteUserMutation();
 
   const [userData, setUserData] = useState<DataItem[]>([]);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -127,6 +131,13 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
       setUserData(mappedData);
     }
   }, [users?.data]);
+
+  useEffect(() => {
+    if (!searchText.trim()) {
+      setPage(1);
+      refetch(); // call get all users
+    }
+  }, [searchText, refetch]);
 
   // Check authorization
   if (user?.role !== USER_ROLE.superAdmin) {
@@ -157,7 +168,12 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
               onSearch={(val) => {
                 setSearchText(val);
                 setPage(1);
+
+                if (!val.trim()) {
+                  refetch();
+                }
               }}
+              onChange={(val) => setSearchText(val)} // ✅ Update state on every keystroke
             />
           )}
         </div>
@@ -207,6 +223,8 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                     email,
                     contactNo,
                     status,
+                    address,
+                    postCode,
                     estimateNumber,
                     projectType,
                     role,
@@ -243,6 +261,7 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                           items={[
                             { key: "view", label: "View User Details" },
                             { key: "edit", label: "Edit User" },
+                            { key: "delete", label: "Delete User" },
                           ]}
                           onClick={(key) => {
                             if (key === "view") {
@@ -255,6 +274,8 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                                 name,
                                 email,
                                 contactNo,
+                                address,
+                                postCode,
                                 status,
                                 estimateNumber,
                                 projectType,
@@ -262,6 +283,20 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                                 profileImg,
                               });
                               effectiveSetOpenDrawer(true);
+                            } else if (key === "delete") {
+                              showDeleteAlert({
+                                title:
+                                  "Are you sure you want to delete this user?",
+                                onConfirm: async () => {
+                                  try {
+                                    await deleteUser(id).unwrap();
+                                    // successAlert("User deleted successfully");
+                                    refetch(); // refresh the list
+                                  } catch {
+                                    errorAlert("Failed to delete user");
+                                  }
+                                },
+                              });
                             }
                           }}
                         />
@@ -330,6 +365,8 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                           email,
                           contactNo,
                           status,
+                          address,
+                          postCode,
                           estimateNumber,
                           projectType,
                           role,
@@ -370,6 +407,7 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                                 items={[
                                   { key: "view", label: "View User Details" },
                                   { key: "edit", label: "Edit User" },
+                                  { key: "delete", label: "Delete User" },
                                 ]}
                                 onClick={(key) => {
                                   if (key === "view") {
@@ -383,12 +421,29 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                                       email,
                                       contactNo,
                                       status,
+                                      address,
+                                      postCode,
                                       estimateNumber,
                                       projectType,
                                       role,
                                       profileImg,
                                     });
                                     effectiveSetOpenDrawer(true);
+                                  } else if (key === "delete") {
+                                    // ✅ Show confirmation alert
+                                    showDeleteAlert({
+                                      title:
+                                        "Are you sure you want to delete this user?",
+                                      onConfirm: async () => {
+                                        try {
+                                          await deleteUser(id).unwrap();
+                                          // successAlert("User deleted successfully");
+                                          refetch(); // refresh the list
+                                        } catch {
+                                          errorAlert("Failed to delete user");
+                                        }
+                                      },
+                                    });
                                   }
                                 }}
                               />
@@ -446,6 +501,8 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                           email,
                           contactNo,
                           status,
+                          address,
+                          postCode,
                           estimateNumber,
                           projectType,
                           role,
@@ -484,8 +541,9 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                             <td className="px-4 py-3">
                               <CustomViewMoreButton
                                 items={[
-                                  { key: "view", label: "View User Details" },
+                                  { key: "view", label: "View User" },
                                   { key: "edit", label: "Edit User" },
+                                  { key: "delete", label: "Delete User" },
                                 ]}
                                 onClick={(key) => {
                                   if (key === "view") {
@@ -499,12 +557,28 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
                                       email,
                                       contactNo,
                                       status,
+                                      address,
+                                      postCode,
                                       estimateNumber,
                                       projectType,
                                       role,
                                       profileImg,
                                     });
                                     effectiveSetOpenDrawer(true);
+                                  } else if (key === "delete") {
+                                    showDeleteAlert({
+                                      title:
+                                        "Are you sure you want to delete this user?",
+                                      onConfirm: async () => {
+                                        try {
+                                          await deleteUser(id).unwrap();
+                                          // successAlert("User deleted successfully");
+                                          refetch(); // refresh the list
+                                        } catch {
+                                          errorAlert("Failed to delete user");
+                                        }
+                                      },
+                                    });
                                   }
                                 }}
                               />
