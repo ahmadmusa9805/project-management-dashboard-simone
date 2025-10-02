@@ -260,7 +260,7 @@
 
 // export default CostManagementPage;
 import { useNavigate, useParams } from "react-router-dom";
-import { Spin } from "antd"; // ← Import Spin here
+import { Card, Col, Row, Spin, Statistic } from "antd"; // ← Import Spin here
 
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import { useGetAllExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/costManagementApi";
@@ -314,8 +314,8 @@ const CostManagementPage = () => {
   return (
     <div className="w-full bg-white h-full p-6 min-h-screen">
       {/* Header */}
-      <div className="flex justify-between py-8">
-        <h1 className="text-2xl font-semibold mb-4">Live Project Cost</h1>
+      <div className="flex justify-between py-10">
+        <h1 className="text-2xl font-semibold ">Project Cost</h1>
         {/* <CustomSearchInput onSearch={() => {}} /> */}
       </div>
 
@@ -328,45 +328,82 @@ const CostManagementPage = () => {
         <div>Error loading cost data. Please try again later.</div>
       ) : (
         // Cost Cards
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <Row gutter={[16, 16]}>
           {[
             { label: "Material", value: totalMaterial },
             { label: "Labour", value: totalLabor },
             { label: "Subcontractor", value: totalSubcontractor },
           ].map(({ label, value }) => (
-            <div
-              key={label}
-              className="p-6 hover:bg-[#e6f4ea] bg-[#f1f1f1] rounded shadow flex flex-col justify-between cursor-pointer"
-              onClick={() => handleViewCost(label)}
-            >
-              <div className="flex justify-between items-start w-full">
-                <h3 className="text-lg font-medium text-gray-900 truncate">
-                  {`${label} Expense${label === "Subcontractor" ? "s" : ""}`}
-                </h3>
-                <CustomViewMoreButton
-                  items={[{ key: "view Cost", label: "👁️ View Cost" }]}
-                  onClick={(key) => {
-                    if (key === "view Cost") handleViewCost(label);
-                  }}
-                />
-              </div>
-              <p className="text-lg font-medium text-gray-900">
-                Value $ : {value}
-              </p>
-            </div>
+            <Col span={6} key={label}>
+              <Card
+                style={{ backgroundColor: "#f1f1f1" }}
+                hoverable
+                bodyStyle={{
+                  backgroundColor: "#f1f1f1",
+                  padding: "12px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+                onClick={() => handleViewCost(label)}
+                title={
+                  <h3 className="text-lg font-medium text-gray-900 truncate">
+                    {`${label} Expense${label === "Subcontractor" ? "s" : ""}`}
+                  </h3>
+                }
+                extra={
+                  <CustomViewMoreButton
+                    items={[{ key: "view Cost", label: "👁️ View Cost" }]}
+                    onClick={(key) => {
+                      if (key === "view Cost") handleViewCost(label);
+                    }}
+                  />
+                }
+              >
+                <div className="flex items-center justify-between w-full">
+                  <Statistic
+                    value={value}
+                    prefix="$"
+                    className="text-lg font-medium text-gray-900"
+                  />
+                  {/* <p className="font-semibold flex items-center text-green-700">
+                    ✅ Recorded
+                  </p> */}
+                </div>
+              </Card>
+            </Col>
           ))}
 
-          <div className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between">
-            <div className="flex justify-between items-start w-full">
-              <h3 className="text-lg font-medium text-gray-900 w-36 truncate">
-                Total Project Cost
-              </h3>
-            </div>
-            <p className="text-lg font-medium text-gray-900">
-              Value $ : {totalProject}
-            </p>
-          </div>
-        </div>
+          {/* Total Project Card */}
+          <Col span={6}>
+            <Card
+              style={{ backgroundColor: "#f1f1f1" }}
+              bodyStyle={{
+                backgroundColor: "#f1f1f1",
+                padding: "12px 24px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+              title={
+                <h3 className="text-lg font-medium text-gray-900 truncate">
+                  Total Project Cost
+                </h3>
+              }
+            >
+              <div className="flex items-center justify-between w-full">
+                <Statistic
+                  value={totalProject}
+                  prefix="$"
+                  className="text-lg font-medium text-gray-900"
+                />
+                <p className="font-semibold flex items-center text-blue-700">
+                  📊 Summary
+                </p>
+              </div>
+            </Card>
+          </Col>
+        </Row>
       )}
     </div>
   );

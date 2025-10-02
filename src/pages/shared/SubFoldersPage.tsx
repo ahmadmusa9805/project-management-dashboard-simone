@@ -222,7 +222,7 @@
 
 import React, { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Modal, Spin } from "antd";
+import { Card, Col, Modal, Row, Spin } from "antd";
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CreateFolder from "../../components/CreateFolder";
 import {
@@ -364,19 +364,29 @@ const SubFoldersPage: React.FC<SubFoldersPageProps> = ({
           <Spin size="large" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mt-20">
-          {subfolders.map((sub: { id: any; name: any }) => (
-            <div
-              key={sub.id}
-              onClick={() => handleSubfolderClick(sub)}
-              className="p-4 rounded hover:shadow-md cursor-pointer hover:bg-[#e6f4ea] bg-[#f1f1f1] transition w-[250px] h-30 "
-            >
-              <h3 className="text-lg font-medium truncate w-[150px]">
-                📁 {sub.name}
-              </h3>
-            </div>
+        <Row gutter={[16, 16]}>
+          {subfolders.map((sub: { id: string; name: string }) => (
+            <Col span={6} key={sub.id}>
+              <Card
+                title={
+                  <h3 className="text-lg font-medium text-gray-900 truncate">
+                    📁 {sub.name}
+                  </h3>
+                }
+                hoverable
+                style={{ backgroundColor: "#f1f1f1" }}
+                bodyStyle={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  height: "60px", // fixed height
+                  padding: "12px 24px",
+                }}
+                onClick={() => handleSubfolderClick(sub)}
+              />
+            </Col>
           ))}
-        </div>
+        </Row>
       )}
 
       {/* Modal for creating subfolder */}

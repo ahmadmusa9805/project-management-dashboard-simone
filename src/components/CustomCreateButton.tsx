@@ -3,16 +3,26 @@ import React from "react";
 interface CustomCreateButtonProps {
   onClick?: () => void;
   title?: string;
+  disabled?: boolean;
 }
 
 const CustomCreateButton: React.FC<CustomCreateButtonProps> = ({
   onClick,
+  disabled,
   title,
 }) => {
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1 px-6 py-2 bg-[#0d542b] hover:opacity-80 text-white text-sm font-medium rounded"
+      className={`inline-flex items-center gap-1 px-6 py-2 text-sm font-medium rounded
+        ${
+          disabled
+            ? "bg-[#0d542b] cursor-not-allowed opacity-70"
+            : "bg-[#0d542b] hover:opacity-80 text-white"
+        }
+      `}
+      // className="inline-flex items-center gap-1 px-6 py-2 bg-[#0d542b] hover:opacity-80 text-white text-sm font-medium rounded"
+      disabled={disabled}
     >
       {/* Plus Icon */}
       <div className="relative w-4 h-4">

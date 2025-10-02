@@ -711,6 +711,7 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
       onConfirm: async () => {
         try {
           await deleteSiteReport(reportId).unwrap();
+          refetchReports();
         } catch {
           errorAlert("Could not delete the report.");
         }

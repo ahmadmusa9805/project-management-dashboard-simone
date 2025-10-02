@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Drawer, Modal, Spin, message } from "antd";
+import { Card, Col, Drawer, Modal, Row, Spin, message } from "antd";
 
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import TaskScheduleForm from "../../../components/TaskScheduleForm";
@@ -213,65 +213,88 @@ const TimeSchedulePage: React.FC = () => {
   const schedules = schedulesData?.data || [];
 
   return (
-    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3 ">
-      <h1 className="text-xl font-bold mb-6 pt-8">Time Schedule </h1>
+    <div className="w-full p-6 gap-4 bg-white min-h-screen  ">
+      <div className="flex justify-between py-10">
+        <h1 className="text-2xl font-semibold">Time Schedules</h1>
+        {/* <CustomSearchInput onSearch={() => {}} /> */}
+        <CustomCreateButton
+          title="Create Schedule"
+          onClick={handleCreateClick}
+        />
+      </div>
+      {/* <h1 className="text-xl font-bold mb-6 pt-8">Time Schedule </h1>
 
       <div className="flex justify-end mb-4">
         <CustomCreateButton
           title="Create Schedule"
           onClick={handleCreateClick}
         />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      </div> */}
+      <Row gutter={[16, 16]}>
         {schedulesLoading ? (
-          <div className="col-span-3 flex justify-center items-center h-40">
+          <div className="col-span-3 flex justify-center items-center h-40 w-full">
             <Spin size="large" />
           </div>
         ) : schedules.length > 0 ? (
           schedules.map((item: any) => (
-            <div
-              key={item._id}
-              className="p-6 bg-gray-100 rounded shadow flex flex-col justify-between"
-            >
-              <div className="flex justify-between">
-                <h3 className="text-lg font-semibold">{item.title}</h3>
-                <CustomViewMoreButton
-                  items={[
-                    //TODO: add view schedule later
-                    //  { key: "view", label: "👁️ View Schedule" },
-                    { key: "edit", label: "✏️ Edit Schedule" },
-                    { key: "share", label: "🔗 Share Schedule" },
-                    {
-                      key: "unshare",
-                      label: (
-                        <div className="flex items-center gap-1">
-                          <Unlink className="text-green-500" size={14} />
-                          Unshare Schedule
-                        </div>
-                      ),
-                    },
-                    {
-                      key: "delete",
-                      label: "🗑️ Delete Schedule",
-                      danger: true,
-                    },
-                  ]}
-                  onClick={(key) => handleMenuClick(key, item)}
-                />
-              </div>
-              <p className="mt-2 text-gray-700">{item.description}</p>
-              <div className="mt-2 text-sm text-gray-500">
-                {new Date(item.startDate).toLocaleDateString()} -{" "}
-                {new Date(item.endDate).toLocaleDateString()}
-              </div>
-            </div>
+            <Col span={6} key={item._id}>
+              <Card
+                style={{ backgroundColor: "#f1f1f1" }}
+                hoverable
+                bodyStyle={{
+                  backgroundColor: "#f1f1f1",
+                  padding: "12px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  minHeight: "60px", // keep card height consistent
+                }}
+                title={
+                  <h3 className="text-lg font-medium text-gray-900 truncate">
+                    {item.title}
+                  </h3>
+                }
+                extra={
+                  <CustomViewMoreButton
+                    items={[
+                      // { key: "view", label: "👀 View"},
+                      { key: "edit", label: "✏️ Edit Schedule" },
+                      { key: "share", label: "🔗 Share Schedule" },
+                      {
+                        key: "unshare",
+                        label: (
+                          <div className="flex items-center gap-1">
+                            <Unlink className="text-green-500" size={14} />
+                            Unshare Schedule
+                          </div>
+                        ),
+                      },
+                      {
+                        key: "delete",
+                        label: "🗑️ Delete Schedule",
+                        danger: true,
+                      },
+                    ]}
+                    onClick={(key) => handleMenuClick(key, item)}
+                  />
+                }
+              >
+                <div className="flex justify-between">
+                  <p className="text-gray-700 truncate">{item.description}</p>
+                  <div className=" text-sm  text-gray-500">
+                    {new Date(item.startDate).toLocaleDateString()} -{" "}
+                    {new Date(item.endDate).toLocaleDateString()}
+                  </div>
+                </div>
+              </Card>
+            </Col>
           ))
         ) : (
-          <div className="col-span-3 text-center py-20 text-gray-500">
+          <div className="col-span-3 text-center py-20 text-gray-500 w-full">
             No schedules found. Create your first schedule.
           </div>
         )}
-      </div>
+      </Row>
 
       {/* Drawer for create/edit */}
       <Drawer

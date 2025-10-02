@@ -255,11 +255,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import ResuableDocumentForm from "../../../components/ResuableDocumentForm";
-import CustomSearchInput from "../../../components/CustomSearchInput";
+// import CustomSearchInput from "../../../components/CustomSearchInput";
 import CustomCreateButton from "../../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import { useNavigate, useParams } from "react-router-dom";
-import { Modal, Spin } from "antd";
+import { Card, Col, Modal, Row, Spin, Statistic } from "antd";
 
 import {
   useGetAllQuotesQuery,
@@ -422,15 +422,16 @@ const QuoteDetailsPage = () => {
   };
 
   return (
-    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
-      <div className="flex justify-between mt-10">
-        <h1 className="text-2xl font-semibold mb-4">Manage Quote</h1>
-        <CustomSearchInput onSearch={() => {}} />
-      </div>
-
-      <div className="flex justify-end mr-4 mb-4">
+    <div className="w-full  gap-4 bg-white min-h-screen p-6">
+      <div className="flex justify-between py-10">
+        <h1 className="text-2xl font-semibold">Quotes</h1>
+        {/* <CustomSearchInput onSearch={() => {}} /> */}
         <CustomCreateButton title="Create Quote" onClick={handleCreateClick} />
       </div>
+
+      {/* <div className="flex justify-end mr-4 mb-4">
+        <CustomCreateButton title="Create Quote" onClick={handleCreateClick} />
+      </div> */}
 
       <ResuableDocumentForm
         title="Quote"
@@ -462,86 +463,94 @@ const QuoteDetailsPage = () => {
           <Spin size="large" />
         </div>
       ) : (
-        <div className="flex flex-wrap gap-4">
+        <Row gutter={[16, 16]}>
           {quotes
             .filter((q) => q.projectId === projectId)
             .map((quote: any) => (
-              <div
-                key={quote._id}
-                className="p-6 hover:bg-[#e6f4ea] bg-[#f1f1f1]  rounded shadow flex flex-col h-full cursor-pointer"
-                onClick={() => handleViewClick(quote)}
-              >
-                {/* Header (title + menu) */}
-                <div className="flex justify-between items-start w-[300px]">
-                  {/* <h3 className="mt-2 flex">
-                    <span className="text-3xl">📁</span>
-                    <span className="font-semibold ml-1 text-xl text-gray-900 truncate">
+              <Col span={6} key={quote._id}>
+                <Card
+                  style={{
+                    backgroundColor: "#f1f1f1",
+                  }}
+                  hoverable
+                  bodyStyle={{
+                    backgroundColor: "#f1f1f1",
+                    padding: "12px 24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                  onClick={() => handleViewClick(quote)}
+                  title={
+                    <h3 className="text-lg font-medium text-gray-900 truncate">
                       {quote.title}
-                    </span>
-                  </h3> */}
-                  <h3 className="text-lg font-medium text-gray-900 w-[150px] truncate">
-                    {quote.title}
-                  </h3>
-                  <CustomViewMoreButton
-                    items={[
-                      { key: "view quote", label: "👁️ View Quote" },
-                      { key: "edit", label: "✏️ Edit Quote" },
-                      { key: "share", label: "🔗 Share Quote" },
-                      {
-                        key: "unshare",
-                        label: (
-                          <div className="flex items-center gap-1">
-                            <Unlink className="text-green-500" size={14} />
-                            Unshare Quote
-                          </div>
-                        ),
-                      },
-                      { key: "delete", label: "🗑️ Delete Quote", danger: true },
-                    ]}
-                    onClick={async (key) => {
-                      switch (key) {
-                        case "view quote":
-                          handleViewClick(quote);
-                          break;
-                        case "edit":
-                          handleEditClick(quote);
-                          break;
-                        case "share":
-                          handleShareQuote(quote);
-                          break;
-                        case "unshare":
-                          handleUnShareQuote(quote);
-                          break;
-                        case "delete":
-                          showDeleteAlert({
-                            onConfirm: async () => {
-                              try {
-                                await deleteQuote(quote._id).unwrap();
-                                refetch();
-                              } catch (err: any) {
-                                errorAlert(
-                                  "Delete Error",
-                                  err?.data?.message || "Failed to delete quote"
-                                );
-                              }
-                            },
-                          });
-                          break;
-                      }
-                    }}
+                    </h3>
+                  }
+                  extra={
+                    <CustomViewMoreButton
+                      items={[
+                        { key: "view quote", label: "👁️ View Quote" },
+                        { key: "edit", label: "✏️ Edit Quote" },
+                        { key: "share", label: "🔗 Share Quote" },
+                        {
+                          key: "unshare",
+                          label: (
+                            <div className="flex items-center gap-1">
+                              <Unlink className="text-green-500" size={14} />
+                              Unshare Quote
+                            </div>
+                          ),
+                        },
+                        {
+                          key: "delete",
+                          label: "🗑️ Delete Quote",
+                          danger: true,
+                        },
+                      ]}
+                      onClick={async (key) => {
+                        switch (key) {
+                          case "view quote":
+                            handleViewClick(quote);
+                            break;
+                          case "edit":
+                            handleEditClick(quote);
+                            break;
+                          case "share":
+                            handleShareQuote(quote);
+                            break;
+                          case "unshare":
+                            handleUnShareQuote(quote);
+                            break;
+                          case "delete":
+                            showDeleteAlert({
+                              onConfirm: async () => {
+                                try {
+                                  await deleteQuote(quote._id).unwrap();
+                                  refetch();
+                                } catch (err: any) {
+                                  errorAlert(
+                                    "Delete Error",
+                                    err?.data?.message ||
+                                      "Failed to delete quote"
+                                  );
+                                }
+                              },
+                            });
+                            break;
+                        }
+                      }}
+                    />
+                  }
+                >
+                  <Statistic
+                    className="text-lg font-medium text-gray-900"
+                    value={quote.value}
+                    prefix="$"
                   />
-                </div>
-
-                {/* Spacer to push footer down */}
-                <div className="flex-grow mt-10" />
-
-                {/* Footer (price at bottom) */}
-                <p className="text-lg font-medium text-gray-900">
-                  $ {quote.value}
-                </p>
-              </div>
+                </Card>
+              </Col>
             ))}
-        </div>
+        </Row>
       )}
 
       {/* Modal for Sharing */}

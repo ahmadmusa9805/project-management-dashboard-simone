@@ -225,7 +225,7 @@
 // export default DocumentsPage;
 
 import { useState } from "react";
-import { Modal, Spin } from "antd";
+import { Card, Col, Modal, Row, Spin } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomCreateButton from "../../../components/CustomCreateButton";
 // import CustomSearchInput from "../../../components/CustomSearchInput";
@@ -338,20 +338,24 @@ const DocumentsPage = ({ title }: DocumentsPageProps) => {
   };
 
   return (
-    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+    <div className="w-full  gap-4 bg-white min-h-screen p-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4 mt-10">
-        <h1 className="text-2xl font-semibold">{pageTitle} Manage</h1>
+      <div className="flex justify-between  py-10">
+        <h1 className="text-2xl font-semibold">{pageTitle}</h1>
+        <CustomCreateButton
+          title="Create Folder"
+          onClick={() => setIsModalOpen(true)}
+        />
         {/* <CustomSearchInput onSearch={() => {}} /> */}
       </div>
 
       {/* Create Button */}
-      <div className="flex justify-end mr-4 mb-6">
+      {/* <div className="flex justify-end mr-4 mb-6">
         <CustomCreateButton
-          title="Create New Folder"
+          title="Create Folder"
           onClick={() => setIsModalOpen(true)}
         />
-      </div>
+      </div> */}
 
       {/* Folder List */}
       {isLoading ? (
@@ -359,17 +363,29 @@ const DocumentsPage = ({ title }: DocumentsPageProps) => {
           <Spin size="large" />
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        <Row gutter={[16, 16]}>
           {folders.map((folder) => (
-            <div
-              key={folder.id}
-              onClick={() => handleFolderClick(folder)}
-              className="p-4 rounded hover:shadow-md cursor-pointer hover:bg-[#e6f4ea] bg-[#f1f1f1] transition w-[250px] h-30"
-            >
-              <h3 className="text-lg font-medium truncate">📁 {folder.name}</h3>
-            </div>
+            <Col span={6} key={folder.id}>
+              <Card
+                title={
+                  <h3 className="text-lg font-medium text-gray-900 truncate">
+                    📁 {folder.name}
+                  </h3>
+                }
+                hoverable
+                style={{ backgroundColor: "#f1f1f1" }}
+                bodyStyle={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  height: "60px", // fixed height
+                  padding: "12px 24px",
+                }}
+                onClick={() => handleFolderClick(folder)}
+              ></Card>
+            </Col>
           ))}
-        </div>
+        </Row>
       )}
 
       {/* Modal */}
