@@ -198,6 +198,9 @@ import { showDeleteAlert } from "../../../utils/deleteAlert";
 import { Unlink } from "lucide-react";
 
 import CertificateDocumentSceoundFixViewer from "../../../components/CertificateDocumentSceoundFixViewer";
+import { USER_ROLE } from "../../../types/userAllTypes/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../Redux/app/store";
 // ✅ new reusable unshare component
 
 const CertificatesPage: React.FC = () => {
@@ -205,6 +208,7 @@ const CertificatesPage: React.FC = () => {
   const { data: certificatesData, isLoading: certificatesLoading } =
     useGetAllCertificatesQuery({ projectId });
   const [selectedCertId, setSelectedCertId] = useState<string | null>(null);
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const { data: singleCertData } = useGetSingleCertificateQuery(
     selectedCertId!,
     {
@@ -333,7 +337,7 @@ const CertificatesPage: React.FC = () => {
     <>
       <div className="w-full  gap-4 bg-white min-h-screen p-6">
         {" "}
-        <div className="flex justify-between  py-10">
+        <div className="flex justify-between items-center py-10">
           <h1 className="text-2xl font-semibold">Certificates</h1>
           <CustomCreateButton
             title="Upload Certificate"
@@ -376,23 +380,28 @@ const CertificatesPage: React.FC = () => {
                   extra={
                     <CustomViewMoreButton
                       items={[
-                        { key: "view", label: "👁️ View Certificate" },
-                        { key: "edit", label: "✏️ Edit Certificate" },
-                        { key: "share", label: "🔗 Share Certificate" },
-                        {
-                          key: "unshare",
-                          label: (
-                            <div className="flex items-center gap-1">
-                              <Unlink className="text-green-500" size={14} />
-                              Unshare Certificate
-                            </div>
-                          ),
-                        },
-                        {
-                          key: "delete",
-                          label: "🗑️ Delete Certificate",
-                          danger: true,
-                        },
+                        { key: "view", label: "👁️ View" },
+
+                        { key: "edit", label: "✏️ Edit" },
+                        // Only show share/unshare if user is not basic admin
+                        ...(userRole !== USER_ROLE.basicAdmin
+                          ? [
+                              { key: "share", label: "🔗 Share" },
+                              {
+                                key: "unshare",
+                                label: (
+                                  <div className="flex items-center gap-1">
+                                    <Unlink
+                                      className="text-green-500"
+                                      size={14}
+                                    />
+                                    Unshare Certificate
+                                  </div>
+                                ),
+                              },
+                            ]
+                          : []),
+                        { key: "delete", label: "🗑️ Delete", danger: true },
                       ]}
                       onClick={(key) => {
                         if (key === "edit") {

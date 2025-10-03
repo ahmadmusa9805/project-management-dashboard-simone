@@ -7,6 +7,9 @@ import {
 } from "../../Redux/features/projects/projectsApi";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { successAlert } from "../../utils/alerts";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../Redux/app/store";
+import { USER_ROLE } from "../../types/userAllTypes/user";
 
 const { Title, Text } = Typography;
 
@@ -21,6 +24,8 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   onClose,
   projectId,
 }) => {
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
+
   // Fetch single project details
   const {
     data: project,
@@ -106,16 +111,19 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                   <Divider />
                   <Text strong>🤝 Shared With:</Text>
                   <div style={{ marginTop: 8 }}>
-                    {project.sharedWith.map((share: any) => {
+                    {project.sharedWith?.map((share: any, idx: number) => {
+                      if (!share?.userId) return null; // <-- skip if no userId
+
                       const user =
                         typeof share.userId === "object"
                           ? share.userId
                           : { _id: share.userId };
+
                       const role = share?.role ?? "Unknown";
 
                       return (
                         <div
-                          key={share._id}
+                          key={share._id || idx} // fallback key if _id missing
                           style={{
                             display: "flex",
                             justifyContent: "space-between",
@@ -124,21 +132,23 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                           }}
                         >
                           <span>
-                            👤 User ID: {user._id} | Role:{" "}
+                            👤 User ID: {user?._id || "N/A"} | Role:{" "}
                             <strong>{role}</strong>
                           </span>
 
                           {/* ✅ Only show Unshare button if project is NOT pending */}
-                          {project.status !== "pending" && (
-                            <Button
-                              size="small"
-                              danger
-                              loading={isUnsharing}
-                              onClick={() => handleUnshare(user._id)}
-                            >
-                              Unshare
-                            </Button>
-                          )}
+                          {project.status !== "pending" &&
+                            user?._id &&
+                            userRole !== USER_ROLE.basicAdmin && (
+                              <Button
+                                size="small"
+                                danger
+                                loading={isUnsharing}
+                                onClick={() => handleUnshare(user._id)}
+                              >
+                                Unshare
+                              </Button>
+                            )}
                         </div>
                       );
                     })}

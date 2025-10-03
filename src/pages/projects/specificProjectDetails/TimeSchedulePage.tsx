@@ -24,11 +24,14 @@ import type { SharedUser } from "../../../Redux/features/projects/projectsApi";
 import { errorAlert, successAlert } from "../../../utils/alerts";
 import { showDeleteAlert } from "../../../utils/deleteAlert";
 import { Unlink } from "lucide-react";
+import { USER_ROLE } from "../../../types/userAllTypes/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../Redux/app/store";
 
 const TimeSchedulePage: React.FC = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
-
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const { data: schedulesData, isLoading: schedulesLoading } =
     useGetAllTimeSchedulesQuery({ projectId });
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
@@ -257,21 +260,30 @@ const TimeSchedulePage: React.FC = () => {
                 extra={
                   <CustomViewMoreButton
                     items={[
-                      // { key: "view", label: "👀 View"},
-                      { key: "edit", label: "✏️ Edit Schedule" },
-                      { key: "share", label: "🔗 Share Schedule" },
-                      {
-                        key: "unshare",
-                        label: (
-                          <div className="flex items-center gap-1">
-                            <Unlink className="text-green-500" size={14} />
-                            Unshare Schedule
-                          </div>
-                        ),
-                      },
+                      // { key: "view", label: "👀 View" },
+                      { key: "edit", label: "✏️ Edit " },
+
+                      // ✅ Only show share/unshare if user is NOT basicAdmin
+                      ...(userRole !== USER_ROLE.basicAdmin
+                        ? [
+                            { key: "share", label: "🔗 Share " },
+                            {
+                              key: "unshare",
+                              label: (
+                                <div className="flex items-center gap-1">
+                                  <Unlink
+                                    className="text-green-500"
+                                    size={14}
+                                  />
+                                  Unshare
+                                </div>
+                              ),
+                            },
+                          ]
+                        : []),
                       {
                         key: "delete",
-                        label: "🗑️ Delete Schedule",
+                        label: "🗑️ Delete",
                         danger: true,
                       },
                     ]}

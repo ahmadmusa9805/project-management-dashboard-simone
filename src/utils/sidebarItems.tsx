@@ -173,7 +173,11 @@ export function getProjectMenuItems(projectId: string, role: Role): MenuItem[] {
       key: `/projects/${projectId}/live-project-costs`,
       label: "Live Project Costs",
       icon: <TrendingUp />,
-      allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
+      allowedRoles: [
+        USER_ROLE.superAdmin,
+        USER_ROLE.primeAdmin,
+        USER_ROLE.basicAdmin,
+      ],
     },
     {
       key: `/projects/${projectId}/payments-track`,

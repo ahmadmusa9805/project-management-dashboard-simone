@@ -359,9 +359,12 @@ import { useParams } from "react-router-dom";
 import { errorAlert, successAlert } from "../../../utils/alerts";
 import { showDeleteAlert } from "../../../utils/deleteAlert";
 import { USER_ROLE } from "../../../types/userAllTypes/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../Redux/app/store";
 
 const NotesPage = () => {
   const projectId = useParams().projectId;
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
 
   const {
     data: notesResponse,
@@ -390,6 +393,7 @@ const NotesPage = () => {
   });
 
   const notes = notesResponse || [];
+  console.log(notes);
 
   const openDrawer = (
     note: any = null,
@@ -538,18 +542,45 @@ const NotesPage = () => {
                   <CustomViewMoreButton
                     items={[
                       { key: "view", label: "👁️ View" },
-                      { key: "edit", label: "✏️ Edit" },
-                      { key: "share", label: "🔗 Share" },
+                      { key: "edit", label: "✏️ Edit " },
+
+                      // ✅ Only show share/unshare if user is NOT basicAdmin
+                      ...(userRole !== USER_ROLE.basicAdmin
+                        ? [
+                            { key: "share", label: "🔗 Share " },
+                            {
+                              key: "unshare",
+                              label: (
+                                <div className="flex items-center gap-1">
+                                  <Unlink
+                                    className="text-green-500"
+                                    size={14}
+                                  />
+                                  Unshare
+                                </div>
+                              ),
+                            },
+                          ]
+                        : []),
                       {
-                        key: "unshare",
-                        label: (
-                          <div className="flex items-center gap-1">
-                            <Unlink className="text-green-500" size={14} />
-                            Unshare Note
-                          </div>
-                        ),
+                        key: "delete",
+                        label: "🗑️ Delete",
+                        danger: true,
                       },
-                      { key: "delete", label: "🗑️ Delete", danger: true },
+
+                      // { key: "view", label: "👁️ View" },
+                      // { key: "edit", label: "✏️ Edit" },
+                      // { key: "share", label: "🔗 Share" },
+                      // {
+                      //   key: "unshare",
+                      //   label: (
+                      //     <div className="flex items-center gap-1">
+                      //       <Unlink className="text-green-500" size={14} />
+                      //       Unshare Note
+                      //     </div>
+                      //   ),
+                      // },
+                      // { key: "delete", label: "🗑️ Delete", danger: true },
                     ]}
                     onClick={(key) => {
                       if (key === "view") openDrawer(note, "view");

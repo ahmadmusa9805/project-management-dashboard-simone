@@ -160,6 +160,9 @@ import { showDeleteAlert } from "../../../utils/deleteAlert";
 
 import { buildFormData } from "../../../utils/buildFormData";
 import { Unlink } from "lucide-react";
+import { USER_ROLE } from "../../../types/userAllTypes/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../Redux/app/store";
 
 // Define the full user interface for unsharing
 interface FullSharedUser {
@@ -172,6 +175,7 @@ interface FullSharedUser {
 
 const SnaggingListPage: React.FC = () => {
   const { projectId } = useParams();
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
 
   // RTK Query hooks
   const {
@@ -401,20 +405,30 @@ const SnaggingListPage: React.FC = () => {
                   extra={
                     <CustomViewMoreButton
                       items={[
-                        { key: "edit", label: "✏️ Edit Snagging" },
-                        { key: "share", label: "🔗 Share Snagging" },
-                        {
-                          key: "unshare",
-                          label: (
-                            <div className="flex items-center gap-1">
-                              <Unlink className="text-green-500" size={14} />
-                              Unshare Snagging
-                            </div>
-                          ),
-                        },
+                        // { key: "view", label: "👀 View" },
+                        { key: "edit", label: "✏️ Edit " },
+
+                        // ✅ Only show share/unshare if user is NOT basicAdmin
+                        ...(userRole !== USER_ROLE.basicAdmin
+                          ? [
+                              { key: "share", label: "🔗 Share " },
+                              {
+                                key: "unshare",
+                                label: (
+                                  <div className="flex items-center gap-1">
+                                    <Unlink
+                                      className="text-green-500"
+                                      size={14}
+                                    />
+                                    Unshare
+                                  </div>
+                                ),
+                              },
+                            ]
+                          : []),
                         {
                           key: "delete",
-                          label: "🗑️ Delete Snagging",
+                          label: "🗑️ Delete",
                           danger: true,
                         },
                       ]}

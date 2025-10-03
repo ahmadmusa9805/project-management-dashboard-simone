@@ -35,6 +35,9 @@ import { showDeleteAlert } from "../../utils/deleteAlert";
 
 import CertificateDocumentSceoundFixViewer from "../../components/CertificateDocumentSceoundFixViewer";
 import ImageUploader from "../../components/ImageUploader";
+import { USER_ROLE } from "../../types/userAllTypes/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../Redux/app/store";
 
 interface SubfolderFilesPageProps {
   baseRoute?: "documents" | "second-fixed-list-material" | "handover-tool";
@@ -58,6 +61,7 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
   const navigate = useNavigate();
   const { projectId, subFolderId } = useParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
 
   const folder =
     (location.state as { name: string; id?: string; from?: string } | null) ||
@@ -425,23 +429,31 @@ const SubfolderFilesPage: React.FC<SubfolderFilesPageProps> = () => {
                 extra={
                   <CustomViewMoreButton
                     items={[
-                      { key: "view", label: "👁️ View File" },
+                      { key: "view", label: "👁️ View " },
                       ...(baseRoute === "second-fixed-list-material"
-                        ? [{ key: "edit", label: "✏️ Edit File" }]
+                        ? [{ key: "edit", label: "✏️ Edit " }]
                         : []),
-                      { key: "share", label: "🔗 Share File" },
-                      {
-                        key: "unshare",
-                        label: (
-                          <div className="flex items-center gap-1">
-                            <Unlink className="text-green-500" size={14} />
-                            Unshare File
-                          </div>
-                        ),
-                      },
+                      // ✅ Only show share/unshare if user is NOT basicAdmin
+                      ...(userRole !== USER_ROLE.basicAdmin
+                        ? [
+                            { key: "share", label: "🔗 Share " },
+                            {
+                              key: "unshare",
+                              label: (
+                                <div className="flex items-center gap-1">
+                                  <Unlink
+                                    className="text-green-500"
+                                    size={14}
+                                  />
+                                  Unshare
+                                </div>
+                              ),
+                            },
+                          ]
+                        : []),
                       {
                         key: "delete",
-                        label: "🗑️ Delete File",
+                        label: "🗑️ Delete",
                         danger: true,
                       },
                     ]}
