@@ -466,11 +466,7 @@ const InterimEvaluationPage: React.FC = () => {
                 }
               >
                 <div className="flex items-center justify-between w-full">
-                  <Statistic
-                    value={doc.value}
-                    prefix="$"
-                    className="text-lg font-medium text-gray-900"
-                  />
+                  <Statistic value={doc.value} prefix="£" />
                   <p
                     className={`font-semibold flex items-center ${
                       doc.status === "pending"
@@ -543,7 +539,7 @@ const InterimEvaluationPage: React.FC = () => {
       >
         <CustomShareSelector
           title="Share this interim"
-          roles={["prime-admin", "basic-admin", "client"]}
+          roles={["primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>

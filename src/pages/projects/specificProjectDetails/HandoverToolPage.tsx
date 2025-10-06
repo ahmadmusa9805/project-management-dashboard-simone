@@ -579,7 +579,7 @@ const HandoverToolPage: React.FC = () => {
         width={500}
       >
         <CustomShareSelector
-          roles={["prime-admin", "basic-admin", "client"]}
+          roles={["superAdmin", "primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>

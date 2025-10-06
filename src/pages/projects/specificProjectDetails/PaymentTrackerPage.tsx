@@ -286,12 +286,8 @@ const PaymentTrackerPage = () => {
                   }
                 >
                   <div className="flex items-center justify-between w-full">
-                    <Statistic
-                      value={item.value}
-                      prefix="$"
-                      className="text-lg font-medium text-gray-900"
-                    />
-                    {isSpecial && (
+                    <Statistic value={item.value} prefix="£" />
+                    {/* {isSpecial && (
                       <p
                         className={`font-semibold flex items-center ${
                           item.title === "Total Profit"
@@ -303,7 +299,7 @@ const PaymentTrackerPage = () => {
                           ? "💰 Profit"
                           : "⚠️ Outstanding"}
                       </p>
-                    )}
+                    )} */}
                   </div>
                 </Card>
               </Col>

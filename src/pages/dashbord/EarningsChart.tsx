@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useMemo } from "react";
+import React from "react";
 import {
   LineChart,
   Line,
@@ -8,121 +7,158 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch } from "recharts/types/state/store";
+import { Spin } from "antd";
+import { useGetAnalyticsProfitByPeriodQuery } from "../../Redux/features/analytics/analyticsApi";
 
-import {
-  fetchProjects,
-  selectProject,
-} from "../../Redux/features/projects/dashbordSlice";
-import { dummyEarnings } from "../../data/mockEarningsData";
-import type { RootState } from "../../Redux/app/store";
+// Define chart data types
+interface ChartDataPoint {
+  period: string;
+  "3 Months"?: number;
+  "6 Months"?: number;
+  "12 Months": number;
+}
 
 const EarningsChart: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { projects, selectedProject } = useSelector(
-    (state: RootState) => state.earnings
-  );
+  // Fetch data for different periods
+  const { data: threeMonthData, isLoading: loading3M } =
+    useGetAnalyticsProfitByPeriodQuery(3);
+  const { data: sixMonthData, isLoading: loading6M } =
+    useGetAnalyticsProfitByPeriodQuery(6);
+  const { data: yearData, isLoading: loading12M } =
+    useGetAnalyticsProfitByPeriodQuery(12);
 
-  useEffect(() => {
-    dispatch(fetchProjects());
-  }, [dispatch]);
+  // Format data for chart
+  const chartData = React.useMemo<ChartDataPoint[]>(() => {
+    if (!threeMonthData?.data || !sixMonthData?.data || !yearData?.data) {
+      return [];
+    }
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    dispatch(selectProject(event.target.value));
-  };
-
-  // 🧠 Combine total earnings from all projects by month
-  const chartData = useMemo(() => {
-    const months = dummyEarnings[Object.keys(dummyEarnings)[0]].map(
-      (d) => d.month
+    const threeMonthValue = Math.abs(
+      parseFloat(threeMonthData.data.totalProfit)
     );
+    const sixMonthValue = Math.abs(parseFloat(sixMonthData.data.totalProfit));
+    const yearValue = Math.abs(parseFloat(yearData.data.totalProfit));
+
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
     return months.map((month, index) => {
-      let total = 0;
-      let selected = 0;
-
-      for (const projectId in dummyEarnings) {
-        const earningEntry = dummyEarnings[projectId][index];
-        total += earningEntry?.earning || 0;
-
-        if (projectId === selectedProject) {
-          selected = earningEntry?.earning || 0;
-        }
-      }
-
+      const monthNumber = index + 1;
       return {
-        month,
-        totalEarning: total,
-        selectedEarning: selectedProject ? selected : null,
+        period: month,
+        "3 Months":
+          monthNumber <= 3 ? (threeMonthValue / 3) * monthNumber : undefined,
+        "6 Months":
+          monthNumber <= 6 ? (sixMonthValue / 6) * monthNumber : undefined,
+        "12 Months": (yearValue / 12) * monthNumber,
       };
     });
-  }, [selectedProject]);
+  }, [threeMonthData, sixMonthData, yearData]);
 
-  const totalEarnings = chartData.reduce(
-    (acc, curr) => acc + (curr.selectedEarning || 0),
-    0
-  );
+  // Calculate total earnings
+  const totalEarnings = React.useMemo(() => {
+    if (!yearData?.data?.totalProfit) return 0;
+    return Math.abs(parseFloat(yearData.data.totalProfit));
+  }, [yearData]);
+
+  if (loading3M || loading6M || loading12M) {
+    return (
+      <div className="flex justify-center items-center h-[400px]">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f1f1f1] rounded shadow p-6 relative">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-medium text-gray-700">
-          Earnings Comparison (Last 6 Months)
+          Earnings Comparison (3M vs 6M vs 12M)
         </h3>
-        <div className="flex items-center gap-2 border border-gray-400 px-4 py-2 rounded">
-          <select
-            onChange={handleChange}
-            value={selectedProject}
-            className="outline-none bg-transparent text-gray-800 font-medium"
-          >
-            {projects.map((proj: any) => (
-              <option key={proj.id} value={proj.id}>
-                {proj.name}
-              </option>
-            ))}
-          </select>
-          <div className="w-3 h-2 bg-[#0d542b]" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white p-4 rounded shadow">
+          <p className="text-sm text-gray-600">3 Month Earnings</p>
+          <h4 className="text-xl font-bold text-gray-900">
+            £
+            {Math.abs(
+              parseFloat(threeMonthData?.data?.totalProfit || "0")
+            ).toLocaleString()}
+          </h4>
+        </div>
+        <div className="bg-white p-4 rounded shadow">
+          <p className="text-sm text-gray-600">6 Month Earnings</p>
+          <h4 className="text-xl font-bold text-gray-900">
+            £
+            {Math.abs(
+              parseFloat(sixMonthData?.data?.totalProfit || "0")
+            ).toLocaleString()}
+          </h4>
+        </div>
+        <div className="bg-white p-4 rounded shadow">
+          <p className="text-sm text-gray-600">12 Month Earnings</p>
+          <h4 className="text-xl font-bold text-gray-900">
+            £{totalEarnings.toLocaleString()}
+          </h4>
         </div>
       </div>
 
-      <h2 className="text-4xl font-bold text-gray-900 mb-4">
-        ${totalEarnings.toLocaleString()}
-      </h2>
-
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={400}>
         <LineChart
           data={chartData}
-          margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
+          <XAxis dataKey="period" padding={{ left: 30, right: 30 }} />
           <YAxis
-            domain={[0, 10000]}
-            tickFormatter={(val) => `$${val / 1000}k`}
+            domain={[0, "auto"]}
+            tickFormatter={(val) => `${(val / 1000000).toFixed(1)}M`}
           />
-          <Tooltip formatter={(val: number) => `$${val}`} />
+          <Tooltip
+            formatter={(val: number) => [`£${val.toLocaleString()}`, ""]}
+            labelFormatter={(label) => `Period: ${label}`}
+          />
+          <Legend />
 
-          {/* Total Line (All projects) */}
           <Line
             type="monotone"
-            dataKey="totalEarning"
+            dataKey="12 Months"
             stroke="#8884d8"
             strokeWidth={2}
-            name="All Projects"
+            name="12 Months"
+            dot={false}
           />
-
-          {/* Selected Project Line */}
-          {selectedProject && (
-            <Line
-              type="monotone"
-              dataKey="selectedEarning"
-              stroke="#82ca9d"
-              strokeWidth={2}
-              name="Selected Project"
-            />
-          )}
+          <Line
+            type="monotone"
+            dataKey="6 Months"
+            stroke="#82ca9d"
+            strokeWidth={2}
+            name="6 Months"
+            dot={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="3 Months"
+            stroke="#ffc658"
+            strokeWidth={2}
+            name="3 Months"
+            dot={false}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

@@ -773,6 +773,7 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
             </div>
           ) : reportsData?.length ? (
             <SiteReportsList
+              refetchReports={refetchReports}
               reports={reportsData}
               project={projectData}
               currentUser={currentUserData}

@@ -11,10 +11,17 @@ export const analyticsApi = baseApi.injectEndpoints({
     getAllAnalyticsCombined: builder.query({
       query: () => "/analytics/get-all-analytics-combined",
     }),
+
+    // Get analytics profit by period (dynamic month)
+    getAnalyticsProfitByPeriod: builder.query({
+      query: (month: number) =>
+        `/analytics/get-analytics-profit-by-period?month=${month}`,
+    }),
   }),
 });
 
 export const {
   useGetSingleProjectAnalyticsQuery,
   useGetAllAnalyticsCombinedQuery,
+  useGetAnalyticsProfitByPeriodQuery,
 } = analyticsApi;

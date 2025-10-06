@@ -542,11 +542,7 @@ const QuoteDetailsPage = () => {
                     />
                   }
                 >
-                  <Statistic
-                    className="text-lg font-medium text-gray-900"
-                    value={quote.value}
-                    prefix="$"
-                  />
+                  <Statistic value={quote.value} prefix="£" />
                 </Card>
               </Col>
             ))}
@@ -566,7 +562,7 @@ const QuoteDetailsPage = () => {
       >
         <CustomShareSelector
           title="Share this quote"
-          roles={["prime-admin", "basic-admin", "client"]}
+          roles={["primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>

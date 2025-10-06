@@ -361,11 +361,7 @@ const CostManagementPage = () => {
                 }
               >
                 <div className="flex items-center justify-between w-full">
-                  <Statistic
-                    value={value}
-                    prefix="$"
-                    className="text-lg font-medium text-gray-900"
-                  />
+                  <Statistic value={value} prefix="£" />
                   {/* <p className="font-semibold flex items-center text-green-700">
                     ✅ Recorded
                   </p> */}
@@ -392,14 +388,10 @@ const CostManagementPage = () => {
               }
             >
               <div className="flex items-center justify-between w-full">
-                <Statistic
-                  value={totalProject}
-                  prefix="$"
-                  className="text-lg font-medium text-gray-900"
-                />
-                <p className="font-semibold flex items-center text-blue-700">
+                <Statistic value={totalProject} prefix="£" className="" />
+                {/* <p className="font-semibold flex items-center text-blue-700">
                   📊 Summary
-                </p>
+                </p> */}
               </div>
             </Card>
           </Col>

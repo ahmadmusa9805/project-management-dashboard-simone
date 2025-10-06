@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Card, Col, Drawer, Modal, Row, Spin, message } from "antd";
 
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
@@ -27,9 +27,10 @@ import { Unlink } from "lucide-react";
 import { USER_ROLE } from "../../../types/userAllTypes/user";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../Redux/app/store";
+import ViewSnaggingAndTimeSchedule from "../../../components/ViewSnaggingAndTimeSchedule";
 
 const TimeSchedulePage: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { projectId } = useParams();
   const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const { data: schedulesData, isLoading: schedulesLoading } =
@@ -62,6 +63,8 @@ const TimeSchedulePage: React.FC = () => {
 
   // Unshare modal state
   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
+  const [viewData, setViewData] = useState<any>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
 
   useEffect(() => {
     // Refetch data if needed
@@ -76,14 +79,17 @@ const TimeSchedulePage: React.FC = () => {
   const handleMenuClick = (key: string, schedule: any) => {
     switch (key) {
       case "view":
-        if (schedule.documents) {
-          navigate(`/projects/${projectId}/schedule-documents`, {
-            state: {
-              scheduleTitle: schedule.title,
-              documents: schedule.documents,
-            },
-          });
-        }
+        // if (schedule.documents) {
+        //   navigate(`/projects/${projectId}/schedule-documents`, {
+        //     state: {
+        //       scheduleTitle: schedule.title,
+        //       documents: schedule.documents,
+        //     },
+        //   });
+        // }
+        setViewData(schedule);
+        setIsViewOpen(true);
+        break;
         break;
       case "edit":
         setFormMode("edit");
@@ -242,6 +248,9 @@ const TimeSchedulePage: React.FC = () => {
           schedules.map((item: any) => (
             <Col span={6} key={item._id}>
               <Card
+                onClick={() => {
+                  handleMenuClick("view", item);
+                }}
                 style={{ backgroundColor: "#f1f1f1" }}
                 hoverable
                 bodyStyle={{
@@ -260,7 +269,7 @@ const TimeSchedulePage: React.FC = () => {
                 extra={
                   <CustomViewMoreButton
                     items={[
-                      // { key: "view", label: "👀 View" },
+                      { key: "view", label: "👀 View" },
                       { key: "edit", label: "✏️ Edit " },
 
                       // ✅ Only show share/unshare if user is NOT basicAdmin
@@ -348,7 +357,7 @@ const TimeSchedulePage: React.FC = () => {
       >
         <CustomShareSelector
           title="Share this schedule"
-          roles={["prime-admin", "basic-admin", "client"]}
+          roles={["superAdmin", "primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>
@@ -377,6 +386,20 @@ const TimeSchedulePage: React.FC = () => {
           onUnshare={handleConfirmUnshare}
         />
       </Modal>
+
+      <Drawer
+        title=""
+        placement="right"
+        width={600}
+        onClose={() => setIsViewOpen(false)}
+        open={isViewOpen}
+      >
+        <ViewSnaggingAndTimeSchedule
+          data={viewData}
+          type="timeSchedule"
+          onClose={() => setIsViewOpen(false)}
+        />
+      </Drawer>
     </div>
   );
 };

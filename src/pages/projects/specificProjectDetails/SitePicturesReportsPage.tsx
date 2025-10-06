@@ -418,7 +418,7 @@ const SitePicturesReportsPage = () => {
       >
         <CustomShareSelector
           title="Share this folder"
-          roles={["super-admin", "prime-admin", "basic-admin", "client"]}
+          roles={["superAdmin", "primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>

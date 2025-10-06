@@ -163,6 +163,7 @@ import { Unlink } from "lucide-react";
 import { USER_ROLE } from "../../../types/userAllTypes/user";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../Redux/app/store";
+import ViewSnaggingAndTimeSchedule from "../../../components/ViewSnaggingAndTimeSchedule";
 
 // Define the full user interface for unsharing
 interface FullSharedUser {
@@ -208,6 +209,9 @@ const SnaggingListPage: React.FC = () => {
 
   // Unshare modal state
   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
+
+  const [viewData, setViewData] = useState<any>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
 
   // Extract snagging list from API response
   const snaggingList = snaggingsData?.data || [];
@@ -307,6 +311,10 @@ const SnaggingListPage: React.FC = () => {
   // Handle actions from menu
   const handleMenuClick = (key: string, snag: any) => {
     switch (key) {
+      case "view":
+        setViewData(snag);
+        setIsViewOpen(true);
+        break;
       case "edit":
         handleEditClick(snag);
         break;
@@ -317,9 +325,7 @@ const SnaggingListPage: React.FC = () => {
           onConfirm: () => handleDeleteSnagging(snag._id),
         });
         break;
-      case "view":
-        alert(`View details of ${snag.title} (implement as needed)`);
-        break;
+
       case "share":
         handleShareSnagging(snag);
         break;
@@ -387,6 +393,7 @@ const SnaggingListPage: React.FC = () => {
             snaggingList.map((snag: any) => (
               <Col span={6} key={snag._id}>
                 <Card
+                  onClick={() => handleMenuClick("view", snag)}
                   style={{ backgroundColor: "#f1f1f1" }}
                   hoverable
                   bodyStyle={{
@@ -405,7 +412,7 @@ const SnaggingListPage: React.FC = () => {
                   extra={
                     <CustomViewMoreButton
                       items={[
-                        // { key: "view", label: "👀 View" },
+                        { key: "view", label: "👀 View" },
                         { key: "edit", label: "✏️ Edit " },
 
                         // ✅ Only show share/unshare if user is NOT basicAdmin
@@ -489,7 +496,7 @@ const SnaggingListPage: React.FC = () => {
       >
         <CustomShareSelector
           title="Share this snagging"
-          roles={["prime-admin", "basic-admin", "client"]}
+          roles={["superAdmin", "primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>
@@ -517,6 +524,19 @@ const SnaggingListPage: React.FC = () => {
           onUnshare={handleConfirmUnshare}
         />
       </Modal>
+      <Drawer
+        title=""
+        placement="right"
+        width={600}
+        onClose={() => setIsViewOpen(false)}
+        open={isViewOpen}
+      >
+        <ViewSnaggingAndTimeSchedule
+          data={viewData}
+          type="snagging"
+          onClose={() => setIsViewOpen(false)}
+        />
+      </Drawer>
     </div>
   );
 };

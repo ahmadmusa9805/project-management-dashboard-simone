@@ -8,7 +8,7 @@ import ExpenseTable from "../../../components/ExpenseTable";
 import { useGetAllLabourExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/labourExpensesApi";
 import { useGetAllMaterialExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/materialExpensesApi";
 import { useGetAllSubContractorsQuery } from "../../../Redux/features/projects/project/costManagenent/subContractorExpensesApi";
-import CustomSearchInput from "../../../components/CustomSearchInput";
+// import CustomSearchInput from "../../../components/CustomSearchInput";
 import { ChevronLeft } from "lucide-react";
 
 const ExpenseDocumentsPage = () => {
@@ -78,9 +78,9 @@ const ExpenseDocumentsPage = () => {
           <h1 className="text-2xl font-bold leading-tight ">{quoteTitle}</h1>
         </div>
         {/* <h1 className="text-2xl font-bold">{quoteTitle}</h1> */}
-        <div>
+        {/* <div>
           <CustomSearchInput onSearch={() => {}} />
-        </div>
+        </div> */}
         {/* <button
           className="bg-blue-600 text-white px-4 py-2 rounded"
           onClick={() => navigate(-1)}

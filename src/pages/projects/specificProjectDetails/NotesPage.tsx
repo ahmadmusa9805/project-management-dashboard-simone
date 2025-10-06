@@ -342,14 +342,7 @@ import {
   useUnShareNoteMutation,
   useGetSingleNoteQuery,
 } from "../../../Redux/features/projects/project/notes/noteApi";
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Unlink,
-  XCircle,
-} from "lucide-react";
+import { Calendar, CheckCircle, Clock, Unlink, XCircle } from "lucide-react";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import NoteForm from "../../../components/NoteForm";
 import CustomCreateButton from "../../../components/CustomCreateButton";
@@ -595,7 +588,7 @@ const NotesPage = () => {
                 <div className="flex justify-between items-center">
                   <div className="mb-4">
                     <div className="flex items-center gap-2 text-black font-medium">
-                      <DollarSign size={16} /> {note.value}
+                      £ {note.value}
                     </div>
                     <div className="flex items-center gap-2 text-gray-600 text-sm">
                       <Calendar size={16} />
