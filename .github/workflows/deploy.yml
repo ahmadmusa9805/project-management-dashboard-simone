@@ -69,6 +69,6 @@ jobs:
       run: |
         ssh -i /tmp/project.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
         cd /var/www/project-management-dashboard
-        # docker compose down || true
-        docker compose up -d --build
+        docker-compose down || true
+        docker-compose up -d --build
         EOF
