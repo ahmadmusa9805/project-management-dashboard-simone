@@ -338,6 +338,9 @@ import type { projectSchema } from "../../types/projectAllTypes/projectSchema";
 import type z from "zod";
 import ProjectDetailsModal from "./SingleProjectDetails";
 import CustomPagination from "../../components/CustomPagination";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../Redux/app/store";
+import { USER_ROLE } from "../../types/userAllTypes/user";
 
 type ProjectForm = z.infer<typeof projectSchema>;
 
@@ -366,6 +369,7 @@ const Projects = () => {
   const queryParams = new URLSearchParams(location.search);
   const statusFilter = queryParams.get("status") ?? "pending";
   const status = queryParams.get("status");
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
 
   // const {
   //   data: projects = [],
@@ -493,21 +497,35 @@ const Projects = () => {
     <>
       <div className="w-full px-4 flex flex-col gap-4 bg-white min-h-screen pt-10">
         {status === "pending" ? (
-          <h2 className="text-xl font-semibold px-4">Pending Projects</h2>
+          <div className="w-full flex justify-between ">
+            <h2 className="text-xl font-semibold px-4">Pending Projects</h2>
+            {/* {statusFilter === "pending" && */}
+            {(userRole === USER_ROLE.superAdmin ||
+              userRole === USER_ROLE.primeAdmin) && (
+              <div className=" ">
+                <CustomCreateButton
+                  title="Create Project"
+                  onClick={() => setIsCreateOpen(true)}
+                />
+              </div>
+            )}
+          </div>
         ) : status === "ongoing" ? (
           <h2 className="text-xl font-semibold px-4">Ongoing Projects</h2>
         ) : status === "completed" ? (
           <h2 className="text-xl font-semibold px-4">Completed Projects</h2>
         ) : null}
 
-        {statusFilter === "pending" && (
-          <div className="w-full flex justify-end ">
-            <CustomCreateButton
-              title="Create Project"
-              onClick={() => setIsCreateOpen(true)}
-            />
-          </div>
-        )}
+        {/* {statusFilter === "pending" &&
+          (userRole === USER_ROLE.superAdmin ||
+            userRole === USER_ROLE.primeAdmin) && (
+            <div className="w-full flex justify-end ">
+              <CustomCreateButton
+                title="Create Project"
+                onClick={() => setIsCreateOpen(true)}
+              />
+            </div>
+          )} */}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -517,8 +535,16 @@ const Projects = () => {
           projects?.data?.map((project) => (
             <div
               key={project._id}
-              className="hover:bg-[#e6f4ea] bg-[#f1f1f1] cursor-pointer"
-              onClick={() => navigate(`/projects/${project._id}`)}
+              className={`hover:bg-[#e6f4ea] bg-[#f1f1f1] ${
+                project.status === "pending"
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              onClick={() => {
+                if (project.status !== "pending") {
+                  navigate(`/projects/${project._id}`);
+                }
+              }}
             >
               <div className="w-full px-4 py-2.5 flex items-center gap-2.5">
                 <div className="w-6 h-6">
@@ -535,22 +561,60 @@ const Projects = () => {
                 </div>
                 <CustomViewMoreButton
                   items={[
-                    { key: "view", label: "👁️View Project" },
-                    { key: "edit", label: "✏️ Edit Project" },
-                    { key: "share", label: "🔗 Share Project" },
-                    {
-                      key: "unshare",
-                      label: (
-                        <div className="flex items-center gap-1">
-                          <Unlink className="text-green-500" size={14} />
-                          Unshare Project
-                        </div>
-                      ),
-                    },
-                    { key: "delete", label: "🗑️ Delete Project" },
+                    { key: "view", label: "👁️ View Project" },
+
+                    // ✅ Show edit only if not basicAdmin
+                    ...(userRole !== USER_ROLE.basicAdmin
+                      ? [{ key: "edit", label: "✏️ Edit Project" }]
+                      : []),
+
+                    // ✅ Show share/unshare only if not pending & not basicAdmin
+                    ...(project.status !== "pending" &&
+                    userRole !== USER_ROLE.basicAdmin
+                      ? [
+                          { key: "share", label: "🔗 Share Project" },
+                          {
+                            key: "unshare",
+                            label: (
+                              <div className="flex items-center gap-1">
+                                <Unlink className="text-green-500" size={14} />
+                                Unshare Project
+                              </div>
+                            ),
+                          },
+                        ]
+                      : []),
+
+                    // ✅ Show delete only if not basicAdmin
+                    ...(userRole !== USER_ROLE.basicAdmin
+                      ? [{ key: "delete", label: "🗑️ Delete Project" }]
+                      : []),
                   ]}
                   onClick={(key) => handleMoreClick(key, project._id)}
                 />
+                {/* <CustomViewMoreButton
+                  items={[
+                    { key: "view", label: "👁️View Project" },
+                    { key: "edit", label: "✏️ Edit Project" },
+                    // ✅ Show share/unshare only if not pending
+                    ...(project.status !== "pending"
+                      ? [
+                          { key: "share", label: "🔗 Share Project" },
+                          {
+                            key: "unshare",
+                            label: (
+                              <div className="flex items-center gap-1">
+                                <Unlink className="text-green-500" size={14} />
+                                Unshare Project
+                              </div>
+                            ),
+                          },
+                        ]
+                      : []),
+                    { key: "delete", label: "🗑️ Delete Project" },
+                  ]}
+                  onClick={(key) => handleMoreClick(key, project._id)}
+                /> */}
               </div>
             </div>
           ))

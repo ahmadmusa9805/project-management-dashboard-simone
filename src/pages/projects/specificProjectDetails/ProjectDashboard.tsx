@@ -199,7 +199,7 @@ const ProjectDashboard = () => {
             <Card style={{ backgroundColor: "#f1f1f1" }}>
               <Statistic
                 title="Total Value"
-                prefix="$"
+                prefix="£"
                 value={mappedData.budget}
               />
             </Card>
@@ -220,7 +220,7 @@ const ProjectDashboard = () => {
               style={{ backgroundColor: "#f1f1f1" }}
               onClick={() => handleNavigate("payments-track")}
             >
-              <Statistic title="Profit" prefix="$" value={mappedData.profit} />
+              <Statistic title="Profit" prefix="£" value={mappedData.profit} />
             </Card>
           </Col>
           <Col span={6}>
@@ -231,7 +231,7 @@ const ProjectDashboard = () => {
             >
               <Statistic
                 title="Total Cost"
-                prefix="$"
+                prefix="£"
                 value={mappedData.totalCost}
               />
             </Card>
@@ -255,7 +255,7 @@ const ProjectDashboard = () => {
             >
               <Statistic
                 title="Material Cost"
-                prefix="$"
+                prefix="£"
                 value={mappedData.materialCost}
               />
             </Card>
@@ -268,7 +268,7 @@ const ProjectDashboard = () => {
             >
               <Statistic
                 title="Labour Cost"
-                prefix="$"
+                prefix="£"
                 value={mappedData.labourCost}
               />
             </Card>
@@ -281,7 +281,7 @@ const ProjectDashboard = () => {
             >
               <Statistic
                 title="Subcontractor Cost"
-                prefix="$"
+                prefix="£"
                 value={mappedData.subcontractorCost}
               />
             </Card>

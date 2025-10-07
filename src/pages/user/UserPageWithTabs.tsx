@@ -3,8 +3,9 @@
 import { Tabs } from "antd";
 import { useState } from "react";
 import AdminTable, { type DataItem } from "./UserManagement"; // This is your main table component
-import CustomSearchInput from "../../components/CustomSearchInput";
+
 import CustomCreateButton from "../../components/CustomCreateButton";
+import { CustomSearchInput } from "../../components/CustomSearchInput";
 
 const UserPageWithTabs = () => {
   const [searchTerm, setSearchTerm] = useState("");

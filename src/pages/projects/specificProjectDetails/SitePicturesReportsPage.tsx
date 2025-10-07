@@ -156,7 +156,7 @@
 // export default SitePicturesReportsPage;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Modal, Spin } from "antd";
+import { Card, Col, Modal, Row, Spin } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import CreateFolder from "../../../components/CreateFolder";
 import CustomCreateButton from "../../../components/CustomCreateButton";
@@ -290,14 +290,12 @@ const SitePicturesReportsPage = () => {
   const allFolders = [...(data?.data || []), reportFolder];
 
   return (
-    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+    <div className="w-full  gap-4 bg-white min-h-screen p-6">
       {/* Header */}
-      <div className="self-stretch flex justify-between items-center py-8">
-        <h1 className="text-gray-950 text-2xl font-medium">
-          Site Pictures & Reports
-        </h1>
+      <div className="self-stretch flex justify-between  py-10">
+        <h1 className="text-2xl font-semibold">Site Pictures & Reports</h1>
         <CustomCreateButton
-          title="Create New Category"
+          title="Create Folder"
           onClick={() => setIsModalOpen(true)}
         />
       </div>
@@ -314,80 +312,85 @@ const SitePicturesReportsPage = () => {
       ) : allFolders.length === 0 ? (
         <div className="text-red-500 mb-4">No folders found.</div>
       ) : (
-        <div className="self-stretch flex-1 flex flex-wrap gap-4">
+        <Row gutter={[16, 16]}>
           {allFolders.map((folder: any) => {
-            const isStatic = isStaticFolder(folder);
+            const isStatic = isStaticFolder(folder); // non-hoverable for static folders
 
             return (
-              <div
-                key={folder._id || folder.id}
-                className="w-80 h-28 px-3 py-8 hover:bg-[#e6f4ea] bg-[#f1f1f1] rounded flex justify-between items-center gap-4 cursor-pointer transition"
-              >
-                <div
-                  className="flex flex-col flex-1"
-                  onClick={() => handleFolderClick(folder._id || folder.id)}
-                >
-                  <div className="text-gray-950 text-lg w-[150px] font-medium truncate">
-                    {folder.title}
-                  </div>
-                  {/* {!isStatic && (
-                    <span className="text-xs text-gray-500">Custom Folder</span>
-                  )} */}
-                </div>
-
-                {!isStatic && (
-                  <CustomViewMoreButton
-                    items={[
-                      // { key: "view", label: "👁️ View Folder" },
-                      { key: "share", label: "🔗 Share Folder" },
-                      {
-                        key: "unshare",
-                        label: (
-                          <div className="flex items-center gap-1">
-                            <Unlink className="text-green-500" size={14} />
-                            Unshare Folder
-                          </div>
-                        ),
-                      },
-                      {
-                        key: "delete",
-                        label: "🗑️ Delete Folder",
-                        danger: true,
-                      },
-                    ]}
-                    onClick={(key) => {
-                      switch (key) {
-                        case "share":
-                          handleShareFolder(folder);
-                          break;
-                        case "unshare":
-                          handleUnshareFolder(folder);
-                          break;
-                        case "delete":
-                          showDeleteAlert({
-                            onConfirm: async () => {
-                              try {
-                                await deleteFolder(folder._id).unwrap();
-                                // successAlert("Folder deleted successfully!");
-                                refetch();
-                              } catch (err: any) {
-                                errorAlert(
-                                  "Delete Error",
-                                  err?.data?.message ||
-                                    "Failed to delete folder"
-                                );
-                              }
-                            },
-                          });
-                          break;
-                      }
-                    }}
-                  />
-                )}
-              </div>
+              <Col span={6} key={folder._id || folder.id}>
+                <Card
+                  style={{ backgroundColor: "#f1f1f1" }}
+                  hoverable // Only hoverable if not static
+                  bodyStyle={{
+                    backgroundColor: "#f1f1f1",
+                    padding: "12px 44px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    height: "60px",
+                  }}
+                  onClick={() => {
+                    handleFolderClick(folder._id || folder.id);
+                  }}
+                  title={
+                    <h3 className="text-lg font-medium text-gray-900 truncate">
+                      {folder.title}
+                    </h3>
+                  }
+                  extra={
+                    !isStatic && (
+                      <CustomViewMoreButton
+                        items={[
+                          { key: "share", label: "🔗 Share Folder" },
+                          {
+                            key: "unshare",
+                            label: (
+                              <div className="flex items-center gap-1">
+                                <Unlink className="text-green-500" size={14} />
+                                Unshare Folder
+                              </div>
+                            ),
+                          },
+                          {
+                            key: "delete",
+                            label: "🗑️ Delete Folder",
+                            danger: true,
+                          },
+                        ]}
+                        onClick={(key) => {
+                          switch (key) {
+                            case "share":
+                              handleShareFolder(folder);
+                              break;
+                            case "unshare":
+                              handleUnshareFolder(folder);
+                              break;
+                            case "delete":
+                              showDeleteAlert({
+                                onConfirm: async () => {
+                                  try {
+                                    await deleteFolder(folder._id).unwrap();
+                                    refetch();
+                                  } catch (err: any) {
+                                    errorAlert(
+                                      "Delete Error",
+                                      err?.data?.message ||
+                                        "Failed to delete folder"
+                                    );
+                                  }
+                                },
+                              });
+                              break;
+                          }
+                        }}
+                      />
+                    )
+                  }
+                ></Card>
+              </Col>
             );
           })}
-        </div>
+        </Row>
       )}
 
       {/* Modal for creating folder */}
@@ -415,7 +418,7 @@ const SitePicturesReportsPage = () => {
       >
         <CustomShareSelector
           title="Share this folder"
-          roles={["super-admin", "prime-admin", "basic-admin", "client"]}
+          roles={["superAdmin", "primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>

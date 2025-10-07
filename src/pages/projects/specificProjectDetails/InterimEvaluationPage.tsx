@@ -212,10 +212,10 @@
 import type React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Modal, Spin } from "antd";
+import { Card, Col, Modal, Row, Spin, Statistic } from "antd";
 
 import CustomCreateButton from "../../../components/CustomCreateButton";
-import CustomSearchInput from "../../../components/CustomSearchInput";
+// import CustomSearchInput from "../../../components/CustomSearchInput";
 import ResuableDocumentForm from "../../../components/ResuableDocumentForm";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import CustomShareSelector from "../../../components/CustomShareSelector";
@@ -403,14 +403,15 @@ const InterimEvaluationPage: React.FC = () => {
 
   return (
     <div className="w-full bg-white h-full p-6 min-h-screen">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Manage Interim</h1>
-        <CustomSearchInput onSearch={() => {}} />
+      <div className="flex justify-between  py-10">
+        <h1 className="text-2xl font-semibold">Interims</h1>
+        <CustomCreateButton title="Create Interim" onClick={handleCreate} />
+        {/* <CustomSearchInput onSearch={() => {}} /> */}
       </div>
 
-      <div className="flex justify-end mr-4 mb-6">
+      {/* <div className="flex justify-end mr-4 mb-6">
         <CustomCreateButton title="Create New Interim" onClick={handleCreate} />
-      </div>
+      </div> */}
 
       {/* Loading spinner */}
       {isLoading ? (
@@ -418,59 +419,68 @@ const InterimEvaluationPage: React.FC = () => {
           <Spin size="large" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Row gutter={[16, 16]}>
           {documents.map((doc) => (
-            <div
-              key={doc._id}
-              className="relative p-6 hover:bg-[#e6f4ea] bg-[#f1f1f1] w-[300px] rounded shadow flex flex-col h-full cursor-pointer"
-              onClick={() => handleViewMoreAction("view Interim", doc)}
-            >
-              <div
-                className="absolute top-2 right-2 opacity-100 z-10"
-                onClick={(e) => e.stopPropagation()}
+            <Col span={6} key={doc._id}>
+              <Card
+                style={{ backgroundColor: "#f1f1f1" }}
+                hoverable
+                bodyStyle={{
+                  backgroundColor: "#f1f1f1",
+                  padding: "12px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+                onClick={() => handleViewMoreAction("view Interim", doc)}
+                title={
+                  <h3 className="text-lg font-medium text-gray-900 truncate">
+                    {doc.title}
+                  </h3>
+                }
+                extra={
+                  <CustomViewMoreButton
+                    items={[
+                      { key: "view Interim", label: "👁️ View Interim" },
+                      { key: "edit", label: "✏️ Edit Interim" },
+                      { key: "share", label: "🔗 Share Interim" },
+                      {
+                        key: "unshare",
+                        label: (
+                          <div className="flex items-center gap-1">
+                            <Unlink className="text-green-500" size={14} />
+                            Unshare Interim
+                          </div>
+                        ),
+                      },
+                      {
+                        key: "delete",
+                        label: "🗑️ Delete Interim",
+                        danger: true,
+                      },
+                    ]}
+                    onClick={(key) => {
+                      handleViewMoreAction(key, doc);
+                    }}
+                  />
+                }
               >
-                <CustomViewMoreButton
-                  items={[
-                    { key: "view Interim", label: "👁️ View Interim" },
-                    { key: "edit", label: "✏️ Edit Interim" },
-                    { key: "share", label: "🔗 Share Interim" },
-                    {
-                      key: "unshare",
-                      label: (
-                        <div className="flex items-center gap-1">
-                          <Unlink className="text-green-500" size={14} />
-                          Unshare Interim
-                        </div>
-                      ),
-                    },
-                    { key: "delete", label: "🗑️ Delete Interim", danger: true },
-                  ]}
-                  onClick={(key) => handleViewMoreAction(key, doc)}
-                />
-              </div>
-
-              <h3 className="mt-2">
-                {/* <span className="text-3xl">📁</span> */}
-                <span className="font-semibold ml-1 text-xl text-gray-900 w-[150px] truncate">
-                  {doc.title}
-                </span>
-              </h3>
-
-              <div className="mt-3 flex items-center justify-between">
-                <p className="text-sm font-semibold">Value: $ {doc.value}</p>
-                <p
-                  className={`text-sm font-semibold ${
-                    doc.status === "pending"
-                      ? "text-yellow-700"
-                      : "text-green-700"
-                  }`}
-                >
-                  {doc.status === "pending" ? "⏳ Pending" : "✅ Paid"}
-                </p>
-              </div>
-            </div>
+                <div className="flex items-center justify-between w-full">
+                  <Statistic value={doc.value} prefix="£" />
+                  <p
+                    className={`font-semibold flex items-center ${
+                      doc.status === "pending"
+                        ? "text-yellow-700"
+                        : "text-green-700"
+                    }`}
+                  >
+                    {doc.status === "pending" ? "⏳ Pending" : "✅ Paid"}
+                  </p>
+                </div>
+              </Card>
+            </Col>
           ))}
-        </div>
+        </Row>
       )}
 
       {/* Drawer Form */}
@@ -529,7 +539,7 @@ const InterimEvaluationPage: React.FC = () => {
       >
         <CustomShareSelector
           title="Share this interim"
-          roles={["prime-admin", "basic-admin", "client"]}
+          roles={["primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>

@@ -163,22 +163,26 @@ const ExpenseTable = ({
       formData.append("data", JSON.stringify(dataToSend));
 
       if (mode === "edit") {
-        if (title === "Labour")
+        console.log(dataToSend);
+        if (title === "Labour") {
           await updateLabourExpense({ id: data._id!, data: formData }).unwrap();
-        else if (title === "Material")
+        } else if (title === "Material") {
           await updateMaterialExpense({
             id: data._id!,
             data: formData,
           }).unwrap();
-        else if (title === "Subcontractor")
+        } else if (title === "Subcontractor") {
           console.log("editing subcontractor", data._id, formData);
-        await updateSubContractor({ id: data._id!, data: formData }).unwrap();
+          await updateSubContractor({ id: data._id!, data: formData }).unwrap();
+        }
       } else {
-        if (title === "Labour") await createLabourExpense(formData).unwrap();
-        else if (title === "Material")
+        if (title === "Labour") {
+          await createLabourExpense(formData).unwrap();
+        } else if (title === "Material") {
           await createMaterialExpense(formData).unwrap();
-        else if (title === "Subcontractor")
+        } else if (title === "Subcontractor") {
           await createSubContractor(formData).unwrap();
+        }
       }
 
       successAlert(
@@ -201,7 +205,7 @@ const ExpenseTable = ({
     <div className="max-w-7xl mx-auto p-4">
       <div className="flex justify-between items-center mb-4 gap-4 flex-wrap">
         <h2 className="text-xl font-semibold">{title} Expenses</h2>
-        <CustomCreateButton title={`Create ${title}`} onClick={handleCreate} />
+        <CustomCreateButton title={`Create expense`} onClick={handleCreate} />
       </div>
 
       {isLoading ? (
@@ -220,7 +224,12 @@ const ExpenseTable = ({
                 <th className="text-left px-4 py-2 text-gray-700">Quantity</th>
                 <th className="text-left px-4 py-2 text-gray-700">Cost</th>
                 <th className="text-left px-4 py-2 text-gray-700">Date</th>
-                <th className="text-left px-4 py-2 text-gray-700">Vat</th>
+                {title === "Labour" || title === "Subcontractor" ? (
+                  ""
+                ) : (
+                  <th className="text-left px-4 py-2 text-gray-700">Vat</th>
+                )}
+
                 <th className="text-left px-4 py-2 text-gray-700">Actions</th>
               </tr>
             </thead>
@@ -240,9 +249,13 @@ const ExpenseTable = ({
                     <td className="px-4 py-2">{item.name}</td>
                     <td className="px-4 py-2">{item.type}</td>
                     <td className="px-4 py-2">{item.quantity}</td>
-                    <td className="px-4 py-2">${item.amount}</td>
+                    <td className="px-4 py-2">£ {item.amount}</td>
                     <td className="px-4 py-2">{item.date}</td>
-                    <td className="px-4 py-2">{item.vat}</td>
+                    {title === "Labour" || title === "Subcontractor" ? (
+                      ""
+                    ) : (
+                      <td className="px-4 py-2">{item.vat}</td>
+                    )}
                     <td className="px-4 py-2">
                       <CustomViewMoreButton
                         items={[

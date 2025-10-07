@@ -21,7 +21,7 @@ const ProjectDefaultRedirect: React.FC = () => {
     ) {
       navigate(`/projects/${projectId}/dashboard`, { replace: true });
     } else if (role === USER_ROLE.basicAdmin) {
-      navigate(`/projects/${projectId}/site-pictures-reports`, {
+      navigate(`/projects/${projectId}/live-project-costs`, {
         replace: true,
       });
     } else if (role === USER_ROLE.client) {

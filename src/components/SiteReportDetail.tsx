@@ -10,6 +10,7 @@ import {
   useGetSingleSiteReportQuery,
   useUpdateSiteReportMutation,
 } from "../Redux/features/projects/project/siteReportPictures/reportApi";
+import { successAlert } from "../utils/alerts";
 
 const { TextArea } = Input;
 
@@ -18,9 +19,11 @@ interface SiteReportDetailProps {
   mode: "view" | "edit";
   onBack: () => void;
   onModeChange: (mode: "view" | "edit") => void;
+  refetchReports: () => void;
 }
 
 const SiteReportDetail: React.FC<SiteReportDetailProps> = ({
+  refetchReports,
   reportId,
   mode,
   onBack,
@@ -84,7 +87,8 @@ const SiteReportDetail: React.FC<SiteReportDetailProps> = ({
         formDataToSend.append("LaborTeam", file);
       });
       await updateReport({ id: reportId, data: formDataToSend }).unwrap();
-      message.success("Report updated successfully");
+      refetchReports();
+      successAlert("Report updated successfully");
       onModeChange("view");
     } catch (error) {
       message.error("Failed to update report");
@@ -216,29 +220,42 @@ const SiteReportDetail: React.FC<SiteReportDetailProps> = ({
       {/* Overview Section */}
       <div className="p-4 bg-gray-100 rounded flex flex-col gap-4">
         <div className="text-gray-700 text-sm font-medium">Overview</div>
-        {mode === "view" ? (
-          <>
-            {renderImages(report.overviewFile, "Overview")}
-            <div className="text-black text-base leading-6">
-              {report.overviewText}
-            </div>
-          </>
-        ) : (
-          <>
-            {renderUploadSection("overviewFile", "Upload Overview Images")}
-            <TextArea
-              value={formData.overviewText}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  overviewText: e.target.value,
-                }))
-              }
-              rows={4}
-              placeholder="Enter overview text..."
-            />
-          </>
-        )}
+        {/* Overview Section */}
+        <div className="p-4 bg-gray-100 rounded flex flex-col gap-4">
+          <div className="text-gray-700 text-sm font-medium">Overview</div>
+
+          {mode === "view" ? (
+            <>
+              {renderImages(report.overviewFile, "Overview")}
+              <div className="text-black text-base leading-6 whitespace-pre-wrap">
+                {
+                  // Remove any HTML tags and show plain text
+                  report.overviewText
+                    ? report.overviewText.replace(/<\/?[^>]+(>|$)/g, "")
+                    : "No description available."
+                }
+              </div>
+            </>
+          ) : (
+            <>
+              {renderUploadSection("overviewFile", "Upload Overview Images")}
+              <TextArea
+                value={
+                  // Clean text if it comes with tags
+                  formData.overviewText.replace(/<\/?[^>]+(>|$)/g, "")
+                }
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    overviewText: e.target.value,
+                  }))
+                }
+                rows={4}
+                placeholder="Enter overview text..."
+              />
+            </>
+          )}
+        </div>
       </div>
 
       {/* Weather Condition Section */}

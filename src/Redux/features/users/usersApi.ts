@@ -65,7 +65,7 @@ export const usersApi = baseApi.injectEndpoints({
         status?: string;
         page?: number;
         limit?: number;
-        search?: string;
+        searchTerm?: string;
         role?: string;
       } | void
     >({
@@ -73,12 +73,12 @@ export const usersApi = baseApi.injectEndpoints({
         status = "",
         page = 1,
         limit = 10,
-        search = "",
+        searchTerm = "",
         role = "",
       } = {}) => {
         let qs = `?page=${page}&limit=${limit}`;
         if (status) qs += `&status=${encodeURIComponent(status)}`;
-        if (search) qs += `&search=${encodeURIComponent(search)}`;
+        if (searchTerm) qs += `&searchTerm=${encodeURIComponent(searchTerm)}`;
         if (role) qs += `&role=${encodeURIComponent(role)}`;
         return `/users${qs}`;
       },

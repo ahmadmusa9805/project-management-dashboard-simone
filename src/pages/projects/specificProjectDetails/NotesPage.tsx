@@ -332,7 +332,7 @@
 // export default NotesPage;
 
 import { useState } from "react";
-import { Drawer, Modal, Spin } from "antd";
+import { Card, Col, Drawer, Modal, Row, Spin } from "antd";
 import {
   useGetAllNotesQuery,
   useCreateNoteMutation,
@@ -342,14 +342,7 @@ import {
   useUnShareNoteMutation,
   useGetSingleNoteQuery,
 } from "../../../Redux/features/projects/project/notes/noteApi";
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Unlink,
-  XCircle,
-} from "lucide-react";
+import { Calendar, CheckCircle, Clock, Unlink, XCircle } from "lucide-react";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import NoteForm from "../../../components/NoteForm";
 import CustomCreateButton from "../../../components/CustomCreateButton";
@@ -359,9 +352,12 @@ import { useParams } from "react-router-dom";
 import { errorAlert, successAlert } from "../../../utils/alerts";
 import { showDeleteAlert } from "../../../utils/deleteAlert";
 import { USER_ROLE } from "../../../types/userAllTypes/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../Redux/app/store";
 
 const NotesPage = () => {
   const projectId = useParams().projectId;
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
 
   const {
     data: notesResponse,
@@ -390,6 +386,7 @@ const NotesPage = () => {
   });
 
   const notes = notesResponse || [];
+  console.log(notes);
 
   const openDrawer = (
     note: any = null,
@@ -493,13 +490,13 @@ const NotesPage = () => {
   };
 
   return (
-    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+    <div className="w-full  gap-4 bg-white min-h-screen p-6">
       {/* Header */}
-      <div className="w-full flex justify-between items-end gap-8 my-10">
-        <h1 className="text-2xl font-medium text-[#000E0F]">My notes</h1>
+      <div className="w-full flex justify-between  gap-8 py-10">
+        <h1 className="text-2xl font-medium text-[#000E0F]">Notes</h1>
         <CustomCreateButton
           onClick={() => openDrawer(null, "create")}
-          title="New Note"
+          title="Create Note"
         />
       </div>
 
@@ -509,76 +506,118 @@ const NotesPage = () => {
           <Spin size="large" />
         </div>
       ) : (
-        <div className="w-full grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Row gutter={[16, 16]}>
           {notes.map((note: any) => (
-            <div
-              key={note._id}
-              className="bg-gray-100 rounded shadow flex flex-col justify-between p-5 h-40 w-[320px] relative"
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex flex-col">
-                  <div className="text-lg font-semibold w-[200px] truncate">
+            <Col span={6} key={note._id}>
+              <Card
+                onClick={() => openDrawer(note, "view")}
+                hoverable
+                style={{
+                  backgroundColor: "#f1f1f1",
+                  // ✅ fixed height for consistency
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+                bodyStyle={{
+                  padding: "16px 12px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  height: 60,
+                }}
+                title={
+                  <h3 className="text-lg font-medium text-gray-900 truncate w-[200px]">
                     {stripHtml(note.title)}
-                  </div>
-                </div>
-                <CustomViewMoreButton
-                  items={[
-                    { key: "view", label: "👁️ View" },
-                    { key: "edit", label: "✏️ Edit" },
-                    { key: "share", label: "🔗 Share" },
-                    {
-                      key: "unshare",
-                      label: (
-                        <div className="flex items-center gap-1">
-                          <Unlink className="text-green-500" size={14} />
-                          Unshare Quote
-                        </div>
-                      ),
-                    },
-                    { key: "delete", label: "🗑️ Delete", danger: true },
-                  ]}
-                  onClick={(key) => {
-                    if (key === "view") openDrawer(note, "view");
-                    if (key === "edit") openDrawer(note, "edit");
-                    if (key === "delete") handleDelete(note._id);
-                    if (key === "share") handleShareNote(note);
-                    if (key === "unshare") handleUnShareNote(note._id);
-                  }}
-                />
-              </div>
+                  </h3>
+                }
+                extra={
+                  <CustomViewMoreButton
+                    items={[
+                      { key: "view", label: "👁️ View" },
+                      { key: "edit", label: "✏️ Edit " },
 
-              <div className="flex justify-between items-center mt-3">
-                <div>
-                  <div className="flex items-center gap-2 mt-2 text-black font-medium">
-                    <DollarSign size={16} /> {note.value}
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-600 text-sm">
-                    <Calendar size={16} />
-                    {new Date(note.date).toLocaleDateString()}
-                  </div>
-                </div>
+                      // ✅ Only show share/unshare if user is NOT basicAdmin
+                      ...(userRole !== USER_ROLE.basicAdmin
+                        ? [
+                            { key: "share", label: "🔗 Share " },
+                            {
+                              key: "unshare",
+                              label: (
+                                <div className="flex items-center gap-1">
+                                  <Unlink
+                                    className="text-green-500"
+                                    size={14}
+                                  />
+                                  Unshare
+                                </div>
+                              ),
+                            },
+                          ]
+                        : []),
+                      {
+                        key: "delete",
+                        label: "🗑️ Delete",
+                        danger: true,
+                      },
 
-                <div>
-                  {note.status === "approved" && (
-                    <span className="flex items-center gap-1 text-green-600 font-medium">
-                      <CheckCircle size={16} /> Approved
-                    </span>
-                  )}
-                  {note.status === "pending" && (
-                    <span className="flex items-center gap-1 text-orange-500 font-medium">
-                      <Clock size={16} /> Pending
-                    </span>
-                  )}
-                  {note.status === "rejected" && (
-                    <span className="flex items-center gap-1 text-red-600 font-medium">
-                      <XCircle size={16} /> Rejected
-                    </span>
-                  )}
+                      // { key: "view", label: "👁️ View" },
+                      // { key: "edit", label: "✏️ Edit" },
+                      // { key: "share", label: "🔗 Share" },
+                      // {
+                      //   key: "unshare",
+                      //   label: (
+                      //     <div className="flex items-center gap-1">
+                      //       <Unlink className="text-green-500" size={14} />
+                      //       Unshare Note
+                      //     </div>
+                      //   ),
+                      // },
+                      // { key: "delete", label: "🗑️ Delete", danger: true },
+                    ]}
+                    onClick={(key) => {
+                      if (key === "view") openDrawer(note, "view");
+                      if (key === "edit") openDrawer(note, "edit");
+                      if (key === "delete") handleDelete(note._id);
+                      if (key === "share") handleShareNote(note);
+                      if (key === "unshare") handleUnShareNote(note._id);
+                    }}
+                  />
+                }
+              >
+                <div className="flex justify-between items-center">
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 text-black font-medium">
+                      £ {note.value}
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600 text-sm">
+                      <Calendar size={16} />
+                      {new Date(note.date).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  <div>
+                    {note.status === "approved" && (
+                      <span className="flex items-center gap-1 text-green-600 font-medium">
+                        <CheckCircle size={16} /> Approved
+                      </span>
+                    )}
+                    {note.status === "pending" && (
+                      <span className="flex items-center gap-1 text-orange-500 font-medium">
+                        <Clock size={16} /> Pending
+                      </span>
+                    )}
+                    {note.status === "rejected" && (
+                      <span className="flex items-center gap-1 text-red-600 font-medium">
+                        <XCircle size={16} /> Rejected
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </Card>
+            </Col>
           ))}
-        </div>
+        </Row>
       )}
 
       {/* Drawer for Create/Edit/View */}
