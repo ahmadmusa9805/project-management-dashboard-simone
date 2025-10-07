@@ -224,7 +224,12 @@ const ExpenseTable = ({
                 <th className="text-left px-4 py-2 text-gray-700">Quantity</th>
                 <th className="text-left px-4 py-2 text-gray-700">Cost</th>
                 <th className="text-left px-4 py-2 text-gray-700">Date</th>
-                <th className="text-left px-4 py-2 text-gray-700">Vat</th>
+                {title === "Labour" || title === "Subcontractor" ? (
+                  ""
+                ) : (
+                  <th className="text-left px-4 py-2 text-gray-700">Vat</th>
+                )}
+
                 <th className="text-left px-4 py-2 text-gray-700">Actions</th>
               </tr>
             </thead>
@@ -246,7 +251,11 @@ const ExpenseTable = ({
                     <td className="px-4 py-2">{item.quantity}</td>
                     <td className="px-4 py-2">£ {item.amount}</td>
                     <td className="px-4 py-2">{item.date}</td>
-                    <td className="px-4 py-2">{item.vat}</td>
+                    {title === "Labour" || title === "Subcontractor" ? (
+                      ""
+                    ) : (
+                      <td className="px-4 py-2">{item.vat}</td>
+                    )}
                     <td className="px-4 py-2">
                       <CustomViewMoreButton
                         items={[

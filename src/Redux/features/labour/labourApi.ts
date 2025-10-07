@@ -5,9 +5,28 @@ import { baseApi } from "../../app/api/baseApi";
 export const labourApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // ✅ Get all labours
-    getAllLabours: builder.query<any, void>({
-      query: () => `/labours`,
-      transformResponse: (response: any) => response,
+    getAllLabours: builder.query<
+      {
+        data: any[];
+        meta: { page: number; limit: number; total: number; totalPage: number };
+      },
+      {
+        page?: number;
+        limit?: number;
+        searchTerm?: string;
+      } | void
+    >({
+      query: ({ page = 1, limit = 10, searchTerm = "" } = {}) => {
+        let qs = `?page=${page}&limit=${limit}`;
+        if (searchTerm) qs += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+        return `/labours${qs}`;
+      },
+      transformResponse: (response: any) => {
+        return {
+          data: Array.isArray(response.data) ? response.data : [],
+          meta: response.meta || { page: 1, limit: 10, total: 0, totalPage: 1 },
+        };
+      },
       providesTags: ["Labours"],
     }),
 

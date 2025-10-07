@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { Select, ConfigProvider, Drawer, Tabs, Spin } from "antd";
-import CustomSearchInput from "../../components/CustomSearchInput";
+
 import CustomCreateButton from "../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../components/CustomViewMoreButton";
 import UserCreateEditPage from "./UserCreateEditPage";
@@ -20,6 +20,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../Redux/app/store";
 import CustomPagination from "../../components/CustomPagination";
 import { showDeleteAlert } from "../../utils/deleteAlert";
+import { CustomSearchInput } from "../../components/CustomSearchInput";
 
 export interface DataItem {
   id: string;
@@ -64,13 +65,16 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10); // default 10 per page
   const [searchText, setSearchText] = useState("");
+  const [debouncedSearchText, setDebouncedSearchText] = useState("");
   const [openDrawer, setOpenDrawer] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<DataItem | null>(null);
   const [activeTab, setActiveTab] = useState<"active" | "blocked">("active");
 
+  console.log(searchText, "searchText");
+
   const effectiveSearchTerm =
-    propSearchTerm !== undefined ? propSearchTerm : searchText;
+    propSearchTerm !== undefined ? propSearchTerm : debouncedSearchText;
   const effectiveOpenDrawer =
     propOpenDrawer !== undefined ? propOpenDrawer : openDrawer;
   const effectiveSetOpenDrawer = propSetOpenDrawer || setOpenDrawer;
@@ -89,6 +93,8 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
   else if (pathname === "/prime-admins") routeUserType = USER_ROLE.primeAdmin;
   else if (pathname === "/basic-admins") routeUserType = USER_ROLE.basicAdmin;
 
+  console.log(effectiveSearchTerm, "effectiveSearchTerm");
+
   const {
     data: users = {
       data: [],
@@ -100,7 +106,7 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
     status: statusFilter !== undefined ? statusFilter : activeTab,
     page,
     limit,
-    search: effectiveSearchTerm?.trim() ? effectiveSearchTerm : undefined,
+    searchTerm: effectiveSearchTerm,
     role: routeUserType ?? undefined, // ✅ backend filters role
     // ✅ newest first
   });
@@ -132,12 +138,20 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
     }
   }, [users?.data]);
 
+  // Debounce search text
   useEffect(() => {
-    if (!searchText.trim()) {
-      setPage(1);
-      refetch(); // call get all users
-    }
-  }, [searchText, refetch]);
+    const timer = setTimeout(() => {
+      setDebouncedSearchText(searchText);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
+  // Effect for debounced search
+  useEffect(() => {
+    setPage(1);
+    refetch();
+  }, [debouncedSearchText, activeTab, refetch]);
 
   // Check authorization
   if (user?.role !== USER_ROLE.superAdmin) {
@@ -160,20 +174,15 @@ const AdminTable: React.FC<AdminTableProps> = (props) => {
     <>
       <div className="w-full mx-auto p-4 bg-white min-h-screen">
         <div className="flex justify-between">
-          <h1 className="text-2xl font-semibold mb-4">
-            Manage {effectiveTitle}
-          </h1>
+          <h1 className="text-2xl font-semibold mb-4">{effectiveTitle}</h1>
           {propSearchTerm === undefined && (
             <CustomSearchInput
               onSearch={(val) => {
                 setSearchText(val);
                 setPage(1);
-
-                if (!val.trim()) {
-                  refetch();
-                }
+                setDebouncedSearchText(val); // Immediate search on button click/enter
               }}
-              onChange={(val) => setSearchText(val)} // ✅ Update state on every keystroke
+              onChange={(val) => setSearchText(val)} // Update state on every keystroke for debounced search
             />
           )}
         </div>
