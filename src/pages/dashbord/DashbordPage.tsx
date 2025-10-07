@@ -14,6 +14,7 @@ import { Spin } from "antd";
 import DashboardSummaryCards from "./UserCard";
 import EarningsChart from "./EarningsChart";
 import { useGetProjectsWithstatusQuery } from "../../Redux/features/projects/projectsApi";
+import { useGetAnalyticsProfitByPeriodQuery } from "../../Redux/features/analytics/analyticsApi";
 
 // Helper: Group projects by month
 const groupByMonth = (projects: any[]) => {
@@ -49,6 +50,8 @@ const groupByMonth = (projects: any[]) => {
 };
 
 const DashboardAnalytics: React.FC = () => {
+  const { data: earningsData, isLoading: isAnalyticLoading } =
+    useGetAnalyticsProfitByPeriodQuery(3);
   const {
     data: ongoingProjects = { data: [], meta: { total: 0 } },
     isLoading,
@@ -59,6 +62,9 @@ const DashboardAnalytics: React.FC = () => {
       refetchOnReconnect: true,
     }
   );
+
+  console.log(isAnalyticLoading, "isAnalyticLoading");
+  console.log(earningsData, "earningsData");
 
   // console.log(isAnalyticLoading, "isAnalyticLoading");
   // console.log(, "analtic");
@@ -80,7 +86,7 @@ const DashboardAnalytics: React.FC = () => {
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-xl font-medium ">Ongoing Projects</h3>
             <p className="text-xl font-medium text-gray-600">
-              Total: {ongoingProjects.data?.length}
+              Total: {ongoingProjects.meta?.total}
             </p>
           </div>
           <ResponsiveContainer width="100%" height={300}>

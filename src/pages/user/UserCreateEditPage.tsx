@@ -3,8 +3,8 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Input, Select, Button, Upload } from "antd";
-import { PlusOutlined, CloudUploadOutlined } from "@ant-design/icons";
+import { Input, Button, Upload } from "antd";
+import { CloudUploadOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -14,7 +14,7 @@ import {
 import { USER_ROLE } from "../../types/userAllTypes/user";
 import { errorAlert, successAlert } from "../../utils/alerts";
 
-const { Option } = Select;
+// const { Option } = Select;
 
 const schema = z.object({
   id: z.string().optional(),
@@ -57,7 +57,7 @@ Props) => {
   const {
     control,
     handleSubmit,
-    watch,
+    // watch,
     setValue,
     reset,
     formState: { errors },
@@ -70,8 +70,8 @@ Props) => {
   console.log("Editing user ID:", editingUserId);
   console.log(editingUserId);
 
-  const [projectTypes, setProjectTypes] = useState(["Construction", "Repair"]);
-  const [newProjectType, setNewProjectType] = useState("");
+  // const [projectTypes, setProjectTypes] = useState(["Construction", "Repair"]);
+  // const [newProjectType, setNewProjectType] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const location = useLocation();
   const path = location.pathname;
@@ -91,11 +91,11 @@ Props) => {
     }
   }, [path, mode]);
 
-  const showClientFields = useMemo(() => {
-    return path.includes("clients");
-  }, [path]);
+  // const showClientFields = useMemo(() => {
+  //   return path.includes("clients");
+  // }, [path]);
 
-  const role = watch("role");
+  // const role = watch("role");
 
   useEffect(() => {
     if (mode === "create" && allowedRoles.length === 1) {
@@ -107,13 +107,13 @@ Props) => {
     }
   }, [mode, allowedRoles, setValue, reset, defaultValues]);
 
-  const handleAddProjectType = () => {
-    if (newProjectType && !projectTypes.includes(newProjectType)) {
-      setProjectTypes((prev) => [...prev, newProjectType]);
-      setValue("projectType", newProjectType);
-      setNewProjectType("");
-    }
-  };
+  // const handleAddProjectType = () => {
+  //   if (newProjectType && !projectTypes.includes(newProjectType)) {
+  //     setProjectTypes((prev) => [...prev, newProjectType]);
+  //     setValue("projectType", newProjectType);
+  //     setNewProjectType("");
+  //   }
+  // };
 
   const onSubmit = async (data: any) => {
     try {
@@ -308,17 +308,9 @@ Props) => {
         />
       </div>
 
-      {showClientFields && role === "client" && (
+      {/* {showClientFields && role === "client" && (
         <div className="flex flex-col gap-4">
           <h3 className="text-lg font-medium">Account Details</h3>
-
-          {/* <Controller
-            control={control}
-            name="estimateNumber"
-            render={({ field }) => (
-              <Input {...field} placeholder="Estimate Number" />
-            )}
-          /> */}
 
           <Controller
             control={control}
@@ -358,7 +350,7 @@ Props) => {
             )}
           />
         </div>
-      )}
+      )} */}
 
       {/* <div className="flex flex-col gap-2">
         <h3 className="text-lg font-medium">Set Default Password</h3>

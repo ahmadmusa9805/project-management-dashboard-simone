@@ -251,15 +251,9 @@ const ClientDetailsPage = () => {
   );
   const loading = projectLoading || clientLoading;
   return (
-    <div className="w-full h-full px-8 py-6 bg-white flex flex-col justify-start items-end gap-8">
+    <div className="w-full h-full p-6 bg-white flex flex-col justify-start  gap-8">
       {/* Header */}
-      <div className="w-full flex justify-start items-end gap-8">
-        <div className="flex justify-center items-center gap-2.5">
-          <div className="text-black text-2xl font-medium leading-8 tracking-wide font-ibm">
-            Client Details
-          </div>
-        </div>
-      </div>
+      <h1 className="text-2xl font-bold py-10">Client Details</h1>
 
       {/* Profile Section */}
       {/* Loader under header */}

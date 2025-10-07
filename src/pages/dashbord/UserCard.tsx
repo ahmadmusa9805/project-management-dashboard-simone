@@ -118,7 +118,7 @@ const DashboardSummaryCards = () => {
     <div className="w-full flex gap-6 my-5">
       <StatCard
         title="Total Profit"
-        value={`$ ${analtic?.data?.totalProfit?.toLocaleString()}`}
+        value={`£ ${analtic?.data?.totalProfit?.toLocaleString()}`}
       />
       <StatCard title="Total projects" value={totalProjects.toString()} />
       <StatCard title="Completed projects" value={completed.toString()} />

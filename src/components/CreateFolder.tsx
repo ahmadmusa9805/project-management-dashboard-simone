@@ -54,26 +54,38 @@
 // export default CreateFolder;
 
 import { Button } from "antd";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface CreateFolderProps {
   onCreate: (folderName: string) => void;
   onCancel: () => void;
+  initialValue?: string; // optional, for editing
 }
 
-const CreateFolder: React.FC<CreateFolderProps> = ({ onCreate, onCancel }) => {
-  const [folderName, setFolderName] = useState("");
+const CreateFolder: React.FC<CreateFolderProps> = ({
+  onCreate,
+  onCancel,
+  initialValue = "",
+}) => {
+  const [folderName, setFolderName] = useState(initialValue);
+
+  // Update state if initialValue changes (for editing different folders)
+  useEffect(() => {
+    setFolderName(initialValue);
+  }, [initialValue]);
 
   const handleCreate = () => {
     if (!folderName.trim()) return;
-    onCreate(folderName); // ✅ just pass name back to parent
+    onCreate(folderName); // ✅ pass name back to parent
   };
 
   return (
     <div className="w-full h-full p-6 bg-white shadow-md rounded-md flex flex-col gap-6">
       {/* Header & Input */}
       <div className="flex flex-col gap-3 w-full">
-        <h2 className="text-[24px] font-medium text-[#000E0F]">New folder</h2>
+        <h2 className="text-[24px] font-medium text-[#000E0F]">
+          {initialValue ? "Update folder" : "New folder"}
+        </h2>
 
         <input
           type="text"
@@ -81,6 +93,7 @@ const CreateFolder: React.FC<CreateFolderProps> = ({ onCreate, onCancel }) => {
           onChange={(e) => setFolderName(e.target.value)}
           placeholder="folder name"
           className="w-full px-2 py-3 border-2 border-[#001D01] outline-none text-sm rounded"
+          autoFocus // ✅ focus input when modal opens
         />
       </div>
 
@@ -96,9 +109,9 @@ const CreateFolder: React.FC<CreateFolderProps> = ({ onCreate, onCancel }) => {
         <Button
           type="primary"
           onClick={handleCreate}
-          className="h-12 px-6  text-white rounded  transition"
+          className="h-12 px-6 text-white rounded transition"
         >
-          Create folder
+          {initialValue ? "Update folder" : "Create folder"}
         </Button>
       </div>
     </div>

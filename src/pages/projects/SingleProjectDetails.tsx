@@ -7,6 +7,9 @@ import {
 } from "../../Redux/features/projects/projectsApi";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { successAlert } from "../../utils/alerts";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../Redux/app/store";
+import { USER_ROLE } from "../../types/userAllTypes/user";
 
 const { Title, Text } = Typography;
 
@@ -21,6 +24,8 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   onClose,
   projectId,
 }) => {
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
+
   // Fetch single project details
   const {
     data: project,
@@ -100,45 +105,57 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <Text strong>💰 Value:</Text> <Text>${project.value}</Text>
             <Divider />
             <Text strong>📞 Contact:</Text> <Text>{project.contact}</Text>
-            {project.sharedWith?.length > 0 && (
-              <>
-                <Divider />
-                <Text strong>🤝 Shared With:</Text>
-                <div style={{ marginTop: 8 }}>
-                  {project.sharedWith.map((share: any) => {
-                    const user =
-                      typeof share.userId === "object"
-                        ? share.userId
-                        : { _id: share.userId };
-                    const role = share?.role ?? "Unknown";
+            <div style={{ marginTop: 8 }}>
+              {project.sharedWith?.length > 0 && (
+                <>
+                  <Divider />
+                  <Text strong>🤝 Shared With:</Text>
+                  <div style={{ marginTop: 8 }}>
+                    {project.sharedWith?.map((share: any, idx: number) => {
+                      if (!share?.userId) return null; // <-- skip if no userId
 
-                    return (
-                      <div
-                        key={share._id}
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginBottom: 6,
-                        }}
-                      >
-                        <span>
-                          👤 User ID: {user._id} | Role: <strong>{role}</strong>
-                        </span>
-                        <Button
-                          size="small"
-                          danger
-                          loading={isUnsharing}
-                          onClick={() => handleUnshare(user._id)}
+                      const user =
+                        typeof share.userId === "object"
+                          ? share.userId
+                          : { _id: share.userId };
+
+                      const role = share?.role ?? "Unknown";
+
+                      return (
+                        <div
+                          key={share._id || idx} // fallback key if _id missing
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: 6,
+                          }}
                         >
-                          Unshare
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
+                          <span>
+                            👤 User ID: {user?._id || "N/A"} | Role:{" "}
+                            <strong>{role}</strong>
+                          </span>
+
+                          {/* ✅ Only show Unshare button if project is NOT pending */}
+                          {project.status !== "pending" &&
+                            user?._id &&
+                            userRole !== USER_ROLE.basicAdmin && (
+                              <Button
+                                size="small"
+                                danger
+                                loading={isUnsharing}
+                                onClick={() => handleUnshare(user._id)}
+                              >
+                                Unshare
+                              </Button>
+                            )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </Card>
       )}

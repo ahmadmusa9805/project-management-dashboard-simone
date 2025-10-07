@@ -711,6 +711,7 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
       onConfirm: async () => {
         try {
           await deleteSiteReport(reportId).unwrap();
+          refetchReports();
         } catch {
           errorAlert("Could not delete the report.");
         }
@@ -772,6 +773,7 @@ const SitePicturesAndReportsViewPage: React.FC = () => {
             </div>
           ) : reportsData?.length ? (
             <SiteReportsList
+              refetchReports={refetchReports}
               reports={reportsData}
               project={projectData}
               currentUser={currentUserData}

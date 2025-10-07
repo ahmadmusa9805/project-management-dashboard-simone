@@ -139,7 +139,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams } from "react-router-dom";
-import { Spin } from "antd"; // ✅ Import Spin
+import { Card, Col, Row, Spin, Statistic } from "antd"; // ✅ Import Spin
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import { useGetAllPaymentTrackerElementsQuery } from "../../../Redux/features/projects/project/paymentTracker/paymentTrackerApi";
 
@@ -208,9 +208,9 @@ const PaymentTrackerPage = () => {
   ].filter(Boolean);
 
   return (
-    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+    <div className="w-full  gap-4 bg-white min-h-screen p-6">
       {/* Title */}
-      <h1 className="text-xl font-bold mb-6 py-8">Payment Tracker Page</h1>
+      <h1 className="text-2xl font-bold py-10">Payment Tracker</h1>
 
       {/* Loader under title */}
       {isLoading ? (
@@ -226,56 +226,86 @@ const PaymentTrackerPage = () => {
           No payment data found. Try loading it first.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {payments.map((item) => {
-            const isSpecialTitle =
+        <Row gutter={[16, 16]}>
+          {payments.map((item: any) => {
+            // Check if card should be non-clickable
+            const isSpecial =
               item.title === "Total Profit" ||
               item.title === "Total Outstanding";
 
             return (
-              <div
-                key={item.id}
-                className={`p-6 bg-[#f1f1f1] rounded flex flex-col justify-between ${
-                  isSpecialTitle ? "" : "hover:bg-[#e6f4ea] cursor-pointer"
-                }`}
-                onClick={() => {
-                  if (!isSpecialTitle) {
-                    navigate(`/projects/${projectId}/paymentrucker-documents`, {
-                      state: {
-                        quoteTitle: item.title,
-                        documents: item.documents,
-                      },
-                    });
-                  }
-                }}
-              >
-                <div className="flex justify-between">
-                  <h3 className="text-lg font-semibold">{item.title}</h3>
-                  {!isSpecialTitle && (
-                    <CustomViewMoreButton
-                      items={[{ key: "view", label: "👁️ View Details" }]}
-                      onClick={(key, e) => {
-                        e.stopPropagation();
-                        if (key === "view" && item.documents) {
-                          navigate(
-                            `/projects/${projectId}/paymentrucker-documents`,
-                            {
-                              state: {
-                                quoteTitle: item.title,
-                                documents: item.documents,
-                              },
-                            }
-                          );
+              <Col span={6} key={item.id}>
+                <Card
+                  style={{ backgroundColor: "#f1f1f1" }}
+                  hoverable={!isSpecial} // Only hoverable if not special
+                  bodyStyle={{
+                    backgroundColor: "#f1f1f1",
+                    padding: "12px 24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                  onClick={() => {
+                    if (!isSpecial) {
+                      navigate(
+                        `/projects/${projectId}/paymentrucker-documents`,
+                        {
+                          state: {
+                            quoteTitle: item.title,
+                            documents: item.documents,
+                          },
                         }
-                      }}
-                    />
-                  )}
-                </div>
-                <p className="mt-2 text-lg text-gray-900">{item.value}</p>
-              </div>
+                      );
+                    }
+                  }}
+                  title={
+                    <h3 className="text-lg font-medium text-gray-900 truncate">
+                      {item.title}
+                    </h3>
+                  }
+                  extra={
+                    !isSpecial && (
+                      <CustomViewMoreButton
+                        items={[{ key: "view", label: "👁️ View Details" }]}
+                        onClick={(key, e) => {
+                          e.stopPropagation();
+                          if (key === "view" && item.documents) {
+                            navigate(
+                              `/projects/${projectId}/paymentrucker-documents`,
+                              {
+                                state: {
+                                  quoteTitle: item.title,
+                                  documents: item.documents,
+                                },
+                              }
+                            );
+                          }
+                        }}
+                      />
+                    )
+                  }
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <Statistic value={item.value} prefix="£" />
+                    {/* {isSpecial && (
+                      <p
+                        className={`font-semibold flex items-center ${
+                          item.title === "Total Profit"
+                            ? "text-green-700"
+                            : "text-red-700"
+                        }`}
+                      >
+                        {item.title === "Total Profit"
+                          ? "💰 Profit"
+                          : "⚠️ Outstanding"}
+                      </p>
+                    )} */}
+                  </div>
+                </Card>
+              </Col>
             );
           })}
-        </div>
+        </Row>
       )}
     </div>
   );

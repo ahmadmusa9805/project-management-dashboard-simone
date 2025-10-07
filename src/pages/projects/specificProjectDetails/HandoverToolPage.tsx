@@ -39,7 +39,17 @@ import {
 import type { SharedUser } from "../../../Redux/features/projects/projectsApi";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import CustomCreateButton from "../../../components/CustomCreateButton";
-import { Modal, Checkbox, Button, Input, message, Spin } from "antd";
+import {
+  Modal,
+  Checkbox,
+  Button,
+  Input,
+  message,
+  Spin,
+  Row,
+  Col,
+  Card,
+} from "antd";
 import CreateFolder from "../../../components/CreateFolder";
 import CustomShareSelector from "../../../components/CustomShareSelector";
 // import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
@@ -331,27 +341,33 @@ const HandoverToolPage: React.FC = () => {
   // console.log(singleHandoverData, "singleHandoverData");
 
   return (
-    <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+    <div className="w-full  gap-4 bg-white min-h-screen p-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4 mt-10">
+      <div className="flex justify-between   py-10">
         <h1 className="text-2xl font-semibold">Handover</h1>
         <div className="flex gap-2">
           <CustomCreateButton
-            title="Upload Handover Documents"
+            title="Create Handover"
             onClick={() => setUploaderOpen(true)}
           />
-          <Button
+          <CustomCreateButton
+            title="Create Folder from Selected"
+            onClick={() => setIsCreateFolderModalOpen(true)}
+            disabled={selectedFileIds.length === 0}
+          />
+          {/* <Button
             type="primary"
+            className="py-10 flex justify-between"
             onClick={() => setIsCreateFolderModalOpen(true)}
             disabled={selectedFileIds.length === 0}
           >
             Create Folder from Selected
-          </Button>
+          </Button> */}
         </div>
       </div>
 
       {selectedFileIds.length > 0 && (
-        <div className="mb-4 p-2 bg-[#e6f4ea] rounded-md">
+        <div className="mb-4 p-3 bg-[#e6f4ea] rounded-md">
           <p className="text-[#0d542b]">
             {selectedFileIds.length} file
             {selectedFileIds.length !== 1 ? "s" : ""} selected
@@ -381,82 +397,36 @@ const HandoverToolPage: React.FC = () => {
           <Spin size="large" />
         </div>
       ) : files.length > 0 ? (
-        <div className="w-full h-full flex flex-wrap gap-4">
+        <Row gutter={[16, 16]} className="">
           {files.map((file) => (
-            <div
-              key={file.id}
-              className={`p-4 rounded outline flex flex-col gap-4 w-64 ${
-                selectedFileIds.includes(file.id)
-                  ? "bg-[#e6f4ea] outline-[#0d542b]"
-                  : "bg-[#F1F1F1] outline-[#E6E7E7]"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <Checkbox
-                  checked={selectedFileIds.includes(file.id)}
-                  onChange={() => toggleFileSelection(file.id)}
-                >
-                  Select
-                </Checkbox>
-                <CustomViewMoreButton
-                  items={[
-                    { key: "view", label: "👁️ View " },
-                    // { key: "edit", label: "✏️ Edit " },
-                    { key: "share", label: "🔗 Share " },
-                    {
-                      key: "unshare",
-                      label: (
-                        <div className="flex items-center gap-1">
-                          <Unlink className="text-green-500" size={14} />
-                          Unshare
-                        </div>
-                      ),
-                    },
-                    {
-                      key: "delete",
-                      label: "🗑️ Delete ",
-                      danger: true,
-                    },
-                  ]}
-                  onClick={(action: string) => handleFileAction(action, file)}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="text-lg font-medium w-[90%] truncate">
-                  {file.name}
-                </div>
-                {/* <div className="text-sm text-gray-500">
-                  {(file.size / 1024).toFixed(2)} KB
-                </div> */}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center flex items-center justify-center w-full min-h-screen">
-          <p className="text-gray-500">No handover documents yet.</p>
-        </div>
-      )}
-
-      {/* Folders */}
-      {folders.length > 0 && (
-        <div className="my-16">
-          <h2 className="text-xl font-semibold ">📂Created Folders</h2>
-          <div className="flex flex-wrap gap-4 mt-8">
-            {folders.map((folder) => (
-              <div
-                key={folder._id}
-                className="p-4 bg-[#E8F5E9] rounded outline outline-[#C8E6C9] flex flex-col gap-2 w-64"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="text-lg font-medium truncate w-[90%]">
-                    {folder.title}
+            <Col span={6} key={file.id}>
+              <Card
+                title={
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium text-gray-900 truncate">
+                      📄 {file.name}
+                    </h3>
+                    <Checkbox
+                      checked={selectedFileIds.includes(file.id)}
+                      onChange={() => toggleFileSelection(file.id)}
+                    />
                   </div>
+                }
+                hoverable
+                style={{ backgroundColor: "#f1f1f1" }}
+                bodyStyle={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  height: "60px", // keep same height as folders
+                  padding: "12px 24px",
+                }}
+                // onClick={() => handleFileAction("view", file)}
+                extra={
                   <CustomViewMoreButton
                     items={[
-                      // { key: "view", label: "👀 View Certificate" },
-                      // { key: "edit", label: "✏️ Edit " },
-                      { key: "share", label: "🔗 Share " },
+                      { key: "view", label: "👁️ View" },
+                      { key: "share", label: "🔗 Share" },
                       {
                         key: "unshare",
                         label: (
@@ -466,24 +436,72 @@ const HandoverToolPage: React.FC = () => {
                           </div>
                         ),
                       },
-                      {
-                        key: "delete",
-                        label: "🗑️ Delete ",
-                        danger: true,
-                      },
+                      { key: "delete", label: "🗑️ Delete", danger: true },
                     ]}
-                    onClick={(action: string) =>
-                      handleFolderAction(action, folder)
-                    }
+                    onClick={(action: string) => handleFileAction(action, file)}
                   />
-                </div>
-                <div className="text-sm ">
-                  {folder.files.length} file
-                  {folder.files.length !== 1 ? "s" : ""}
-                </div>
-              </div>
+                }
+              />
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <div className="text-center flex items-center justify-center w-full min-h-screen">
+          <p className="text-gray-500">No handover documents yet.</p>
+        </div>
+      )}
+
+      {/* Folders */}
+      {folders.length > 0 && (
+        <div className="mt-16">
+          <h2 className="text-xl font-semibold ">📂 Created Folders</h2>
+          <Row gutter={[16, 16]} className="mt-10">
+            {folders.map((folder) => (
+              <Col span={6} key={folder._id}>
+                <Card
+                  title={
+                    <h3 className="text-lg font-medium text-gray-900 truncate">
+                      📁 {folder.title}
+                    </h3>
+                  }
+                  style={{ backgroundColor: "#E8F5E9" }}
+                  bodyStyle={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    height: "60px",
+                    padding: "12px 24px",
+                  }}
+                  onClick={() => console.log("Open folder", folder._id)}
+                  extra={
+                    <CustomViewMoreButton
+                      items={[
+                        { key: "share", label: "🔗 Share" },
+                        {
+                          key: "unshare",
+                          label: (
+                            <div className="flex items-center gap-1">
+                              <Unlink className="text-green-500" size={14} />
+                              Unshare
+                            </div>
+                          ),
+                        },
+                        { key: "delete", label: "🗑️ Delete", danger: true },
+                      ]}
+                      onClick={(action: string) =>
+                        handleFolderAction(action, folder)
+                      }
+                    />
+                  }
+                >
+                  {/* <p className="text-sm text-gray-600">
+              {folder.files.length} file
+              {folder.files.length !== 1 ? "s" : ""}
+            </p> */}
+                </Card>
+              </Col>
             ))}
-          </div>
+          </Row>
         </div>
       )}
 
@@ -561,7 +579,7 @@ const HandoverToolPage: React.FC = () => {
         width={500}
       >
         <CustomShareSelector
-          roles={["prime-admin", "basic-admin", "client"]}
+          roles={["superAdmin", "primeAdmin", "basicAdmin", "client"]}
           onShare={handleConfirmShare}
         />
       </Modal>

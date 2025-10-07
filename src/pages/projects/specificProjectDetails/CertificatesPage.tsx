@@ -172,9 +172,9 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Modal, Spin, message } from "antd";
+import { Card, Col, Modal, Row, Spin, message } from "antd";
 import { useParams } from "react-router-dom";
-import CertificateCard from "../../../components/CertificateCard";
+
 import CustomCreateButton from "../../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import ImageUploader from "../../../components/ImageUploader";
@@ -198,6 +198,9 @@ import { showDeleteAlert } from "../../../utils/deleteAlert";
 import { Unlink } from "lucide-react";
 
 import CertificateDocumentSceoundFixViewer from "../../../components/CertificateDocumentSceoundFixViewer";
+import { USER_ROLE } from "../../../types/userAllTypes/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../Redux/app/store";
 // ✅ new reusable unshare component
 
 const CertificatesPage: React.FC = () => {
@@ -205,6 +208,7 @@ const CertificatesPage: React.FC = () => {
   const { data: certificatesData, isLoading: certificatesLoading } =
     useGetAllCertificatesQuery({ projectId });
   const [selectedCertId, setSelectedCertId] = useState<string | null>(null);
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const { data: singleCertData } = useGetSingleCertificateQuery(
     selectedCertId!,
     {
@@ -331,12 +335,12 @@ const CertificatesPage: React.FC = () => {
 
   return (
     <>
-      <div className="w-full px-4 gap-4 bg-white min-h-screen pt-3">
+      <div className="w-full  gap-4 bg-white min-h-screen p-6">
         {" "}
-        <div className="flex justify-between items-center mb-4 mt-10">
+        <div className="flex justify-between items-center py-10">
           <h1 className="text-2xl font-semibold">Certificates</h1>
           <CustomCreateButton
-            title="Add Certificate"
+            title="Upload Certificate"
             onClick={() => {
               setEditingCert(null);
               setDrawerOpen(true);
@@ -349,35 +353,55 @@ const CertificatesPage: React.FC = () => {
             <Spin size="large" />
           </div>
         ) : (
-          <div className="w-full p-5 flex flex-wrap gap-4 items-start justify-start">
+          <Row gutter={[16, 16]}>
             {certificatesData?.data?.map((cert: any) => (
-              <div className="">
-                <div
-                  key={cert._id}
-                  className="relative hover:bg-[#e6f4ea] bg-[#f1f1f1] cursor-pointer"
+              <Col span={6} key={cert._id}>
+                <Card
+                  style={{ backgroundColor: "#f1f1f1" }}
+                  hoverable
+                  bodyStyle={{
+                    backgroundColor: "#f1f1f1",
+                    padding: "12px 24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    height: "60px", // fixed height like folder cards
+                  }}
                   onClick={() => handleView(cert)}
-                >
-                  <CertificateCard title={cert.title} size={``} />
-                  <div className="absolute top-2 right-2">
+                  title={
+                    <div className="flex items-center gap-2">
+                      {
+                        <h3 className="text-lg font-medium text-gray-900 truncate">
+                          📄 {cert.title}
+                        </h3>
+                      }
+                    </div>
+                  }
+                  extra={
                     <CustomViewMoreButton
                       items={[
-                        { key: "view", label: "👁️ View Certificate" },
-                        { key: "edit", label: "✏️ Edit Certificate" },
-                        { key: "share", label: "🔗 Share Certificate" },
-                        {
-                          key: "unshare",
-                          label: (
-                            <div className="flex items-center gap-1">
-                              <Unlink className="text-green-500" size={14} />
-                              Unshare Certificate
-                            </div>
-                          ),
-                        },
-                        {
-                          key: "delete",
-                          label: "🗑️ Delete Certificate",
-                          danger: true,
-                        },
+                        { key: "view", label: "👁️ View" },
+
+                        { key: "edit", label: "✏️ Edit" },
+                        // Only show share/unshare if user is not basic admin
+                        ...(userRole !== USER_ROLE.basicAdmin
+                          ? [
+                              { key: "share", label: "🔗 Share" },
+                              {
+                                key: "unshare",
+                                label: (
+                                  <div className="flex items-center gap-1">
+                                    <Unlink
+                                      className="text-green-500"
+                                      size={14}
+                                    />
+                                    Unshare Certificate
+                                  </div>
+                                ),
+                              },
+                            ]
+                          : []),
+                        { key: "delete", label: "🗑️ Delete", danger: true },
                       ]}
                       onClick={(key) => {
                         if (key === "edit") {
@@ -391,11 +415,11 @@ const CertificatesPage: React.FC = () => {
                         if (key === "view") handleView(cert);
                       }}
                     />
-                  </div>
-                </div>
-              </div>
+                  }
+                ></Card>
+              </Col>
             ))}
-          </div>
+          </Row>
         )}
         {/* Drawer for Image Uploader */}
         <Modal

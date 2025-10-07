@@ -375,7 +375,11 @@ const AppRoutes: React.FC = () => (
           path="expense-documents"
           element={
             <ProtectedRoute
-              allowedRoles={[USER_ROLE.superAdmin, USER_ROLE.primeAdmin]}
+              allowedRoles={[
+                USER_ROLE.superAdmin,
+                USER_ROLE.primeAdmin,
+                USER_ROLE.basicAdmin,
+              ]}
             >
               <ExpenseDocumentsPage />
             </ProtectedRoute>
@@ -405,7 +409,11 @@ const AppRoutes: React.FC = () => (
           path="site-pictures-reports/:folderId"
           element={
             <ProtectedRoute
-              allowedRoles={[USER_ROLE.superAdmin, USER_ROLE.primeAdmin]}
+              allowedRoles={[
+                USER_ROLE.superAdmin,
+                USER_ROLE.primeAdmin,
+                USER_ROLE.basicAdmin,
+              ]}
             >
               <SitePicturesAndReportsViewPage />
             </ProtectedRoute>

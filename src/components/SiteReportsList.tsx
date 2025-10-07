@@ -242,7 +242,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { Table, Modal, Spin } from "antd";
+import { Table, Modal, Spin, message } from "antd";
 
 import CustomViewMoreButton from "./CustomViewMoreButton";
 import SiteReportDetail from "./SiteReportDetail";
@@ -256,15 +256,20 @@ import {
   useGetSingleSiteReportQuery,
 } from "../Redux/features/projects/project/siteReportPictures/reportApi";
 import { errorAlert, successAlert } from "../utils/alerts";
+import { useSelector } from "react-redux";
+import type { RootState } from "../Redux/app/store";
+import { USER_ROLE } from "../types/userAllTypes/user";
 
 interface SiteReportsListProps {
   reports: any[];
   project: any;
   currentUser: any;
   onDelete?: (reportId: string) => void;
+  refetchReports: () => void;
 }
 
 const SiteReportsList: React.FC<SiteReportsListProps> = ({
+  refetchReports,
   reports,
   project,
   currentUser,
@@ -281,6 +286,7 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
 
   const [exportingReport, setExportingReport] = useState<any>(null);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
 
   const [shareSiteReport] = useShareSiteReportMutation();
   const [unshareSiteReport] = useUnshareSiteReportMutation();
@@ -317,6 +323,11 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
         setUnshareModalVisible(true);
         break;
       case "export":
+        // Validate report data before exporting
+        if (!record || !record.title) {
+          message.error("Invalid report data for export");
+          return;
+        }
         setIsExporting(true);
         setExportingReport(record);
         break;
@@ -379,28 +390,29 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
       key: "date",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
-    {
-      title: "Shared",
-      dataIndex: "isShared",
-      key: "isShared",
-      render: (isShared: boolean) => (isShared ? "Yes" : "No"),
-    },
+    // {
+    //   title: "Shared",
+    //   dataIndex: "isShared",
+    //   key: "isShared",
+    //   render: (isShared: boolean) => (isShared ? "Yes" : "No"),
+    // },
     {
       title: "Actions",
       key: "actions",
       render: (_: any, record: any) => (
         <CustomViewMoreButton
           items={[
-            { key: "view", label: "👀 View Report" },
-            { key: "export", label: "👀 Export Report" },
-            { key: "edit", label: "✏️ Edit Report" },
-            { key: "share", label: "🔗 Share Report" },
-            { key: "unshare", label: "🚫 Unshare Report" },
-            {
-              key: "delete",
-              label: "🗑️ Delete Report",
-              danger: true,
-            },
+            { key: "view", label: "👀 View" },
+            { key: "export", label: "👀 Export" },
+            { key: "edit", label: "✏️ Edit" },
+            // Only show share/unshare if user is not basic admin
+            ...(userRole !== USER_ROLE.basicAdmin
+              ? [
+                  { key: "share", label: "🔗 Share" },
+                  { key: "unshare", label: "🚫 Unshare" },
+                ]
+              : []),
+            { key: "delete", label: "🗑️ Delete", danger: true },
           ]}
           onClick={(key) => handleAction(key, record)}
         />
@@ -427,6 +439,7 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
       >
         {selectedReportId && (
           <SiteReportDetail
+            refetchReports={refetchReports}
             reportId={selectedReportId}
             mode={detailMode}
             onBack={handleBack}
@@ -444,7 +457,7 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
       >
         <CustomShareSelector
           title="Share this report"
-          roles={["prime-admin", "basic-admin", "client"]}
+          roles={["superAdmin", "primeAdmin", "basicAdmin", "client"]}
           onShare={handleShare}
         />
       </Modal>
@@ -483,13 +496,22 @@ const SiteReportsList: React.FC<SiteReportsListProps> = ({
       <Modal
         title="Generating PDF..."
         open={isExporting}
-        onCancel={() => setIsExporting(false)}
+        onCancel={() => {
+          setIsExporting(false);
+          setExportingReport(null);
+        }}
         footer={null}
         closable={false}
+        maskClosable={false}
       >
-        <div style={{ textAlign: "center" }}>
-          <p>Please wait while your PDF is being generated.</p>
+        <div style={{ textAlign: "center", padding: "20px" }}>
           <Spin size="large" />
+          <p style={{ marginTop: "16px" }}>
+            Please wait while your PDF is being generated...
+          </p>
+          <p style={{ fontSize: "12px", color: "#666", marginTop: "8px" }}>
+            This may take a moment depending on the number of images.
+          </p>
         </div>
       </Modal>
     </>
