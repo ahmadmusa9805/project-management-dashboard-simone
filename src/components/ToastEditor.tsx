@@ -222,7 +222,7 @@ interface ToastEditorProps {
 const ToastEditor: React.FC<ToastEditorProps> = ({
   readOnly = false,
   value = "",
-  height = "400px",
+  height = "150px",
   onChange,
 }) => {
   const editorRef = useRef<Quill | null>(null);

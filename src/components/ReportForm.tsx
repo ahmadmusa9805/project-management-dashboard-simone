@@ -755,7 +755,7 @@ const ReportForm: React.FC<ReportFormProps> = ({
         <div className="border border-gray-300 rounded min-h-[300px] px-4 py-3">
           <ToastEditor
             initialValue={overviewContent}
-            height="400px"
+            height="150px"
             onChange={(val) => {
               setOverviewContent(val);
               setValue("overviewText", val);

@@ -166,7 +166,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
             <ToastEditor
               value={field.value}
               onChange={field.onChange}
-              height="300px"
+              height="150px"
               readOnly={isFormDisabled}
               key={initialData?.id || "title"}
             />
@@ -186,7 +186,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
             <ToastEditor
               value={field.value}
               onChange={field.onChange}
-              height="300px"
+              height="150px"
               readOnly={isFormDisabled}
               key={initialData?.id || "desc"}
             />
