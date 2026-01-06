@@ -72,7 +72,7 @@ const EarningsChart: React.FC = () => {
   // Calculate total earnings
   const totalEarnings = React.useMemo(() => {
     if (!yearData?.data?.totalProfit) return 0;
-    return Math.abs(parseFloat(yearData.data.totalProfit));
+    return parseFloat(yearData.data.totalProfit);
   }, [yearData]);
 
   if (loading3M || loading6M || loading12M) {
@@ -95,19 +95,13 @@ const EarningsChart: React.FC = () => {
         <div className="bg-white p-4 rounded shadow">
           <p className="text-sm text-gray-600">3 Month Earnings</p>
           <h4 className="text-xl font-bold text-gray-900">
-            £
-            {Math.abs(
-              parseFloat(threeMonthData?.data?.totalProfit || "0")
-            ).toLocaleString()}
+            £{parseFloat(threeMonthData?.data?.totalProfit || "0")}
           </h4>
         </div>
         <div className="bg-white p-4 rounded shadow">
           <p className="text-sm text-gray-600">6 Month Earnings</p>
           <h4 className="text-xl font-bold text-gray-900">
-            £
-            {Math.abs(
-              parseFloat(sixMonthData?.data?.totalProfit || "0")
-            ).toLocaleString()}
+            £{parseFloat(sixMonthData?.data?.totalProfit || "0")}
           </h4>
         </div>
         <div className="bg-white p-4 rounded shadow">

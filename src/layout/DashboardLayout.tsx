@@ -51,8 +51,8 @@ const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const { projectId } = useParams();
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth.user);
-  const token = useSelector((state: RootState) => state.auth.token);
+  const user = useSelector((state: RootState) => state.auth?.user);
+  const token = useSelector((state: RootState) => state.auth?.token);
   console.log("user from layout:", user?.role);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 

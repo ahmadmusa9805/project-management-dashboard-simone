@@ -39,6 +39,7 @@ import SubFoldersPage from "../pages/shared/SubFoldersPage";
 import SubfolderFilesPage from "../pages/shared/SubfolderFilesPage";
 import Projects from "../pages/projects/Projects";
 import { USER_ROLE } from "../types/userAllTypes/user";
+import OverheadCostsPage from "../pages/overheadCosts/OverheadCostsPage";
 
 const AppRoutes: React.FC = () => (
   <Routes>
@@ -89,6 +90,14 @@ const AppRoutes: React.FC = () => (
         element={
           <ProtectedRoute allowedRoles={[USER_ROLE.superAdmin]}>
             <AdminTable />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/overhead-costs"
+        element={
+          <ProtectedRoute allowedRoles={[USER_ROLE.superAdmin]}>
+            <OverheadCostsPage />
           </ProtectedRoute>
         }
       />
