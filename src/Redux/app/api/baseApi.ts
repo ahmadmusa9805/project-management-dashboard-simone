@@ -7,6 +7,7 @@ import type { RootState } from "../store";
 
 const myApi = "http://52.44.187.49:5001";
 // const myApi = "http://localhost:5001";
+// const myApi = "http://localhost:5001";
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
