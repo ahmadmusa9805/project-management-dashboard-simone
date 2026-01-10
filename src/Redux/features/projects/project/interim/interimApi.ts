@@ -35,6 +35,7 @@ export const interimApi = baseApi.injectEndpoints({
             title: data.title,
             projectId: data.projectId,
             value: Number(data.value),
+            vat: Number(data.vat),
             status: data.status || "pending",
           })
         );
@@ -56,7 +57,6 @@ export const interimApi = baseApi.injectEndpoints({
     // Update Interim
     updateInterim: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => {
-        console.log(id, data);
         const formData = new FormData();
         if (data.file) {
           formData.append("file", data.file);
@@ -67,6 +67,7 @@ export const interimApi = baseApi.injectEndpoints({
             title: data.title,
             projectId: data.projectId,
             value: Number(data.value),
+            vat: Number(data.vat),
             status: data.status,
           })
         );

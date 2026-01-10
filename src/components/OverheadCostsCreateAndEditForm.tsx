@@ -241,7 +241,7 @@ const OverheadCostCreateEditForm = ({
         {/* Value & VAT Row */}
         <div className="flex gap-4">
           <div className="w-1/2">
-            <label className="text-sm font-medium mb-1 block">Value ($)</label>
+            <label className="text-sm font-medium mb-1 block">Value (£)</label>
             <Controller
               control={control}
               name="value"

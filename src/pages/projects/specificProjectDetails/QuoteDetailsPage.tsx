@@ -253,9 +253,351 @@
 // TODO: refactor this above code after review
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// import { useState } from "react";
+// import ResuableDocumentForm from "../../../components/ResuableDocumentForm";
+// // import CustomSearchInput from "../../../components/CustomSearchInput";
+// import CustomCreateButton from "../../../components/CustomCreateButton";
+// import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
+// import { useNavigate, useParams } from "react-router-dom";
+// import { Card, Col, Modal, Row, Spin, Statistic } from "antd";
+
+// import {
+//   useGetAllQuotesQuery,
+//   useCreateQuoteMutation,
+//   useUpdateQuoteMutation,
+//   useDeleteQuoteMutation,
+//   useShareQuoteMutation,
+//   useUnShareQuoteMutation,
+//   useGetSingleQuoteQuery,
+// } from "../../../Redux/features/projects/project/quote/qouteApi";
+// import { errorAlert, successAlert } from "../../../utils/alerts";
+// import { showDeleteAlert } from "../../../utils/deleteAlert";
+// import CustomShareSelector from "../../../components/CustomShareSelector";
+// import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
+// import { Unlink } from "lucide-react";
+
+// const QuoteDetailsPage = () => {
+//   const navigate = useNavigate();
+//   const { projectId } = useParams();
+
+//   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null);
+//   const { data: singleQuoteData } = useGetSingleQuoteQuery(selectedQuoteId!, {
+//     skip: !selectedQuoteId,
+//   });
+
+//   const {
+//     data: quotes = [],
+//     isLoading,
+//     refetch,
+//   } = useGetAllQuotesQuery(projectId);
+
+//   const [createQuote, { isLoading: creating }] = useCreateQuoteMutation();
+//   const [updateQuote, { isLoading: updating }] = useUpdateQuoteMutation();
+//   const [deleteQuote] = useDeleteQuoteMutation();
+//   const [shareQuote] = useShareQuoteMutation();
+//   const [unShareQuote] = useUnShareQuoteMutation();
+
+//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+//   const [editQuote, setEditQuote] = useState<any | null>(null);
+//   const [mode, setMode] = useState<"create" | "edit">("create");
+
+//   // Share modal state
+//   const [shareModalOpen, setShareModalOpen] = useState(false);
+//   const [shareQuoteItem, setShareQuoteItem] = useState<any | null>(null);
+
+//   // Unshare modal state
+//   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
+
+//   const handleCreateClick = () => {
+//     setMode("create");
+//     setEditQuote(null);
+//     setIsDrawerOpen(true);
+//   };
+
+//   const handleViewClick = (quote: any) => {
+//     console.log("Viewing quote:", quote);
+//     navigate(`/projects/${projectId}/quote-documents`, {
+//       state: {
+//         quoteTitle: quote.title,
+//         documents: [
+//           {
+//             id: quote._id,
+//             title: quote.title,
+//             amount: quote.value,
+//             fileUrl: quote.file,
+//           },
+//         ],
+//       },
+//     });
+//   };
+
+//   const handleEditClick = (quote: any) => {
+//     setMode("edit");
+//     setEditQuote(quote);
+//     setIsDrawerOpen(true);
+//   };
+
+//   const handleSubmit = async (data: any) => {
+//     const formData = {
+//       title: data.title,
+//       projectId: projectId,
+//       amount: Number(data.amount),
+//       file: data.file,
+//     };
+
+//     try {
+//       if (mode === "create") {
+//         const result = await createQuote(formData).unwrap();
+//         successAlert(result.message);
+//         refetch();
+//       } else if (mode === "edit" && editQuote) {
+//         const result = await updateQuote({
+//           id: editQuote._id,
+//           data: formData,
+//         }).unwrap();
+//         successAlert(result.message);
+//         refetch();
+//       }
+//       setIsDrawerOpen(false);
+//       setEditQuote(null);
+//     } catch (error: any) {
+//       const errorMessage =
+//         error?.data?.errorSources?.[0]?.message ||
+//         error?.data?.message ||
+//         "Failed to submit quote.";
+//       errorAlert("Submission Error", errorMessage);
+//       console.error("Error submitting quote:", error);
+//     }
+//   };
+
+//   // ✅ Handle Share Quote
+//   const handleShareQuote = (quote: any) => {
+//     setShareQuoteItem(quote);
+//     setShareModalOpen(true);
+//   };
+
+//   // ✅ Confirm Share
+//   const handleConfirmShare = async (selectedUsers: any[]) => {
+//     console.log(selectedUsers);
+//     try {
+//       await shareQuote({
+//         id: shareQuoteItem._id,
+//         sharedWith: selectedUsers,
+//       }).unwrap();
+//       successAlert("Quote shared successfully!");
+//       setShareModalOpen(false);
+//       setShareQuoteItem(null);
+//       refetch();
+//     } catch (err: any) {
+//       errorAlert(
+//         "Sharing Error",
+//         err?.data?.message || "Failed to share quote"
+//       );
+//     }
+//   };
+
+//   // ✅ Handle Unshare Quote
+//   const handleUnShareQuote = (quote: any) => {
+//     setSelectedQuoteId(quote._id);
+//     setUnshareModalOpen(true);
+//   };
+
+//   // ✅ Confirm Unshare
+//   const handleConfirmUnshare = async (selectedUsers: any[]) => {
+//     try {
+//       await unShareQuote({
+//         id: selectedQuoteId!,
+//         unShareWith: selectedUsers.map((u) => u.userId),
+//       }).unwrap();
+//       successAlert("Quote unshared successfully!");
+//       setUnshareModalOpen(false);
+//       setSelectedQuoteId(null);
+//       refetch();
+//     } catch (err: any) {
+//       errorAlert(
+//         "Unsharing Error",
+//         err?.data?.message || "Failed to unshare quote"
+//       );
+//     }
+//   };
+
+//   return (
+//     <div className="w-full  gap-4 bg-white min-h-screen p-6">
+//       <div className="flex justify-between py-10">
+//         <h1 className="text-2xl font-semibold">Quotes</h1>
+//         {/* <CustomSearchInput onSearch={() => {}} /> */}
+//         <CustomCreateButton title="Create Quote" onClick={handleCreateClick} />
+//       </div>
+
+//       {/* <div className="flex justify-end mr-4 mb-4">
+//         <CustomCreateButton title="Create Quote" onClick={handleCreateClick} />
+//       </div> */}
+
+//       <ResuableDocumentForm
+//         title="Quote"
+//         mode={mode}
+//         creating={creating}
+//         updating={updating}
+//         open={isDrawerOpen}
+//         onClose={() => setIsDrawerOpen(false)}
+//         onSubmit={handleSubmit}
+//         defaultValues={
+//           mode === "edit" && editQuote
+//             ? {
+//                 title: editQuote.title,
+//                 amount: editQuote.value,
+//               }
+//             : {
+//                 title: "",
+//                 amount: "",
+//               }
+//         }
+//         fields={[
+//           { name: "title", label: "Quote Title", placeholder: "Enter title" },
+//           { name: "amount", label: "Amount", placeholder: "Enter amount" },
+//         ]}
+//       />
+
+//       {isLoading ? (
+//         <div className="flex justify-center items-center h-40">
+//           <Spin size="large" />
+//         </div>
+//       ) : (
+//         <Row gutter={[16, 16]}>
+//           {quotes
+//             .filter((q) => q.projectId === projectId)
+//             .map((quote: any) => (
+//               <Col span={6} key={quote._id}>
+//                 <Card
+//                   style={{
+//                     backgroundColor: "#f1f1f1",
+//                   }}
+//                   hoverable
+//                   bodyStyle={{
+//                     backgroundColor: "#f1f1f1",
+//                     padding: "12px 24px",
+//                     display: "flex",
+//                     flexDirection: "column",
+//                     justifyContent: "center",
+//                   }}
+//                   onClick={() => handleViewClick(quote)}
+//                   title={
+//                     <h3 className="text-lg font-medium text-gray-900 truncate">
+//                       {quote.title}
+//                     </h3>
+//                   }
+//                   extra={
+//                     <CustomViewMoreButton
+//                       items={[
+//                         { key: "view quote", label: "👁️ View Quote" },
+//                         { key: "edit", label: "✏️ Edit Quote" },
+//                         { key: "share", label: "🔗 Share Quote" },
+//                         {
+//                           key: "unshare",
+//                           label: (
+//                             <div className="flex items-center gap-1">
+//                               <Unlink className="text-green-500" size={14} />
+//                               Unshare Quote
+//                             </div>
+//                           ),
+//                         },
+//                         {
+//                           key: "delete",
+//                           label: "🗑️ Delete Quote",
+//                           danger: true,
+//                         },
+//                       ]}
+//                       onClick={async (key) => {
+//                         switch (key) {
+//                           case "view quote":
+//                             handleViewClick(quote);
+//                             break;
+//                           case "edit":
+//                             handleEditClick(quote);
+//                             break;
+//                           case "share":
+//                             handleShareQuote(quote);
+//                             break;
+//                           case "unshare":
+//                             handleUnShareQuote(quote);
+//                             break;
+//                           case "delete":
+//                             showDeleteAlert({
+//                               onConfirm: async () => {
+//                                 try {
+//                                   await deleteQuote(quote._id).unwrap();
+//                                   refetch();
+//                                 } catch (err: any) {
+//                                   errorAlert(
+//                                     "Delete Error",
+//                                     err?.data?.message ||
+//                                       "Failed to delete quote"
+//                                   );
+//                                 }
+//                               },
+//                             });
+//                             break;
+//                         }
+//                       }}
+//                     />
+//                   }
+//                 >
+//                   <Statistic value={quote.value} prefix="£" />
+//                 </Card>
+//               </Col>
+//             ))}
+//         </Row>
+//       )}
+
+//       {/* Modal for Sharing */}
+//       <Modal
+//         title="Share Quote"
+//         open={shareModalOpen}
+//         onCancel={() => {
+//           setShareModalOpen(false);
+//           setShareQuoteItem(null);
+//         }}
+//         footer={null}
+//         width={500}
+//       >
+//         <CustomShareSelector
+//           title="Share this quote"
+//           roles={["primeAdmin", "basicAdmin", "client"]}
+//           onShare={handleConfirmShare}
+//         />
+//       </Modal>
+
+//       {/* Modal for Unsharing */}
+//       <Modal
+//         title="Unshare Quote"
+//         open={unshareModalOpen}
+//         onCancel={() => {
+//           setUnshareModalOpen(false);
+//           setSelectedQuoteId(null);
+//         }}
+//         footer={null}
+//         width={500}
+//       >
+//         <CustomUnshareSelector
+//           title="Remove access from users"
+//           sharedUsers={(singleQuoteData?.sharedWith || []).map((u: any) => ({
+//             userId: u.userId._id,
+//             name: u.userId.name,
+//             role: u.userId.role,
+//             email: u.userId.email || "",
+//             profileImg: u.userId.profileImg,
+//           }))}
+//           onUnshare={handleConfirmUnshare}
+//         />
+//       </Modal>
+//     </div>
+//   );
+// };
+
+// export default QuoteDetailsPage;
+
 import { useState } from "react";
 import ResuableDocumentForm from "../../../components/ResuableDocumentForm";
-// import CustomSearchInput from "../../../components/CustomSearchInput";
 import CustomCreateButton from "../../../components/CustomCreateButton";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import { useNavigate, useParams } from "react-router-dom";
@@ -275,6 +617,12 @@ import { showDeleteAlert } from "../../../utils/deleteAlert";
 import CustomShareSelector from "../../../components/CustomShareSelector";
 import CustomUnshareSelector from "../../../components/CustomUnshareSelector";
 import { Unlink } from "lucide-react";
+
+// --- Helper Function to Strip HTML ---
+const stripHtml = (html: string) => {
+  if (!html) return "";
+  return html.replace(/<[^>]*>?/gm, "");
+};
 
 const QuoteDetailsPage = () => {
   const navigate = useNavigate();
@@ -301,11 +649,8 @@ const QuoteDetailsPage = () => {
   const [editQuote, setEditQuote] = useState<any | null>(null);
   const [mode, setMode] = useState<"create" | "edit">("create");
 
-  // Share modal state
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareQuoteItem, setShareQuoteItem] = useState<any | null>(null);
-
-  // Unshare modal state
   const [unshareModalOpen, setUnshareModalOpen] = useState(false);
 
   const handleCreateClick = () => {
@@ -315,14 +660,15 @@ const QuoteDetailsPage = () => {
   };
 
   const handleViewClick = (quote: any) => {
-    console.log("Viewing quote:", quote);
+    // Strip HTML for navigation state as well
+    const cleanTitle = stripHtml(quote.title);
     navigate(`/projects/${projectId}/quote-documents`, {
       state: {
-        quoteTitle: quote.title,
+        quoteTitle: cleanTitle,
         documents: [
           {
             id: quote._id,
-            title: quote.title,
+            title: cleanTitle,
             amount: quote.value,
             fileUrl: quote.file,
           },
@@ -366,19 +712,15 @@ const QuoteDetailsPage = () => {
         error?.data?.message ||
         "Failed to submit quote.";
       errorAlert("Submission Error", errorMessage);
-      console.error("Error submitting quote:", error);
     }
   };
 
-  // ✅ Handle Share Quote
   const handleShareQuote = (quote: any) => {
     setShareQuoteItem(quote);
     setShareModalOpen(true);
   };
 
-  // ✅ Confirm Share
   const handleConfirmShare = async (selectedUsers: any[]) => {
-    console.log(selectedUsers);
     try {
       await shareQuote({
         id: shareQuoteItem._id,
@@ -396,13 +738,11 @@ const QuoteDetailsPage = () => {
     }
   };
 
-  // ✅ Handle Unshare Quote
   const handleUnShareQuote = (quote: any) => {
     setSelectedQuoteId(quote._id);
     setUnshareModalOpen(true);
   };
 
-  // ✅ Confirm Unshare
   const handleConfirmUnshare = async (selectedUsers: any[]) => {
     try {
       await unShareQuote({
@@ -422,16 +762,11 @@ const QuoteDetailsPage = () => {
   };
 
   return (
-    <div className="w-full  gap-4 bg-white min-h-screen p-6">
+    <div className="w-full gap-4 bg-white min-h-screen p-6">
       <div className="flex justify-between py-10">
         <h1 className="text-2xl font-semibold">Quotes</h1>
-        {/* <CustomSearchInput onSearch={() => {}} /> */}
         <CustomCreateButton title="Create Quote" onClick={handleCreateClick} />
       </div>
-
-      {/* <div className="flex justify-end mr-4 mb-4">
-        <CustomCreateButton title="Create Quote" onClick={handleCreateClick} />
-      </div> */}
 
       <ResuableDocumentForm
         title="Quote"
@@ -444,13 +779,11 @@ const QuoteDetailsPage = () => {
         defaultValues={
           mode === "edit" && editQuote
             ? {
-                title: editQuote.title,
+                // Strip HTML when populating the edit form
+                title: stripHtml(editQuote.title),
                 amount: editQuote.value,
               }
-            : {
-                title: "",
-                amount: "",
-              }
+            : { title: "", amount: "" }
         }
         fields={[
           { name: "title", label: "Quote Title", placeholder: "Enter title" },
@@ -465,91 +798,94 @@ const QuoteDetailsPage = () => {
       ) : (
         <Row gutter={[16, 16]}>
           {quotes
-            .filter((q) => q.projectId === projectId)
-            .map((quote: any) => (
-              <Col span={6} key={quote._id}>
-                <Card
-                  style={{
-                    backgroundColor: "#f1f1f1",
-                  }}
-                  hoverable
-                  bodyStyle={{
-                    backgroundColor: "#f1f1f1",
-                    padding: "12px 24px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                  }}
-                  onClick={() => handleViewClick(quote)}
-                  title={
-                    <h3 className="text-lg font-medium text-gray-900 truncate">
-                      {quote.title}
-                    </h3>
-                  }
-                  extra={
-                    <CustomViewMoreButton
-                      items={[
-                        { key: "view quote", label: "👁️ View Quote" },
-                        { key: "edit", label: "✏️ Edit Quote" },
-                        { key: "share", label: "🔗 Share Quote" },
-                        {
-                          key: "unshare",
-                          label: (
-                            <div className="flex items-center gap-1">
-                              <Unlink className="text-green-500" size={14} />
-                              Unshare Quote
-                            </div>
-                          ),
-                        },
-                        {
-                          key: "delete",
-                          label: "🗑️ Delete Quote",
-                          danger: true,
-                        },
-                      ]}
-                      onClick={async (key) => {
-                        switch (key) {
-                          case "view quote":
-                            handleViewClick(quote);
-                            break;
-                          case "edit":
-                            handleEditClick(quote);
-                            break;
-                          case "share":
-                            handleShareQuote(quote);
-                            break;
-                          case "unshare":
-                            handleUnShareQuote(quote);
-                            break;
-                          case "delete":
-                            showDeleteAlert({
-                              onConfirm: async () => {
-                                try {
-                                  await deleteQuote(quote._id).unwrap();
-                                  refetch();
-                                } catch (err: any) {
-                                  errorAlert(
-                                    "Delete Error",
-                                    err?.data?.message ||
-                                      "Failed to delete quote"
-                                  );
-                                }
-                              },
-                            });
-                            break;
-                        }
-                      }}
-                    />
-                  }
-                >
-                  <Statistic value={quote.value} prefix="£" />
-                </Card>
-              </Col>
-            ))}
+            .filter((q: any) => q.projectId === projectId)
+            .map((quote: any) => {
+              // ✅ Clean title here for UI display
+              const displayTitle = stripHtml(quote.title);
+
+              return (
+                <Col span={6} key={quote._id}>
+                  <Card
+                    style={{ backgroundColor: "#f1f1f1" }}
+                    hoverable
+                    bodyStyle={{
+                      backgroundColor: "#f1f1f1",
+                      padding: "12px 24px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
+                    onClick={() => handleViewClick(quote)}
+                    title={
+                      <h3 className="text-lg font-medium text-gray-900 truncate">
+                        {displayTitle}
+                      </h3>
+                    }
+                    extra={
+                      <CustomViewMoreButton
+                        items={[
+                          { key: "view quote", label: "👁️ View Quote" },
+                          { key: "edit", label: "✏️ Edit Quote" },
+                          { key: "share", label: "🔗 Share Quote" },
+                          {
+                            key: "unshare",
+                            label: (
+                              <div className="flex items-center gap-1">
+                                <Unlink className="text-green-500" size={14} />
+                                Unshare Quote
+                              </div>
+                            ),
+                          },
+                          {
+                            key: "delete",
+                            label: "🗑️ Delete Quote",
+                            danger: true,
+                          },
+                        ]}
+                        onClick={async (key) => {
+                          switch (key) {
+                            case "view quote":
+                              handleViewClick(quote);
+                              break;
+                            case "edit":
+                              handleEditClick(quote);
+                              break;
+                            case "share":
+                              handleShareQuote(quote);
+                              break;
+                            case "unshare":
+                              handleUnShareQuote(quote);
+                              break;
+                            case "delete":
+                              showDeleteAlert({
+                                onConfirm: async () => {
+                                  try {
+                                    await deleteQuote(quote._id).unwrap();
+                                    refetch();
+                                  } catch (err: any) {
+                                    errorAlert(
+                                      "Delete Error",
+                                      err?.data?.message ||
+                                        "Failed to delete quote"
+                                    );
+                                  }
+                                },
+                              });
+                              break;
+                          }
+                        }}
+                      />
+                    }
+                  >
+                    <Statistic value={quote.value} prefix="£" />
+                  </Card>
+                </Col>
+              );
+            })}
         </Row>
       )}
 
-      {/* Modal for Sharing */}
+      {/* Share Modal */}
       <Modal
         title="Share Quote"
         open={shareModalOpen}
@@ -567,7 +903,7 @@ const QuoteDetailsPage = () => {
         />
       </Modal>
 
-      {/* Modal for Unsharing */}
+      {/* Unshare Modal */}
       <Modal
         title="Unshare Quote"
         open={unshareModalOpen}

@@ -235,7 +235,7 @@ export default function OverheadCostsPage() {
 
                   {/* --- NEW: Value Column --- */}
                   <td className="px-4 py-3 font-medium text-gray-700">
-                    ${item.value?.toLocaleString()}
+                    £{item.value?.toLocaleString()}
                   </td>
 
                   {/* --- NEW: VAT Rate Column --- */}
@@ -247,7 +247,7 @@ export default function OverheadCostsPage() {
 
                   {/* --- NEW: VAT Amount Column --- */}
                   <td className="px-4 py-3 font-medium text-orange-600">
-                    +${item.vatAmount?.toLocaleString()}
+                    +£{item.vatAmount?.toLocaleString()}
                   </td>
 
                   {/* Actions */}

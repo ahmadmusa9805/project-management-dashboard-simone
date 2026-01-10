@@ -402,7 +402,7 @@ const SnaggingListPage: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
-                    minHeight: "60px", // ✅ keep card height consistent
+                    minHeight: "80px", // Increased slightly to accommodate status text
                   }}
                   title={
                     <h3 className="text-lg font-medium text-gray-900 truncate">
@@ -414,8 +414,6 @@ const SnaggingListPage: React.FC = () => {
                       items={[
                         { key: "view", label: "👀 View" },
                         { key: "edit", label: "✏️ Edit " },
-
-                        // ✅ Only show share/unshare if user is NOT basicAdmin
                         ...(userRole !== USER_ROLE.basicAdmin
                           ? [
                               { key: "share", label: "🔗 Share " },
@@ -443,16 +441,16 @@ const SnaggingListPage: React.FC = () => {
                     />
                   }
                 >
-                  <p className="text-gray-700 line-clamp-2">
+                  <p className="text-gray-700 line-clamp-2 mb-2">
                     {snag.description}
                   </p>
-                  {/* <div className="mt-2 text-sm text-gray-500 space-y-1">
-                    {snag.startDate && <p>Start: {snag.startDate}</p>}
-                    {snag.endDate && <p>End: {snag.endDate}</p>}
-                    {snag.isShared && (
-                      <p className="text-green-600 font-medium">✅ Shared</p>
-                    )}
-                  </div> */}
+
+                  {/* Logic for Status */}
+                  {snag?.status === "true" ? (
+                    <p className="text-green-600 font-medium">✅ completed</p>
+                  ) : (
+                    <p className="text-orange-500 font-medium">⏳ pending</p>
+                  )}
                 </Card>
               </Col>
             ))

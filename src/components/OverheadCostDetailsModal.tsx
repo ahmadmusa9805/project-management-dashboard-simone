@@ -92,8 +92,14 @@ const OverheadCostDetailsModal: React.FC<Props> = ({
                 <Text>{costItem.reference}</Text>
               </div>
               <div>
-                <Text strong>💰 Value:</Text> <Text>${costItem.value}</Text>
+                <Text strong>💰 Value:</Text> <Text>£ {costItem.value}</Text>
               </div>
+
+              <div>
+                <Text strong>VAT Amount:</Text>{" "}
+                <Text>+£{costItem.vatAmount}</Text>
+              </div>
+
               <div>
                 <Text strong>VAT:</Text> <Text>{costItem.vat}%</Text>
               </div>
