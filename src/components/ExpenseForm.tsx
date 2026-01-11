@@ -1162,7 +1162,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const { data: labourList, isLoading: labourLoading } =
     useGetAllLaboursQuery();
 
-  const selectedLaborName = watch("name");
+  // const selectedLaborName = watch("name");
   const days = watch("days");
   const ratePerDay = watch("ratePerDay");
 

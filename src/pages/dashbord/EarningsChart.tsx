@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
   LineChart,
@@ -124,7 +125,11 @@ const EarningsChart: React.FC = () => {
             tickFormatter={(val) => `${(val / 1000000).toFixed(1)}M`}
           />
           <Tooltip
-            formatter={(val: number) => [`£${val.toLocaleString()}`, ""]}
+            // formatter={(val: number) => [`£${val.toLocaleString()}`, ""]}
+            formatter={(val) => [`£${(val ?? 0).toLocaleString("en-GB")}`,""]}
+
+            // formatter={(val) => [val?.toString() ?? "0", ""]}
+
             labelFormatter={(label) => `Period: ${label}`}
           />
           <Legend />
