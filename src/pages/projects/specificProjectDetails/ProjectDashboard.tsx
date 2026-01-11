@@ -5,7 +5,10 @@ import { useGetSingleProjectQuery } from "../../../Redux/features/projects/proje
 import { useGetAllExpensesQuery } from "../../../Redux/features/projects/project/costManagenent/costManagementApi";
 import { useGetAllPaymentTrackerElementsQuery } from "../../../Redux/features/projects/project/paymentTracker/paymentTrackerApi";
 import { useGetUserByIdQuery } from "../../../Redux/features/users/usersApi";
-import { useGetSingleProjectAnalyticsQuery } from "../../../Redux/features/analytics/analyticsApi";
+import {
+  useGetSingleProjectAnalyticsQuery,
+  useGetSingleProjectVatDueAnalyticsQuery,
+} from "../../../Redux/features/analytics/analyticsApi";
 // import { useGetAllSnaggingsQuery } from "../../../Redux/features/projects/project/snaggingList/snaggingListApi";
 
 // import { useGetAllNotesQuery } from "../../../Redux/features/projects/project/notes/noteApi";
@@ -53,6 +56,12 @@ const ProjectDashboard = () => {
     useGetSingleProjectAnalyticsQuery(projectId!, {
       skip: !projectId,
     });
+  const {
+    data: projectAnalticsVatDueData,
+    isLoading: isAnalyticsVatDueLoading,
+  } = useGetSingleProjectVatDueAnalyticsQuery(projectId!, {
+    skip: !projectId,
+  });
   // Queries
   const { data: singleProject, isLoading: projectLoading } =
     useGetSingleProjectQuery(
@@ -142,6 +151,7 @@ const ProjectDashboard = () => {
     expenseLoading ||
     paymentLoading ||
     clientLoading ||
+    isAnalyticsVatDueLoading ||
     isAnalyticsLoading;
   const labourCost = getAmountByName("Labour");
   const materialCost = getAmountByName("Material");
@@ -158,6 +168,7 @@ const ProjectDashboard = () => {
     clientName: clientData?.name || "N/A",
     // assignedAdmin: projectData.assignedAdmin || "N/A", // if you add later
     budget: projectAnalticsData?.data?.totalQuoteeValue || 0,
+    vatDue: projectAnalticsVatDueData?.data?.vatDue || 0,
     // approvedBudget: projectData.approvedBudget || 0,
     materialCost: materialCost || 0,
     labourCost: labourCost || 0,
@@ -234,6 +245,15 @@ const ProjectDashboard = () => {
                 prefix="£"
                 value={mappedData.totalCost}
               />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card
+              hoverable
+              style={{ backgroundColor: "#f1f1f1" }}
+              onClick={() => handleNavigate("live-project-costs")}
+            >
+              <Statistic title="VAT Due" prefix="£" value={mappedData.vatDue} />
             </Card>
           </Col>
 

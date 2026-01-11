@@ -70,6 +70,14 @@ const LoginPage = () => {
 
         // decode token to route by role (your code used jwtDecode earlier)
         const decoded = jwtDecode<{ role?: string }>(result.accessToken || "");
+
+        if (decoded?.role === USER_ROLE.client) {
+          errorAlert(
+            "Access Denied",
+            "Clients are not authorized to access this portal."
+          );
+          return; // Stop the login process
+        }
         successAlert("Login successful", "You have successfully logged in.");
 
         if (decoded?.role === USER_ROLE.superAdmin) {

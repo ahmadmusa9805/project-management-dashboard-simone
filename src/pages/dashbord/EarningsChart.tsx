@@ -72,7 +72,7 @@ const EarningsChart: React.FC = () => {
   // Calculate total earnings
   const totalEarnings = React.useMemo(() => {
     if (!yearData?.data?.totalProfit) return 0;
-    return Math.abs(parseFloat(yearData.data.totalProfit));
+    return parseFloat(yearData.data.totalProfit);
   }, [yearData]);
 
   if (loading3M || loading6M || loading12M) {

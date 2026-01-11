@@ -37,6 +37,21 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
     initialData?.file || null
   );
 
+  // const {
+  //   control,
+  //   handleSubmit,
+  //   formState: { errors },
+  //   setValue,
+  // } = useForm({
+  //   defaultValues: {
+  //     title: initialData?.title || "",
+  //     startDate: initialData?.startDate || "",
+  //     endDate: initialData?.endDate || "",
+  //     description: initialData?.description || "",
+  //     completed: initialData?.completed || false,
+  //     file: initialData?.file || null,
+  //   },
+  // });
   const {
     control,
     handleSubmit,
@@ -48,7 +63,10 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
       startDate: initialData?.startDate || "",
       endDate: initialData?.endDate || "",
       description: initialData?.description || "",
-      completed: initialData?.completed || false,
+      // Logic: Check if completed is true OR if status is the string "true"
+      completed:
+        initialData?.completed === true ||
+        (initialData as any)?.status === "true",
       file: initialData?.file || null,
     },
   });
@@ -198,7 +216,7 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
       </div>
 
       {/* Mark as Completed – Only in Edit */}
-      {mode === "edit" && entityName === "Task" && (
+      {/* {mode === "edit" && entityName === "Task" && (
         <div className="flex items-center gap-2">
           <Controller
             name="completed"
@@ -215,6 +233,34 @@ const TaskScheduleForm: React.FC<TaskScheduleFormProps> = ({
           />
           <label className="text-[#000E0F] font-medium">
             Mark as Completed
+          </label>
+        </div>
+      )} */}
+
+      {/* Mark as Completed – Only in Edit Mode for Tasks */}
+      {mode === "edit" && entityName === "Task" && (
+        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+          <Controller
+            name="completed"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <input
+                type="checkbox"
+                id="completed-checkbox"
+                checked={!!value} // Ensures a boolean value
+                onChange={(e) => onChange(e.target.checked)}
+                className="w-5 h-5 cursor-pointer accent-[#83ac72]"
+              />
+            )}
+          />
+          <label
+            htmlFor="completed-checkbox"
+            className="text-[#000E0F] font-medium cursor-pointer select-none"
+          >
+            {/* Dynamic label based on state */}
+            {control._formValues.completed
+              ? "Task Completed ✅"
+              : "Mark as Completed"}
           </label>
         </div>
       )}

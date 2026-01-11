@@ -7,6 +7,7 @@ import {
   CalendarClockIcon,
   ChartBarBigIcon,
   ClipboardListIcon,
+  CoinsIcon,
   Crown,
   FileBadgeIcon,
   FilePenLineIcon,
@@ -107,6 +108,12 @@ const rawSidebarItems: SidebarItem[] = [
     label: "Labour Management",
     icon: <HardHatIcon />,
     allowedRoles: [USER_ROLE.superAdmin, USER_ROLE.primeAdmin],
+  },
+  {
+    key: "/overhead-costs",
+    label: "Overhead Costs",
+    icon: <CoinsIcon />,
+    allowedRoles: [USER_ROLE.superAdmin],
   },
   {
     key: "/clients",

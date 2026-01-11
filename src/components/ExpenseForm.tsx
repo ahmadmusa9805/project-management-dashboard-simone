@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import React, { useEffect } from "react";
 // import { useForm, Controller } from "react-hook-form";
 // import { DatePicker, Button, Input, Select, Upload, Spin } from "antd";
@@ -439,6 +440,628 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+// import React, { useEffect } from "react";
+// import { useForm, Controller } from "react-hook-form";
+// import { DatePicker, Button, Input, Select, Spin } from "antd";
+
+// import dayjs from "dayjs";
+// import type { ExpenseType } from "../types/projectAllTypes/expense";
+// import { useGetAllLaboursQuery } from "../Redux/features/labour/labourApi";
+// import { ErrorMessage } from "@hookform/error-message";
+// import Dragger from "antd/es/upload/Dragger";
+// import { CloudUpload } from "lucide-react";
+
+// export interface ExpenseFormValues {
+//   _id?: string;
+//   type?: ExpenseType;
+//   name: string;
+//   quantity?: number;
+//   unit?: string;
+//   unitPrice?: number;
+//   days?: number;
+//   vat?: number;
+//   ratePerDay?: number;
+//   amount?: number;
+//   file?: string | any;
+//   date?: string;
+//   description?: string;
+//   labourId?: string;
+// }
+
+// interface ExpenseFormProps {
+//   defaultValues?: ExpenseFormValues;
+//   mode?: "create" | "edit";
+//   onSubmit: (data: ExpenseFormValues) => void;
+//   onCancel: () => void;
+//   title: string;
+//   creating?: boolean;
+//   updating?: boolean;
+// }
+
+// const { TextArea } = Input;
+
+// const ExpenseForm: React.FC<ExpenseFormProps> = ({
+//   defaultValues,
+//   title,
+//   creating,
+//   updating,
+//   mode = "create",
+//   onSubmit,
+//   onCancel,
+// }) => {
+//   const normalizedTitle = (defaultValues?.type || title).trim().toLowerCase();
+
+//   // Set expense options & disable type selection if already determined
+//   let expenseOptions: { label: string; value: ExpenseType }[] = [];
+//   let isTypeDisabled = false;
+//   let defaultTypeValue: ExpenseType | undefined;
+
+//   if (normalizedTitle === "labour") {
+//     expenseOptions = [{ label: "Labour", value: "Labour" }];
+//     isTypeDisabled = true;
+//     defaultTypeValue = "Labour";
+//   } else if (normalizedTitle === "subcontractor") {
+//     expenseOptions = [{ label: "Subcontractor", value: "Subcontractor" }];
+//     isTypeDisabled = true;
+//     defaultTypeValue = "Subcontractor";
+//   } else if (normalizedTitle === "material") {
+//     expenseOptions = [{ label: "Material", value: "Material" }];
+//     isTypeDisabled = true;
+//     defaultTypeValue = "Material";
+//   } else {
+//     expenseOptions = [
+//       { label: "Labour", value: "Labour" },
+//       { label: "Subcontractor", value: "Subcontractor" },
+//       { label: "Material", value: "Material" },
+//     ];
+//   }
+
+//   console.log("defaultValue", defaultValues);
+
+//   const {
+//     control,
+//     handleSubmit,
+//     setValue,
+//     watch,
+//     formState: { errors },
+//   } = useForm<ExpenseFormValues>({
+//     defaultValues: defaultValues ?? {
+//       _id: "",
+//       type: defaultTypeValue,
+//       name: "",
+//       quantity: 0,
+//       // unit: "",
+//       unitPrice: 0,
+//       days: 0,
+//       vat: 0,
+//       ratePerDay: 0,
+//       amount: 0,
+//       date: dayjs().format("YYYY-MM-DD"),
+//       description: "",
+//     },
+//   });
+
+//   // Fetch labour list from backend
+//   const { data: labourList, isLoading: labourLoading } =
+//     useGetAllLaboursQuery();
+
+//   const selectedLaborName = watch("name");
+//   const days = watch("days");
+//   const ratePerDay = watch("ratePerDay");
+
+//   // Calculate amount dynamically
+//   useEffect(() => {
+//     if (typeof days === "number" && typeof ratePerDay === "number") {
+//       const calculatedAmount = days * ratePerDay;
+//       setValue("amount", calculatedAmount, {
+//         shouldValidate: true,
+//         shouldDirty: true,
+//       });
+//     }
+//   }, [days, ratePerDay, setValue]);
+
+//   const selectedLabourId = watch("labourId");
+
+//   useEffect(() => {
+//     if (selectedLabourId && labourList?.data?.length) {
+//       const labour = labourList.data.find(
+//         (lab: any) => lab._id === selectedLabourId
+//       );
+//       if (labour) {
+//         setValue("ratePerDay", labour.dayRate || 0);
+//         setValue("description", labour.description || "");
+//         setValue("name", labour.name);
+//       }
+//     }
+//   }, [selectedLabourId, labourList, setValue]);
+
+//   useEffect(() => {
+//     if (
+//       normalizedTitle === "labour" &&
+//       labourList?.data?.length &&
+//       selectedLaborName
+//     ) {
+//       const selectedLabor = labourList?.data?.find(
+//         (lab: any) => lab.name === selectedLaborName
+//       );
+//       if (selectedLabor) {
+//         setValue("ratePerDay", selectedLabor.dayRate || 0, {
+//           shouldValidate: true,
+//           shouldDirty: true,
+//         });
+//         setValue("description", selectedLabor.description || "", {
+//           shouldValidate: false,
+//         });
+//       }
+//     }
+//   }, [selectedLaborName, labourList, normalizedTitle, setValue]);
+
+//   const handleFormSubmit = (data: ExpenseFormValues) => {
+//     onSubmit(data);
+//   };
+
+//   const showMaterialFields = normalizedTitle === "material";
+//   const showLabourFields = normalizedTitle === "labour";
+//   const showSubcontractorFields = normalizedTitle === "subcontractor";
+
+//   return (
+//     <form
+//       onSubmit={handleSubmit(handleFormSubmit)}
+//       className="w-full bg-white rounded  p-6 flex flex-col gap-6"
+//     >
+//       <h2 className="text-2xl font-semibold text-[#000E0F]">
+//         {mode === "edit" ? "Edit Expense" : "Create Expense"}
+//       </h2>
+
+//       {/* Expense Type */}
+//       <div className="flex flex-col gap-2">
+//         <label>Expense Type</label>
+//         <Controller
+//           control={control}
+//           name="type"
+//           rules={{ required: "Expense type is required" }}
+//           render={({ field }) => (
+//             <Select
+//               {...field}
+//               disabled={isTypeDisabled}
+//               placeholder="Select expense type"
+//             >
+//               {expenseOptions.map((opt) => (
+//                 <Select.Option key={opt.value} value={opt.value}>
+//                   {opt.label}
+//                 </Select.Option>
+//               ))}
+//             </Select>
+//           )}
+//         />
+//         <ErrorMessage
+//           errors={errors}
+//           name="type"
+//           render={({ message }: { message: string }) => (
+//             <p className="text-red-500 text-sm">{message}</p>
+//           )}
+//         />
+//       </div>
+
+//       {/* Name */}
+//       <div className="flex flex-col gap-2">
+//         <label>Name</label>
+//         {showLabourFields ? (
+//           labourLoading ? (
+//             <Spin size="small" />
+//           ) : (
+//             <>
+//               <Controller
+//                 control={control}
+//                 name="labourId"
+//                 rules={{ required: "Name is required" }}
+//                 render={({ field }) => (
+//                   <Select
+//                     {...field}
+//                     showSearch
+//                     placeholder="Select Labour"
+//                     optionFilterProp="children"
+//                     filterOption={(input, option) =>
+//                       (option?.children as unknown as string)
+//                         .toLowerCase()
+//                         .includes(input.toLowerCase())
+//                     }
+//                     allowClear
+//                   >
+//                     {labourList?.data?.length ? (
+//                       labourList?.data?.map((lab: any) => (
+//                         <Select.Option key={lab._id} value={lab._id}>
+//                           {lab.name}
+//                         </Select.Option>
+//                       ))
+//                     ) : (
+//                       <Select.Option disabled>No labours found</Select.Option>
+//                     )}
+//                   </Select>
+//                 )}
+//               />
+//               <ErrorMessage
+//                 errors={errors}
+//                 name="labourId"
+//                 render={({ message }: { message: string }) => (
+//                   <p className="text-red-500 text-sm">{message}</p>
+//                 )}
+//               />
+//               <Controller
+//                 control={control}
+//                 name="name"
+//                 render={() => null as unknown as React.ReactElement}
+//               />
+//             </>
+//           )
+//         ) : (
+//           <>
+//             <Controller
+//               control={control}
+//               name="name"
+//               rules={{ required: "Name is required" }}
+//               render={({ field }) => (
+//                 <Input
+//                   {...field}
+//                   placeholder="Name of labour/material/vendor"
+//                 />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="name"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </>
+//         )}
+//       </div>
+
+//       {/* Material-specific fields */}
+//       {showMaterialFields && (
+//         <>
+//           <div className="flex flex-col gap-2">
+//             <label>Quantity</label>
+//             <Controller
+//               control={control}
+//               name="quantity"
+//               rules={{ required: "Quantity is required" }}
+//               render={({ field }) => (
+//                 <Input type="number" {...field} placeholder="Quantity" />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="quantity"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div>
+//           {/* <div className="flex flex-col gap-2">
+//             <label>Unit</label>
+//             <Controller
+//               control={control}
+//               name="unit"
+//               rules={{ required: "Unit is required" }}
+//               render={({ field }) => (
+//                 <Input {...field} placeholder="Unit (e.g. kg, m)" />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="unit"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div> */}
+//           <div className="flex flex-col gap-2">
+//             <label>Unit Price</label>
+//             <Controller
+//               control={control}
+//               name="unitPrice"
+//               rules={{ required: "Unit price is required" }}
+//               render={({ field }) => (
+//                 <Input type="number" {...field} placeholder="Unit Price" />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="unitPrice"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div>
+
+//           {/* VAT */}
+//           <div className="flex flex-col gap-2">
+//             <label>VAT %</label>
+//             <Controller
+//               control={control}
+//               name="vat"
+//               rules={{ required: "VAT is required" }}
+//               render={({ field }) => (
+//                 <Input
+//                   {...field}
+//                   value={field.value ?? 20} // ensure default value
+//                   disabled
+//                   placeholder="VAT"
+//                 />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="vat"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div>
+
+//           {/* Upload */}
+
+//           <Controller
+//             control={control}
+//             name="file"
+//             // rules={{ required:  }}
+//             render={({ field }) => (
+//               <div className="flex flex-col gap-2">
+//                 <label className="font-medium">Upload Files</label>
+//                 <Dragger
+//                   name="file"
+//                   accept="*"
+//                   beforeUpload={() => false} // prevent auto upload
+//                   multiple={false}
+//                   fileList={
+//                     field.value
+//                       ? [
+//                           {
+//                             uid: "-1",
+//                             name: field.value.name,
+//                             status: "done",
+//                             originFileObj: field.value,
+//                           },
+//                         ]
+//                       : []
+//                   }
+//                   onChange={({ fileList }) => {
+//                     field.onChange(fileList?.[0]?.originFileObj || undefined);
+//                   }}
+//                   onRemove={() => field.onChange(undefined)}
+//                   style={{ padding: "8px" }}
+//                 >
+//                   <p className="text-center flex flex-col items-center">
+//                     <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+//                   </p>
+//                   <p className="text-[10px]">Click or drag file to upload</p>
+//                 </Dragger>
+
+//                 <ErrorMessage
+//                   errors={errors}
+//                   name="file"
+//                   render={({ message }: { message: string }) => (
+//                     <p className="text-red-500 text-sm">{message}</p>
+//                   )}
+//                 />
+//               </div>
+//             )}
+//           />
+//         </>
+//       )}
+
+//       {/* Labour-specific fields */}
+//       {showLabourFields && (
+//         <>
+//           <div className="flex flex-col gap-2">
+//             <label>Days</label>
+//             <Controller
+//               control={control}
+//               name="days"
+//               rules={{ required: "Days are required" }}
+//               render={({ field }) => (
+//                 <Input
+//                   type="number"
+//                   {...field}
+//                   placeholder="Number of days"
+//                   min={1}
+//                   onChange={(e) => {
+//                     const val = Number(e.target.value);
+//                     field.onChange(val > 0 ? val : 1);
+//                   }}
+//                 />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="days"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div>
+//           <div className="flex flex-col gap-2">
+//             <label>Rate Per Day</label>
+//             <Controller
+//               control={control}
+//               name="ratePerDay"
+//               rules={{ required: "Rate per day is required" }}
+//               render={({ field }) => (
+//                 <Input
+//                   type="number"
+//                   {...field}
+//                   placeholder="Rate Per Day"
+//                   min={0}
+//                   onChange={(e) => {
+//                     const val = Number(e.target.value);
+//                     field.onChange(val >= 0 ? val : 0);
+//                   }}
+//                 />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="ratePerDay"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div>
+//         </>
+//       )}
+
+//       {/* Subcontractor-specific fields */}
+//       {showSubcontractorFields && (
+//         <>
+//           {/* <div className="flex flex-col gap-2">
+//             <label>Days</label>
+//             <Controller
+//               control={control}
+//               name="days"
+//               rules={{ required: "Days are required" }}
+//               render={({ field }) => (
+//                 <Input type="number" {...field} placeholder="Number of days" />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="days"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div> */}
+//           {/* <div className="flex flex-col gap-2">
+//             <label>Rate Per Day</label>
+//             <Controller
+//               control={control}
+//               name="ratePerDay"
+//               rules={{ required: "Rate per day is required" }}
+//               render={({ field }) => (
+//                 <Input type="number" {...field} placeholder="Rate Per Day" />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="ratePerDay"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div> */}
+
+//           {/* total cost */}
+//           <div className="flex flex-col gap-2">
+//             <label>Total Cost</label>
+//             <Controller
+//               control={control}
+//               name="amount"
+//               defaultValue={defaultValues?.amount || 0}
+//               rules={{ required: "Total cost is required" }}
+//               render={({ field }) => (
+//                 <Input type="number" {...field} placeholder="Total Cost" />
+//               )}
+//             />
+//             <ErrorMessage
+//               errors={errors}
+//               name="amount"
+//               render={({ message }: { message: string }) => (
+//                 <p className="text-red-500 text-sm">{message}</p>
+//               )}
+//             />
+//           </div>
+//         </>
+//       )}
+
+//       {/* Date */}
+//       <div className="flex flex-col gap-2">
+//         <label>Date</label>
+//         <Controller
+//           control={control}
+//           name="date"
+//           // rules={{ required: "Date is required" }}
+//           render={({ field }) => (
+//             <DatePicker
+//               className="w-full"
+//               format="YYYY-MM-DD"
+//               value={field.value ? dayjs(field.value) : undefined}
+//               onChange={(_date, dateString) => field.onChange(dateString)}
+//             />
+//           )}
+//         />
+//         <ErrorMessage
+//           errors={errors}
+//           name="date"
+//           render={({ message }: { message: string }) => (
+//             <p className="text-red-500 text-sm">{message}</p>
+//           )}
+//         />
+//       </div>
+
+//       {/* Description */}
+//       <div className="flex flex-col gap-2">
+//         <label>Description</label>
+//         <Controller
+//           control={control}
+//           name="description"
+//           // rules={{ required: "Description is required" }}
+//           render={({ field }) => (
+//             <TextArea {...field} rows={3} placeholder="Optional notes" />
+//           )}
+//         />
+//         <ErrorMessage
+//           errors={errors}
+//           name="description"
+//           render={({ message }: { message: string }) => (
+//             <p className="text-red-500 text-sm">{message}</p>
+//           )}
+//         />
+//       </div>
+
+//       {/* <div className="flex flex-col gap-2">
+//         <label>Upload Files</label>
+//         <Controller
+//           control={control}
+//           name="file"
+//           rules={{ required: "File is required" }}
+//           render={({ field }) => (
+//             <Upload
+//               beforeUpload={() => false}
+//               onChange={({ fileList }) =>
+//                 field.onChange(fileList?.[0]?.originFileObj)
+//               }
+//               maxCount={1}
+//             >
+//               <Button icon={<UploadOutlined />}>Upload</Button>
+//             </Upload>
+//           )}
+//         />
+//         <ErrorMessage
+//           errors={errors}
+//           name="file"
+//           render={({ message }: { message: string }) => (
+//             <p className="text-red-500 text-sm">{message}</p>
+//           )}
+//         />
+//       </div> */}
+
+//       {/* Buttons */}
+//       <div className="flex justify-end gap-4">
+//         <Button type="text" onClick={onCancel} className="cancel">
+//           Cancel
+//         </Button>
+//         <Button type="primary" htmlType="submit" loading={creating || updating}>
+//           {mode === "edit" ? "Update" : "Create"}
+//         </Button>
+//       </div>
+//     </form>
+//   );
+// };
+
+// export default ExpenseForm;
+
 import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { DatePicker, Button, Input, Select, Spin } from "antd";
@@ -490,7 +1113,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 }) => {
   const normalizedTitle = (defaultValues?.type || title).trim().toLowerCase();
 
-  // Set expense options & disable type selection if already determined
   let expenseOptions: { label: string; value: ExpenseType }[] = [];
   let isTypeDisabled = false;
   let defaultTypeValue: ExpenseType | undefined;
@@ -515,8 +1137,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     ];
   }
 
-  console.log("defaultValue", defaultValues);
-
   const {
     control,
     handleSubmit,
@@ -529,10 +1149,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       type: defaultTypeValue,
       name: "",
       quantity: 0,
-      // unit: "",
       unitPrice: 0,
       days: 0,
-      vat: 0,
+      vat: 0, // Default to 0, but user can change it
       ratePerDay: 0,
       amount: 0,
       date: dayjs().format("YYYY-MM-DD"),
@@ -540,7 +1159,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     },
   });
 
-  // Fetch labour list from backend
   const { data: labourList, isLoading: labourLoading } =
     useGetAllLaboursQuery();
 
@@ -548,7 +1166,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const days = watch("days");
   const ratePerDay = watch("ratePerDay");
 
-  // Calculate amount dynamically
   useEffect(() => {
     if (typeof days === "number" && typeof ratePerDay === "number") {
       const calculatedAmount = days * ratePerDay;
@@ -574,29 +1191,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     }
   }, [selectedLabourId, labourList, setValue]);
 
-  useEffect(() => {
-    if (
-      normalizedTitle === "labour" &&
-      labourList?.data?.length &&
-      selectedLaborName
-    ) {
-      const selectedLabor = labourList?.data?.find(
-        (lab: any) => lab.name === selectedLaborName
-      );
-      if (selectedLabor) {
-        setValue("ratePerDay", selectedLabor.dayRate || 0, {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
-        setValue("description", selectedLabor.description || "", {
-          shouldValidate: false,
-        });
-      }
-    }
-  }, [selectedLaborName, labourList, normalizedTitle, setValue]);
-
   const handleFormSubmit = (data: ExpenseFormValues) => {
-    onSubmit(data);
+    // Ensure numeric types are correctly formatted before submission
+    const formattedData = {
+      ...data,
+      vat: Number(data.vat),
+      amount: Number(data.amount),
+    };
+    onSubmit(formattedData);
   };
 
   const showMaterialFields = normalizedTitle === "material";
@@ -606,7 +1208,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="w-full bg-white rounded  p-6 flex flex-col gap-6"
+      className="w-full bg-white rounded p-6 flex flex-col gap-6"
     >
       <h2 className="text-2xl font-semibold text-[#000E0F]">
         {mode === "edit" ? "Edit Expense" : "Create Expense"}
@@ -636,13 +1238,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         <ErrorMessage
           errors={errors}
           name="type"
-          render={({ message }: { message: string }) => (
+          render={({ message }) => (
             <p className="text-red-500 text-sm">{message}</p>
           )}
         />
       </div>
 
-      {/* Name */}
+      {/* Name Field Logic */}
       <div className="flex flex-col gap-2">
         <label>Name</label>
         {showLabourFields ? (
@@ -660,395 +1262,188 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     showSearch
                     placeholder="Select Labour"
                     optionFilterProp="children"
-                    filterOption={(input, option) =>
-                      (option?.children as unknown as string)
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
                     allowClear
                   >
-                    {labourList?.data?.length ? (
-                      labourList?.data?.map((lab: any) => (
-                        <Select.Option key={lab._id} value={lab._id}>
-                          {lab.name}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option disabled>No labours found</Select.Option>
-                    )}
+                    {labourList?.data?.map((lab: any) => (
+                      <Select.Option key={lab._id} value={lab._id}>
+                        {lab.name}
+                      </Select.Option>
+                    ))}
                   </Select>
-                )}
-              />
-              <ErrorMessage
-                errors={errors}
-                name="labourId"
-                render={({ message }: { message: string }) => (
-                  <p className="text-red-500 text-sm">{message}</p>
                 )}
               />
               <Controller
                 control={control}
                 name="name"
-                render={() => null as unknown as React.ReactElement}
+                render={() => null as any}
               />
             </>
           )
         ) : (
-          <>
-            <Controller
-              control={control}
-              name="name"
-              rules={{ required: "Name is required" }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  placeholder="Name of labour/material/vendor"
-                />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="name"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
-          </>
+          <Controller
+            control={control}
+            name="name"
+            rules={{ required: "Name is required" }}
+            render={({ field }) => (
+              <Input {...field} placeholder="Name of labour/material/vendor" />
+            )}
+          />
         )}
+        <ErrorMessage
+          errors={errors}
+          name="name"
+          render={({ message }) => (
+            <p className="text-red-500 text-sm">{message}</p>
+          )}
+        />
       </div>
 
-      {/* Material-specific fields */}
+      {/* Conditional Fields for Material */}
       {showMaterialFields && (
-        <>
+        <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2">
             <label>Quantity</label>
             <Controller
               control={control}
               name="quantity"
-              rules={{ required: "Quantity is required" }}
               render={({ field }) => (
                 <Input type="number" {...field} placeholder="Quantity" />
               )}
             />
-            <ErrorMessage
-              errors={errors}
-              name="quantity"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
           </div>
-          {/* <div className="flex flex-col gap-2">
-            <label>Unit</label>
-            <Controller
-              control={control}
-              name="unit"
-              rules={{ required: "Unit is required" }}
-              render={({ field }) => (
-                <Input {...field} placeholder="Unit (e.g. kg, m)" />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="unit"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
-          </div> */}
           <div className="flex flex-col gap-2">
             <label>Unit Price</label>
             <Controller
               control={control}
               name="unitPrice"
-              rules={{ required: "Unit price is required" }}
               render={({ field }) => (
                 <Input type="number" {...field} placeholder="Unit Price" />
               )}
             />
-            <ErrorMessage
-              errors={errors}
-              name="unitPrice"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
           </div>
+        </div>
+      )}
 
-          {/* VAT */}
+      {/* Conditional Fields for Labour */}
+      {showLabourFields && (
+        <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2">
-            <label>VAT %</label>
+            <label>Days</label>
             <Controller
               control={control}
-              name="vat"
-              rules={{ required: "VAT is required" }}
+              name="days"
               render={({ field }) => (
-                <Input
-                  {...field}
-                  value={field.value ?? 20} // ensure default value
-                  disabled
-                  placeholder="VAT"
-                />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="vat"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
+                <Input type="number" {...field} placeholder="Days" />
               )}
             />
           </div>
+          <div className="flex flex-col gap-2">
+            <label>Rate Per Day</label>
+            <Controller
+              control={control}
+              name="ratePerDay"
+              render={({ field }) => (
+                <Input type="number" {...field} placeholder="Rate" />
+              )}
+            />
+          </div>
+        </div>
+      )}
 
-          {/* Upload */}
-
+      {/* Subcontractor Total Cost */}
+      {showSubcontractorFields && (
+        <div className="flex flex-col gap-2">
+          <label>Total Cost</label>
           <Controller
             control={control}
-            name="file"
-            // rules={{ required:  }}
+            name="amount"
             render={({ field }) => (
-              <div className="flex flex-col gap-2">
-                <label className="font-medium">Upload Files</label>
-                <Dragger
-                  name="file"
-                  accept="*"
-                  beforeUpload={() => false} // prevent auto upload
-                  multiple={false}
-                  fileList={
-                    field.value
-                      ? [
-                          {
-                            uid: "-1",
-                            name: field.value.name,
-                            status: "done",
-                            originFileObj: field.value,
-                          },
-                        ]
-                      : []
-                  }
-                  onChange={({ fileList }) => {
-                    field.onChange(fileList?.[0]?.originFileObj || undefined);
-                  }}
-                  onRemove={() => field.onChange(undefined)}
-                  style={{ padding: "8px" }}
-                >
-                  <p className="text-center flex flex-col items-center">
-                    <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
-                  </p>
-                  <p className="text-[10px]">Click or drag file to upload</p>
-                </Dragger>
-
-                <ErrorMessage
-                  errors={errors}
-                  name="file"
-                  render={({ message }: { message: string }) => (
-                    <p className="text-red-500 text-sm">{message}</p>
-                  )}
-                />
-              </div>
+              <Input type="number" {...field} placeholder="Total Cost" />
             )}
           />
-        </>
+        </div>
       )}
 
-      {/* Labour-specific fields */}
-      {showLabourFields && (
-        <>
-          <div className="flex flex-col gap-2">
-            <label>Days</label>
-            <Controller
-              control={control}
-              name="days"
-              rules={{ required: "Days are required" }}
-              render={({ field }) => (
-                <Input
-                  type="number"
-                  {...field}
-                  placeholder="Number of days"
-                  min={1}
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    field.onChange(val > 0 ? val : 1);
-                  }}
-                />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="days"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label>Rate Per Day</label>
-            <Controller
-              control={control}
-              name="ratePerDay"
-              rules={{ required: "Rate per day is required" }}
-              render={({ field }) => (
-                <Input
-                  type="number"
-                  {...field}
-                  placeholder="Rate Per Day"
-                  min={0}
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    field.onChange(val >= 0 ? val : 0);
-                  }}
-                />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="ratePerDay"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
-          </div>
-        </>
-      )}
-
-      {/* Subcontractor-specific fields */}
-      {showSubcontractorFields && (
-        <>
-          {/* <div className="flex flex-col gap-2">
-            <label>Days</label>
-            <Controller
-              control={control}
-              name="days"
-              rules={{ required: "Days are required" }}
-              render={({ field }) => (
-                <Input type="number" {...field} placeholder="Number of days" />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="days"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
-          </div> */}
-          {/* <div className="flex flex-col gap-2">
-            <label>Rate Per Day</label>
-            <Controller
-              control={control}
-              name="ratePerDay"
-              rules={{ required: "Rate per day is required" }}
-              render={({ field }) => (
-                <Input type="number" {...field} placeholder="Rate Per Day" />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="ratePerDay"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
-          </div> */}
-
-          {/* total cost */}
-          <div className="flex flex-col gap-2">
-            <label>Total Cost</label>
-            <Controller
-              control={control}
-              name="amount"
-              defaultValue={defaultValues?.amount || 0}
-              rules={{ required: "Total cost is required" }}
-              render={({ field }) => (
-                <Input type="number" {...field} placeholder="Total Cost" />
-              )}
-            />
-            <ErrorMessage
-              errors={errors}
-              name="amount"
-              render={({ message }: { message: string }) => (
-                <p className="text-red-500 text-sm">{message}</p>
-              )}
-            />
-          </div>
-        </>
-      )}
-
-      {/* Date */}
+      {/* ✅ VAT Field - NOW VISIBLE AND EDITABLE FOR ALL TYPES */}
       <div className="flex flex-col gap-2">
-        <label>Date</label>
+        <label>VAT %</label>
         <Controller
           control={control}
-          name="date"
-          // rules={{ required: "Date is required" }}
+          name="vat"
           render={({ field }) => (
-            <DatePicker
-              className="w-full"
-              format="YYYY-MM-DD"
-              value={field.value ? dayjs(field.value) : undefined}
-              onChange={(_date, dateString) => field.onChange(dateString)}
+            <Input
+              type="number"
+              {...field}
+              placeholder="Enter VAT percentage"
+              onChange={(e) => field.onChange(Number(e.target.value))}
             />
           )}
         />
         <ErrorMessage
           errors={errors}
-          name="date"
-          render={({ message }: { message: string }) => (
+          name="vat"
+          render={({ message }) => (
             <p className="text-red-500 text-sm">{message}</p>
           )}
         />
       </div>
 
-      {/* Description */}
+      {/* File Upload */}
       <div className="flex flex-col gap-2">
-        <label>Description</label>
-        <Controller
-          control={control}
-          name="description"
-          // rules={{ required: "Description is required" }}
-          render={({ field }) => (
-            <TextArea {...field} rows={3} placeholder="Optional notes" />
-          )}
-        />
-        <ErrorMessage
-          errors={errors}
-          name="description"
-          render={({ message }: { message: string }) => (
-            <p className="text-red-500 text-sm">{message}</p>
-          )}
-        />
-      </div>
-
-      {/* <div className="flex flex-col gap-2">
-        <label>Upload Files</label>
+        <label className="font-medium">Upload Files</label>
         <Controller
           control={control}
           name="file"
-          rules={{ required: "File is required" }}
           render={({ field }) => (
-            <Upload
+            <Dragger
               beforeUpload={() => false}
+              multiple={false}
               onChange={({ fileList }) =>
                 field.onChange(fileList?.[0]?.originFileObj)
               }
-              maxCount={1}
+              onRemove={() => field.onChange(undefined)}
             >
-              <Button icon={<UploadOutlined />}>Upload</Button>
-            </Upload>
+              <p className="text-center flex flex-col items-center">
+                <CloudUpload size={24} color="#83ac72" strokeWidth={2.5} />
+              </p>
+              <p className="text-[10px]">Click or drag file to upload</p>
+            </Dragger>
           )}
         />
-        <ErrorMessage
-          errors={errors}
-          name="file"
-          render={({ message }: { message: string }) => (
-            <p className="text-red-500 text-sm">{message}</p>
-          )}
-        />
-      </div> */}
+      </div>
 
-      {/* Buttons */}
+      {/* Date and Description */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <label>Date</label>
+          <Controller
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <DatePicker
+                className="w-full"
+                format="YYYY-MM-DD"
+                value={field.value ? dayjs(field.value) : undefined}
+                onChange={(_date, dateString) => field.onChange(dateString)}
+              />
+            )}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label>Description</label>
+          <Controller
+            control={control}
+            name="description"
+            render={({ field }) => (
+              <TextArea {...field} rows={1} placeholder="Optional notes" />
+            )}
+          />
+        </div>
+      </div>
+
+      {/* Form Buttons */}
       <div className="flex justify-end gap-4">
-        <Button type="text" onClick={onCancel} className="cancel">
+        <Button type="text" onClick={onCancel}>
           Cancel
         </Button>
         <Button type="primary" htmlType="submit" loading={creating || updating}>

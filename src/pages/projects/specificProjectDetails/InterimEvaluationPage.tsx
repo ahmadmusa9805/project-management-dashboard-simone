@@ -241,6 +241,8 @@ interface DocumentType {
   title: string;
   projectId: string;
   value: number;
+  vat: number;
+  vatAmount: number;
   status: "pending" | "paid";
   file?: any;
 }
@@ -374,6 +376,8 @@ const InterimEvaluationPage: React.FC = () => {
               id: doc._id,
               title: doc.title,
               amount: Number(doc.value),
+              vat: Number(doc.vat),
+              vatAmount: Number(doc.vatAmount),
               fileUrl: doc.file,
             },
           ],
@@ -389,6 +393,7 @@ const InterimEvaluationPage: React.FC = () => {
   const handleSubmit = async (data: any) => {
     try {
       if (mode === "create") {
+        console.log(data, "dataattt");
         await createInterim(data).unwrap();
         successAlert("Interim created successfully.");
       } else if (editDoc) {
@@ -466,7 +471,12 @@ const InterimEvaluationPage: React.FC = () => {
                 }
               >
                 <div className="flex items-center justify-between w-full">
-                  <Statistic value={doc.value} prefix="£" />
+                  <Statistic
+                    title="Value"
+                    value={doc.value}
+                    prefix="£"
+                    valueStyle={{ fontSize: "1.2rem" }}
+                  />
                   <p
                     className={`font-semibold flex items-center ${
                       doc.status === "pending"
@@ -477,6 +487,16 @@ const InterimEvaluationPage: React.FC = () => {
                     {doc.status === "pending" ? "⏳ Pending" : "✅ Paid"}
                   </p>
                 </div>
+
+                {/* --- Added VAT Details Section --- */}
+                <div className="mt-2 pt-2 border-t border-gray-300 text-xs text-gray-600 flex justify-between">
+                  <span>
+                    <strong>VAT:</strong> {doc.vat}%
+                  </span>
+                  <span>
+                    <strong>VAT Amount:</strong> £{doc.vatAmount}
+                  </span>
+                </div>
               </Card>
             </Col>
           ))}
@@ -484,7 +504,7 @@ const InterimEvaluationPage: React.FC = () => {
       )}
 
       {/* Drawer Form */}
-      <ResuableDocumentForm
+      {/* <ResuableDocumentForm
         title="Interim"
         creating={creating}
         updating={updating}
@@ -498,6 +518,7 @@ const InterimEvaluationPage: React.FC = () => {
                 title: editDoc.title,
                 projectId: editDoc.projectId,
                 value: editDoc.value,
+
                 status: editDoc.status,
               }
             : { projectId: projectId || "" }
@@ -524,8 +545,63 @@ const InterimEvaluationPage: React.FC = () => {
             ],
           },
         ]}
-      />
+      /> */}
 
+      <ResuableDocumentForm
+        title="Interim"
+        creating={creating}
+        updating={updating}
+        mode={mode}
+        open={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onSubmit={handleSubmit}
+        defaultValues={
+          editDoc
+            ? {
+                title: editDoc.title,
+                projectId: editDoc.projectId,
+                value: editDoc.value,
+                vat: editDoc.vat, // Added
+                // vatAmount: editDoc.vatAmount, // Added
+                status: editDoc.status,
+              }
+            : { projectId: projectId || "" } // Defaults for create
+        }
+        fields={[
+          {
+            name: "title",
+            label: "Title",
+            placeholder: "Enter interim title",
+          },
+          {
+            name: "value",
+            label: "Value (£)",
+            placeholder: "Enter value",
+          },
+          // --- Added VAT Fields ---
+          {
+            name: "vat",
+            label: "VAT Rate (%)",
+            placeholder: "e.g. 20",
+          },
+          // {
+          //   name: "vatAmount",
+          //   label: "VAT Amount (£)",
+          //   placeholder: "e.g. 40",
+          // },
+          // -----------------------
+          {
+            name: "status",
+            label: "Status",
+            placeholder: "Select status",
+            type: "select",
+            options: [
+              { label: "Pending", value: "pending" },
+              { label: "Paid", value: "paid" },
+            ],
+          },
+        ]}
+      />
       {/* Share Modal */}
       <Modal
         title="Share Interim"

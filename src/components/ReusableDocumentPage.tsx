@@ -10,6 +10,8 @@ import { errorAlert } from "../utils/alerts";
 interface DocumentItem {
   id: number;
   title: string;
+  vat?: number;
+  vatAmount?: number;
   iconColor?: string;
   amount?: number;
   fileUrl?: string;
@@ -17,6 +19,7 @@ interface DocumentItem {
 
 interface LocationState {
   quoteTitle: string;
+  interimTitle: string;
   documents: DocumentItem[];
 }
 
@@ -24,7 +27,7 @@ const ReusableDocumentPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { state } = useLocation() as { state: LocationState };
-  const { quoteTitle, documents } = state || {};
+  const { quoteTitle, interimTitle, documents } = state || {};
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleDocumentClick = (fileUrl?: string) => {
@@ -59,7 +62,7 @@ const ReusableDocumentPage: React.FC = () => {
           className="w-10 h-10 cursor-pointer -translate-y-[4px]" // Adjust -translate-y value as needed
         />
         <h1 className="text-2xl font-bold leading-tight ">
-          Documents for {quoteTitle}
+          Documents for {quoteTitle} {interimTitle}
           {/* {quoteTitle} */}
         </h1>
       </div>
@@ -85,14 +88,45 @@ const ReusableDocumentPage: React.FC = () => {
             </div>
           )}
 
-          <div className="w-full p-4 bg-[#F1F1F1] border border-[#E6E7E7] rounded flex justify-between items-center">
-            <p className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
-              Value
-            </p>
-            <span className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
-              $ {doc.amount ?? "N/A"}
-            </span>
-          </div>
+          {interimTitle && (
+            <div className="w-full p-4 bg-[#F1F1F1] border border-[#E6E7E7] rounded flex justify-between items-center">
+              <div className="flex gap-4">
+                <p className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
+                  Value
+                </p>
+                <span className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
+                  £ {doc.amount ?? "N/A"}
+                </span>
+              </div>
+              <div className="flex gap-4">
+                <p className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
+                  VAT
+                </p>
+                <span className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
+                  {doc?.vat ?? "N/A"}%
+                </span>
+              </div>
+              <div className="flex gap-4">
+                <p className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
+                  VAT Amount
+                </p>
+                <span className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
+                  £ {doc?.vatAmount ?? "N/A"}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {quoteTitle && (
+            <div className="w-full p-4 bg-[#F1F1F1] border border-[#E6E7E7] rounded flex justify-between items-center">
+              <p className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
+                Value
+              </p>
+              <span className="text-[#2B3738] text-lg font-medium font-ibm-plex leading-6 tracking-wide">
+                £ {doc.amount ?? "N/A"}
+              </span>
+            </div>
+          )}
         </div>
       ))}
 
