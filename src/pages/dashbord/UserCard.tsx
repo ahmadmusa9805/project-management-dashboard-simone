@@ -100,16 +100,6 @@ const DashboardSummaryCards = () => {
   console.log(projects.data.length, "projects");
   console.log(allOverheadCostDataAllproject, "overhead cost all project");
 
-  // const usersList =
-  //   users &&
-  //   typeof users === "object" &&
-  //   "data" in users &&
-  //   Array.isArray((users as any).data)
-  //     ? (users as any).data
-  //     : [];
-
-  // ✅ Direct totals (no lastMonth needed)
-  // const totalProjects = projects?.data?.length;
   const totalProjects = projects?.meta?.total;
   const completed = completedProjects?.meta?.total;
 
