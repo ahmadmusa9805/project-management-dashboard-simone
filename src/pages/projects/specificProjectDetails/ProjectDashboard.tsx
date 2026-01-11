@@ -9,6 +9,8 @@ import {
   useGetSingleProjectAnalyticsQuery,
   useGetSingleProjectVatDueAnalyticsQuery,
 } from "../../../Redux/features/analytics/analyticsApi";
+import { useGetAllOverheadCostByProjectQuery } from "../../../Redux/features/overheadCosts/overheadCostsApi";
+
 // import { useGetAllSnaggingsQuery } from "../../../Redux/features/projects/project/snaggingList/snaggingListApi";
 
 // import { useGetAllNotesQuery } from "../../../Redux/features/projects/project/notes/noteApi";
@@ -112,6 +114,17 @@ const ProjectDashboard = () => {
         refetchOnReconnect: true,
       }
     );
+  const { data: overheadData, isLoading: overheadLoading } =
+    useGetAllOverheadCostByProjectQuery(projectId!, {
+      skip: !projectId,
+    });
+
+  // ✅ Calculate Total In (sum of all paid / interim payments)
+  const totalIn =
+    paymentData?.interims?.reduce(
+      (sum: number, item: any) => sum + (item.value || 0),
+      0
+    ) || 0;
   // const { data: snaggingsData } = useGetAllSnaggingsQuery({ projectId });
   // const { data: imagesData } = useGetAllSitePictureImagesQuery({
   //   projectId: projectId as string,
@@ -152,6 +165,7 @@ const ProjectDashboard = () => {
     paymentLoading ||
     clientLoading ||
     isAnalyticsVatDueLoading ||
+    overheadLoading ||
     isAnalyticsLoading;
   const labourCost = getAmountByName("Labour");
   const materialCost = getAmountByName("Material");
@@ -162,6 +176,8 @@ const ProjectDashboard = () => {
   const profit = paymentData?.profit || 0;
   // const projectValue= paymentData?.
 
+  console.log(overheadData, "overHeadData ");
+
   const mappedData = {
     projectName: projectData.projectName || "N/A",
     projectStatus: projectData.status || "N/A",
@@ -169,12 +185,16 @@ const ProjectDashboard = () => {
     // assignedAdmin: projectData.assignedAdmin || "N/A", // if you add later
     budget: projectAnalticsData?.data?.totalQuoteeValue || 0,
     vatDue: projectAnalticsVatDueData?.data?.vatDue || 0,
+    vatOut: projectAnalticsVatDueData?.data?.vatOut || 0,
+    vatIn: projectAnalticsVatDueData?.data?.vatIn || 0,
     // approvedBudget: projectData.approvedBudget || 0,
     materialCost: materialCost || 0,
     labourCost: labourCost || 0,
     subcontractorCost: subcontractorCost || 0,
     profit: profit || 0,
+    paymentIn: totalIn || 0,
     totalCost: totalCost || 0,
+    overheadCost: overheadData || 0,
     // utilization: projectData.utilization || 0,
     // progress: projectData.progress || 0,
     daysRemaining: projectData.endDate
@@ -231,7 +251,11 @@ const ProjectDashboard = () => {
               style={{ backgroundColor: "#f1f1f1" }}
               onClick={() => handleNavigate("payments-track")}
             >
-              <Statistic title="Profit" prefix="£" value={mappedData.profit} />
+              <Statistic
+                title="Total Net Profit"
+                prefix="£"
+                value={mappedData.profit}
+              />
             </Card>
           </Col>
           <Col span={6}>
@@ -251,9 +275,54 @@ const ProjectDashboard = () => {
             <Card
               hoverable
               style={{ backgroundColor: "#f1f1f1" }}
-              onClick={() => handleNavigate("live-project-costs")}
+              onClick={() => handleNavigate("interim-evaluation")}
+            >
+              <Statistic
+                title="Payment In"
+                prefix="£"
+                value={mappedData.paymentIn}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card
+              // hoverable
+              style={{ backgroundColor: "#f1f1f1" }}
+              // onClick={() => handleNavigate("live-project-costs")}
+            >
+              <Statistic
+                title="Overhead Cost"
+                prefix="£"
+                value={mappedData.overheadCost}
+              />
+            </Card>
+          </Col>
+
+          <Col span={6}>
+            <Card
+              // hoverable
+              style={{ backgroundColor: "#f1f1f1" }}
+              // onClick={() => handleNavigate("live-project-costs")}
             >
               <Statistic title="VAT Due" prefix="£" value={mappedData.vatDue} />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card
+              // hoverable
+              style={{ backgroundColor: "#f1f1f1" }}
+              // onClick={() => handleNavigate("live-project-costs")}
+            >
+              <Statistic title="VAT In" prefix="£" value={mappedData.vatIn} />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card
+              // hoverable
+              style={{ backgroundColor: "#f1f1f1" }}
+              // onClick={() => handleNavigate("live-project-costs")}
+            >
+              <Statistic title="VAT Out" prefix="£" value={mappedData.vatOut} />
             </Card>
           </Col>
 

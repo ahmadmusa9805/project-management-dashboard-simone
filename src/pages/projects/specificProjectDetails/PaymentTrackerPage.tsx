@@ -138,13 +138,16 @@
 // export default PaymentTrackerPage;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, Col, Row, Spin, Statistic } from "antd"; // ✅ Import Spin
+import { Card, Col, Row, Spin, Statistic } from "antd";
 import CustomViewMoreButton from "../../../components/CustomViewMoreButton";
 import { useGetAllPaymentTrackerElementsQuery } from "../../../Redux/features/projects/project/paymentTracker/paymentTrackerApi";
 
 const PaymentTrackerPage = () => {
   const { projectId } = useParams();
+  const navigate = useNavigate();
+
   const {
     data: paymentData,
     isLoading,
@@ -160,11 +163,16 @@ const PaymentTrackerPage = () => {
     }
   );
 
-  const navigate = useNavigate();
+  // ✅ Calculate Total In (sum of all paid / interim payments)
+  const totalIn =
+    paymentData?.interims?.reduce(
+      (sum: number, item: any) => sum + (item.value || 0),
+      0
+    ) || 0;
 
-  // ✅ Convert object -> array for UI mapping
+  // ✅ Prepare cards data
   const payments = [
-    // ✅ Add total quote with all documents
+    // ✅ Total Quote
     paymentData?.quote && {
       id: "totalQuote",
       title: "Total Quote",
@@ -177,7 +185,20 @@ const PaymentTrackerPage = () => {
       })),
     },
 
-    // ✅ Add interim payments
+    // ✅ Total In (NEW)
+    {
+      id: "totalIn",
+      title: "Payment In",
+      value: totalIn,
+      documents: paymentData?.interims?.map((i: any) => ({
+        id: i._id,
+        title: i.title,
+        amount: i.value,
+        fileUrl: i.file,
+      })),
+    },
+
+    // ✅ Interim Payments
     ...(paymentData?.interims?.map((i: any) => ({
       id: i._id,
       title: i.title,
@@ -192,14 +213,14 @@ const PaymentTrackerPage = () => {
       ],
     })) || []),
 
-    // ✅ Add outstanding
+    // ✅ Total Outstanding
     {
       id: "outStanding",
       title: "Total Outstanding",
       value: paymentData?.outStanding,
     },
 
-    // ✅ Add profit
+    // ✅ Total Profit
     {
       id: "profit",
       title: "Total Profit",
@@ -208,11 +229,11 @@ const PaymentTrackerPage = () => {
   ].filter(Boolean);
 
   return (
-    <div className="w-full  gap-4 bg-white min-h-screen p-6">
+    <div className="w-full bg-white min-h-screen p-6">
       {/* Title */}
       <h1 className="text-2xl font-bold py-10">Payment Tracker</h1>
 
-      {/* Loader under title */}
+      {/* Loader */}
       {isLoading ? (
         <div className="flex justify-center items-center h-40 my-10">
           <Spin size="large" />
@@ -228,7 +249,7 @@ const PaymentTrackerPage = () => {
       ) : (
         <Row gutter={[16, 16]}>
           {payments.map((item: any) => {
-            // Check if card should be non-clickable
+            // ❌ Non-clickable cards
             const isSpecial =
               item.title === "Total Profit" ||
               item.title === "Total Outstanding";
@@ -236,8 +257,8 @@ const PaymentTrackerPage = () => {
             return (
               <Col span={6} key={item.id}>
                 <Card
+                  hoverable={!isSpecial}
                   style={{ backgroundColor: "#f1f1f1" }}
-                  hoverable={!isSpecial} // Only hoverable if not special
                   bodyStyle={{
                     backgroundColor: "#f1f1f1",
                     padding: "12px 24px",
@@ -246,7 +267,7 @@ const PaymentTrackerPage = () => {
                     justifyContent: "center",
                   }}
                   onClick={() => {
-                    if (!isSpecial) {
+                    if (!isSpecial && item.documents) {
                       navigate(
                         `/projects/${projectId}/paymentrucker-documents`,
                         {
@@ -264,12 +285,13 @@ const PaymentTrackerPage = () => {
                     </h3>
                   }
                   extra={
-                    !isSpecial && (
+                    !isSpecial &&
+                    item.documents && (
                       <CustomViewMoreButton
                         items={[{ key: "view", label: "👁️ View Details" }]}
                         onClick={(key, e) => {
                           e.stopPropagation();
-                          if (key === "view" && item.documents) {
+                          if (key === "view") {
                             navigate(
                               `/projects/${projectId}/paymentrucker-documents`,
                               {
@@ -287,19 +309,6 @@ const PaymentTrackerPage = () => {
                 >
                   <div className="flex items-center justify-between w-full">
                     <Statistic value={item.value} prefix="£" />
-                    {/* {isSpecial && (
-                      <p
-                        className={`font-semibold flex items-center ${
-                          item.title === "Total Profit"
-                            ? "text-green-700"
-                            : "text-red-700"
-                        }`}
-                      >
-                        {item.title === "Total Profit"
-                          ? "💰 Profit"
-                          : "⚠️ Outstanding"}
-                      </p>
-                    )} */}
                   </div>
                 </Card>
               </Col>
