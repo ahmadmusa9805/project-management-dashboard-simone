@@ -3,6 +3,7 @@ import { useGetProjectsWithstatusQuery } from "../../Redux/features/projects/pro
 import { useGetAllUsersQuery } from "../../Redux/features/users/usersApi";
 import { Spin } from "antd";
 import { useGetAllAnalyticsCombinedQuery } from "../../Redux/features/analytics/analyticsApi";
+import { useGetAllOverheadCostsAllProjectQuery } from "../../Redux/features/overheadCosts/overheadCostsApi";
 
 interface CardProps {
   title: string;
@@ -81,11 +82,15 @@ const DashboardSummaryCards = () => {
     }
   );
 
+  const { data: allOverheadCostDataAllproject, isLoading: overheadLoading } =
+    useGetAllOverheadCostsAllProjectQuery();
+
   if (
     isLoading ||
     isLoadingUsers ||
     isLoadingCompletedProjects ||
-    isAnalyticLoading
+    isAnalyticLoading ||
+    overheadLoading
   )
     return (
       <div className="flex justify-center items-center h-40">
@@ -93,17 +98,8 @@ const DashboardSummaryCards = () => {
       </div>
     );
   console.log(projects.data.length, "projects");
+  console.log(allOverheadCostDataAllproject, "overhead cost all project");
 
-  // const usersList =
-  //   users &&
-  //   typeof users === "object" &&
-  //   "data" in users &&
-  //   Array.isArray((users as any).data)
-  //     ? (users as any).data
-  //     : [];
-
-  // ✅ Direct totals (no lastMonth needed)
-  // const totalProjects = projects?.data?.length;
   const totalProjects = projects?.meta?.total;
   const completed = completedProjects?.meta?.total;
 
@@ -119,6 +115,10 @@ const DashboardSummaryCards = () => {
       <StatCard
         title="Total Profit"
         value={`£ ${analtic?.data?.totalProfit?.toLocaleString()}`}
+      />
+      <StatCard
+        title="Total Overhead Cost"
+        value={`£ ${allOverheadCostDataAllproject?.toLocaleString()}`}
       />
       <StatCard title="Total projects" value={totalProjects.toString()} />
       <StatCard title="Completed projects" value={completed.toString()} />
