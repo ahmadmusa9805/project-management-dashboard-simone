@@ -34,11 +34,32 @@ export const overheadCostApi = baseApi.injectEndpoints({
 
     // 3. Get All by Project ID (Added based on your backend)
     // Backend: router.get('/get-all-with-projectid/:id', ...)
-    getAllOverheadCostByProject: builder.query<any[], string>({
+
+    //  getAllOverheadCostByProject: builder.query<
+    //       any[],
+    //       Record<string, any> | undefined
+    //     >({
+    //       query: (params) => {
+    //         const queryString = new URLSearchParams(params || {}).toString();
+    //         return `/over-costs/get-all-with-projectid?${queryString}`;
+    //       },
+    //       providesTags: ["OverheadCost"],
+    //       transformResponse: (response: { success: boolean; data: any[] }) =>
+    //         response.data,
+    //     }),
+
+    getAllOverheadCostsAllProject: builder.query<number, void>({
+      query: () => `/over-costs/get-all-over-cost`,
+      providesTags: ["OverheadCost"],
+      transformResponse: (response: { success: boolean; data: number }) =>
+        response.data,
+    }),
+
+    getAllOverheadCostByProject: builder.query<number, string>({
       query: (projectId) => `/over-costs/get-all-with-projectid/${projectId}`,
       providesTags: ["OverheadCost"],
-      transformResponse: (response: { success: boolean; data: any[] }) =>
-        Array.isArray(response.data) ? response.data : [],
+      transformResponse: (response: { success: boolean; data: number }) =>
+        response.data,
     }),
 
     // 4. Create OverheadCost
@@ -162,7 +183,9 @@ export const overheadCostApi = baseApi.injectEndpoints({
 export const {
   useGetAllOverheadCostQuery,
   useGetSingleOverheadCostQuery,
-  useGetAllOverheadCostByProjectQuery, // Export the new hook
+  useGetAllOverheadCostByProjectQuery,
+
+  useGetAllOverheadCostsAllProjectQuery,
   useCreateOverheadCostMutation,
   useUpdateOverheadCostMutation,
   useDeleteOverheadCostMutation,
