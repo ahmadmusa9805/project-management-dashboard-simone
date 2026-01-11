@@ -95,19 +95,19 @@ const EarningsChart: React.FC = () => {
         <div className="bg-white p-4 rounded shadow">
           <p className="text-sm text-gray-600">3 Month Earnings</p>
           <h4 className="text-xl font-bold text-gray-900">
-            {`£ ${parseFloat(threeMonthData?.data?.totalProfit || "0")}`}
+            £{parseFloat(threeMonthData?.data?.totalProfit || "0")}
           </h4>
         </div>
         <div className="bg-white p-4 rounded shadow">
           <p className="text-sm text-gray-600">6 Month Earnings</p>
           <h4 className="text-xl font-bold text-gray-900">
-            {`£ ${parseFloat(sixMonthData?.data?.totalProfit || "0")}`}
+            £{parseFloat(sixMonthData?.data?.totalProfit || "0")}
           </h4>
         </div>
         <div className="bg-white p-4 rounded shadow">
           <p className="text-sm text-gray-600">12 Month Earnings</p>
           <h4 className="text-xl font-bold text-gray-900">
-            {`£ ${parseFloat(totalEarnings.toLocaleString() || "0")}`}
+            £{totalEarnings.toLocaleString()}
           </h4>
         </div>
       </div>

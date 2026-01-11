@@ -631,7 +631,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
             <ToastEditor
               value={field.value}
               onChange={field.onChange}
-              height="150px"
+              height="300px"
               readOnly={isFormDisabled}
               key={initialData?.id || "title"}
             />
@@ -639,22 +639,24 @@ const NoteForm: React.FC<NoteFormProps> = ({
         />
       </div>
 
-      {/* Description */}
-      <div className="w-full px-4 flex flex-col gap-3 mb-5">
-        <label className="text-[#2B3738] text-sm font-medium">
-          Extra cost Description
-        </label>
-        <Controller
-          name="noteDesc"
-          control={control}
-          render={({ field }) => (
-            <ToastEditor
-              value={field.value}
-              onChange={field.onChange}
-              height="150px"
-              readOnly={isFormDisabled}
-              key={initialData?.id || "desc"}
-            />
+      {/* ✅ Extra cost Description (Dropdown/Toggle Logic) */}
+      <div className="w-full px-4 flex flex-col gap-3">
+        <div
+          className="flex items-center justify-between cursor-pointer py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors px-1"
+          onClick={() => setShowExtraDesc(!showExtraDesc)}
+        >
+          <label className="text-[#2B3738] text-sm font-medium cursor-pointer flex items-center gap-2">
+            Extra cost Description
+            <span className="text-[10px] text-gray-400 font-normal">
+              (Optional)
+            </span>
+          </label>
+          {showExtraDesc ? (
+            <ChevronUp size={18} />
+          ) : (
+            <div className="flex items-center gap-1 text-blue-600 text-xs">
+              <Plus size={14} /> Add Description
+            </div>
           )}
         </div>
 

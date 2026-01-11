@@ -570,7 +570,6 @@ const DocumentsPage = ({ title }: DocumentsPageProps) => {
       state: { name: folder.name, id: folder.id, from: baseRoute },
     });
   };
-  //  add somthing
 
   return (
     <div className="w-full gap-4 bg-white min-h-screen p-6">
